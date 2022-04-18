@@ -1,6 +1,42 @@
 import string
 import openpyxl
 import re
+
+class ExcelIndex:
+    def  __init__(self):
+        self.keyMap = {}
+        self.typeMap = {}
+        
+    
+    def setKeyMap( self, sheet, row, cellValueList: list):
+        self.__setMap( sheet, row, cellValueList, self.keyMap)
+            
+    def setTypeMap( self, sheet, row, cellValueList:list):
+        self.__setMap( sheet, row, cellValueList, self.typeMap)
+    
+    def __setMap(self, sheet, row, cellValueList: list, dataMap: map):
+        index = self.__getColumnsIdxBasedOnList( sheet, row, cellValueList)
+        i = 0
+        for key in cellValueList:
+            dataMap[key] =index[i]
+            i = i + 1
+                
+    def __getColumnsIdxBasedOnList(self, sheet, row, cellValueList: list) -> list:
+        if( isinstance(cellValueList, list) != True ):
+            raise Exception("Note that cellValueList is a list")
+
+        result = cellValueList.copy()
+
+        for col in sheet[row]:
+            if col.value:
+                index = cellValueList.index(col.value) if col.value in cellValueList else -1
+                if index != -1:
+                    result[index] = col.col_idx - 1
+                
+        return result 
+    
+    
+
 """
   Class Items
 """
@@ -25,6 +61,7 @@ class Item:
 """
   End Class Items
 """
+
 #
 def getColumnsBasedOnList( sheet, row, cellValueList: list):
     if( isinstance(cellValueList, list) != True ):
@@ -39,20 +76,6 @@ def getColumnsBasedOnList( sheet, row, cellValueList: list):
                 result[index] = col.column_letter
                 
     return result
-
-def getColumnsIdxBasedOnList( sheet, row, cellValueList: list):
-    if( isinstance(cellValueList, list) != True ):
-         raise Exception("Note that cellValueList is a list")
-
-    result = cellValueList.copy()
-
-    for col in sheet[row]:
-        if col.value:
-           index = cellValueList.index(col.value) if col.value in cellValueList else -1
-           if index != -1:
-                result[index] = col.col_idx - 1
-                
-    return result 
 
 def getColumnsBasedOnString( sheet, row, cellValue: str):   
     if( isinstance(cellValue, str) != True ):
