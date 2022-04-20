@@ -5,7 +5,7 @@ from openpyxl.worksheet.worksheet import Worksheet
 import re
 
 
-KEYINFO = ["Id", "Description", "Status", "ChapterId", "Chapter", "SectionId", "Section"]
+KEYINFO = ["Id", "Description", "Status", "ChapterId", "Chapter", "SectionId", "Section", "DocLocation"]
 NOCOLUMNINX = -1
 
 """
@@ -75,7 +75,7 @@ class ExcelParser:
        
         
         for i in range( 0, len(cellValueList) ):
-             cellValueList[i] = idxMap[ cellValueList[i] ]      
+             result[i] = idxMap[ cellValueList[i] ]      
         return result 
     
     @staticmethod
@@ -115,13 +115,18 @@ class ExcelParser:
 
     def parseExcel(self, fileName, dataRow, sheet: Worksheet):
         result = []
-
+        print("[ExcelParser.parseExcel][BEGIN]: MAX ROW = " + str(sheet.max_row))
+        idx = 0
         for r in range( dataRow, sheet.max_row + 1):
             item = Item(fileName, self.getProductTypeList() )
             item.setKeyInfo( sheet[r], self.keyMap, self.typeMap)
 
             result.append(item)
-        
+            
+            idx = idx + 1
+            if idx % 500 == 0:
+                print(" processing: " + str(idx) )
+        print("[ExcelParser.parseExcel][END]:")
         return result
 """
    END class ExcelParser
