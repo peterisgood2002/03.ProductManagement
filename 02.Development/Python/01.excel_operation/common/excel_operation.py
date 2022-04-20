@@ -70,15 +70,29 @@ class ExcelParser:
             raise Exception("Note that cellValueList is a list")
 
         result = cellValueList.copy()
-
-        for col in sheet[row]:
-            if col.value:
-                index = cellValueList.index(col.value) if col.value in cellValueList else -1
-                if index != -1:
-                    result[index] = col.col_idx - 1
-                
+        
+        idxMap = ExcelParser.__getIdxMap(sheet, row, cellValueList)
+       
+        
+        for i in range( 0, len(cellValueList) ):
+             cellValueList[i] = idxMap[ cellValueList[i] ]      
         return result 
     
+    @staticmethod
+    def __getIdxMap(sheet, row, cellValueList: list ) -> dict: 
+        idxMap = {}
+        for v in cellValueList:
+            if idxMap.get(v) == None:
+                idxMap[v] = -1
+        
+        for col in sheet[row]:
+            if col.value:
+                index = idxMap.get(col.value)
+                if index != None and index == -1:
+                    idxMap[col.value] = col.col_idx - 1
+        return idxMap
+    
+        
     def getKeyIndex(self, key):
         return self.keyMap[key] 
     def getProductTypeList(self):
@@ -91,8 +105,15 @@ class ExcelParser:
     def parse( self, fileName, sheetName, dataRow) :
         excel = openpyxl.load_workbook(fileName)
         sheet = excel[sheetName]
+        
         print("[ExcelParser.parse][BEGIN]: " + fileName +" MAX ROW = " + str(sheet.max_row))
-    
+        result = self.parseExcel(fileName, dataRow, sheet)
+        print("[ExcelParser.parse][END]: " + fileName)
+        
+        excel.close()
+        return result
+
+    def parseExcel(self, fileName, dataRow, sheet: Worksheet):
         result = []
 
         for r in range( dataRow, sheet.max_row + 1):
@@ -100,11 +121,8 @@ class ExcelParser:
             item.setKeyInfo( sheet[r], self.keyMap, self.typeMap)
 
             result.append(item)
-
-        print("[ExcelParser.parse][END]: " + fileName)
-        excel.close()
+        
         return result
-
 """
    END class ExcelParser
 """
