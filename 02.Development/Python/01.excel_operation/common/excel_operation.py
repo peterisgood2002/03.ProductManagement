@@ -79,17 +79,18 @@ class ExcelParser:
         return result 
     
     @staticmethod
-    def __getIdxMap(sheet, row, cellValueList: list ) -> dict: 
+    def __getIdxMap(sheet: Worksheet, row, cellValueList: list ) -> dict: 
         idxMap = {}
         for v in cellValueList:
             if idxMap.get(v) == None:
                 idxMap[v] = -1
         
-        for col in sheet[row]:
-            if col.value:
-                index = idxMap.get(col.value)
+        for col in sheet.iter_cols(min_row=row, max_row=row):
+            cell = col[0]
+            if cell.value:
+                index = idxMap.get(cell.value)
                 if index != None and index == -1:
-                    idxMap[col.value] = col.col_idx - 1
+                    idxMap[cell.value] = cell.col_idx - 1
         return idxMap
     
         
@@ -117,15 +118,15 @@ class ExcelParser:
         result = []
         print("[ExcelParser.parseExcel][BEGIN]: MAX ROW = " + str(sheet.max_row))
         idx = 0
-        for r in range( dataRow, sheet.max_row + 1):
+        for row in sheet.iter_rows(min_row= dataRow): 
             item = Item(fileName, self.getProductTypeList() )
-            item.setKeyInfo( sheet[r], self.keyMap, self.typeMap)
-
+            item.setKeyInfo( row, self.keyMap, self.typeMap)
             result.append(item)
-            
+
             idx = idx + 1
             if idx % 500 == 0:
                 print(" processing: " + str(idx) )
+                
         print("[ExcelParser.parseExcel][END]:")
         return result
 """
