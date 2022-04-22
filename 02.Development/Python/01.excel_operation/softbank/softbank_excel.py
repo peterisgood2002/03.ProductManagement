@@ -2,7 +2,7 @@
 from itertools import product
 from pickle import TRUE
 from typing import Dict
-from common import excel_operation
+from common import excel_operation, util
 from common import file_operation
 import openpyxl
 import time
@@ -30,7 +30,7 @@ getItemsFromExcel
 #addToMap Function
 def addToMap( items: list[ excel_operation.Item ], itemMap: dict ):
     for item in items:
-        id = item.getKeyInfo("Id")
+        id = item.getKeyInfo(excel_operation.KEYINFO.Id)
         if id != None:
             status = item.getKeyInfo("Status")
             if status != "Delete":
@@ -73,9 +73,9 @@ def outputExcel( outputFileName, productType: list, itemMap: dict  ):
 
     r = 2
     for item in itemMap.values():
-        sheet.cell(row=r, column=1).value = item.getKeyInfo("Id")
-        sheet.cell(row=r, column=2).value = item.getKeyInfo("Description")
-        sheet.cell(row=r, column=3).value = item.getKeyInfo("Section")
+        sheet.cell(row=r, column=1).value = item.getKeyInfo(excel_operation.KEYINFO.Id)
+        sheet.cell(row=r, column=2).value = item.getKeyInfo(excel_operation.KEYINFO.Description)
+        sheet.cell(row=r, column=3).value = item.getKeyInfo(excel_operation.KEYINFO.Section)
         sheet.cell(row=r, column=4).value = item.fileName
         c = 5
         for p in item.priority:
@@ -99,24 +99,23 @@ def softbank_parser():
     #2. Get each items in the files
     sheetName="Conformance Sheet"
     keyColumnName = {
-        "Id": "Requirement ID", 
-        "Description":  "Function\n(Description)", 
-        "Status": "Status", 
+        excel_operation.KEYINFO.Id: "Requirement ID", 
+        excel_operation.KEYINFO.Description:  "Function\n(Description)", 
+        excel_operation.KEYINFO.Status: "Status", 
         #"ChapterId":"", 
-        "Chapter": "Capability", 
-        "SectionId": "Reference\n(Section Info.)", 
-        "Section": "Reference\n(Section Name)"
+        excel_operation.KEYINFO.Chapter: "Capability", 
+        excel_operation.KEYINFO.SectionId: "Reference\n(Section Info.)", 
+        excel_operation.KEYINFO.Section: "Reference\n(Section Name)"
     }
     productType = ["M2M", "Manufacturer brand M2M"]
     #2.1 Get Critical Column
     excelIndex = getExcelParser( fileName[0], sheetName, keyColumnName, productType)
     itemMap = getItemsFromExcel(fileName, sheetName, excelIndex)
     #3. Output to one Excels
-    outputFolder = ".\\result\\"
-    if os.path.isdir(outputFolder) != True:
-        os.makedirs(outputFolder)
+    if os.path.isdir(util.OUTPUT_FOLDER) != True:
+        os.makedirs(util.OUTPUT_FOLDER)
     
-    outputFileName = outputFolder+"softbank_item.xlsx"
+    outputFileName = util.OUTPUT_FOLDER+"softbank_item.xlsx"
     outputExcel(outputFileName, productType, itemMap)
 
 if __name__ == '__main__':
