@@ -75,11 +75,24 @@ WSGI_APPLICATION = 'pms_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'NAME': 'django_admin',
+        'USER': 'root',
+        'PASSWORD': 'U0654t/6'
+    },
+    'pms_db': {
+        'ENGINE': 'django.db.backends.mysql',
+        'HOST': 'localhost',
+        'PORT': '3306',
+        'NAME': 'pms',
+        'USER': 'root',
+        'PASSWORD': 'U0654t/6'
     }
 }
 
+DATABASE_ROUTERS = ['pms_backend.database_router.PmsDBRouter']
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
