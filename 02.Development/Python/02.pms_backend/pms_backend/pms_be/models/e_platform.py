@@ -1,8 +1,8 @@
 from django.db import models
 
-from e_employee import EEmployee
-from a_attribute import ACategory
-from e_operator_ta import ETechnicalAcceptance
+from .e_employee import EEmployee
+from .a_attribute import ACategory
+from .e_operator_ta import ETechnicalAcceptance
 
 class EPlatformFamily(models.Model):
     id = models.IntegerField(primary_key=True)

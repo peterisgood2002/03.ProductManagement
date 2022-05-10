@@ -1,8 +1,8 @@
 from django.db import models
 
-from e_project import EProject
-from e_platform import EPlatform
-from e_product import EProduct
+from .e_project import EProject
+from .e_platform import EPlatform
+from .e_product import EProduct
 
 class RProjectPlatform(models.Model):
     project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)

@@ -1,11 +1,11 @@
 from django.db import models
 
-from e_project import EProject
-from e_platform import EPlatform
-from e_milestone import EMilestone
-from e_product import EProduct
-from e_employee import EEmployee
-from a_attribute import APriority
+from .e_project import EProject
+from .e_platform import EPlatform
+from .e_milestone import EMilestone
+from .e_product import EProduct
+from .e_employee import EEmployee
+from .a_attribute import APriority
        
 class RPlatformSchedule(models.Model):
     platform = models.OneToOneField(EPlatform, models.DO_NOTHING, primary_key=True)

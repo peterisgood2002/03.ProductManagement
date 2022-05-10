@@ -1,6 +1,6 @@
 from django.db import models
 
-from e_employee import EEmployee
+from .e_employee import EEmployee
 
 class EArea(models.Model):
     name = models.CharField(max_length=45, blank=True, null=True)

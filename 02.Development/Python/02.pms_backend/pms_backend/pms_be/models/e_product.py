@@ -1,7 +1,7 @@
 from django.db import models
 
-from a_attribute import ACategory
-from e_operator_ta import ETechnicalAcceptance
+from .a_attribute import ACategory
+from .e_operator_ta import ETechnicalAcceptance
 
 
 class EProduct(models.Model):

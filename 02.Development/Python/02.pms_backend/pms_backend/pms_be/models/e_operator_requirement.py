@@ -1,6 +1,6 @@
 from django.db import models
 
-from a_attribute import APriority
+from .a_attribute import APriority
 
 class EDocStructureCategory(models.Model):
     id = models.IntegerField(primary_key=True)

@@ -1,6 +1,6 @@
 from django.db import models
-from e_platform import EPlatformFwversion
-from e_product import EProduct
+from .e_platform import EPlatformFwversion
+from .e_product import EProduct
 
 class EFeature(models.Model):
     id = models.IntegerField(primary_key=True)

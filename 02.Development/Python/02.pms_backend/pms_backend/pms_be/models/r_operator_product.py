@@ -1,7 +1,7 @@
 from django.db import models
 
-from e_operator import EOperator
-from e_product import EProduct
+from .e_operator import EOperator
+from .e_product import EProduct
 
 class ROpRfp(models.Model):
     operator = models.OneToOneField(EOperator, models.DO_NOTHING, primary_key=True)

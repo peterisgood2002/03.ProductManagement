@@ -1,9 +1,10 @@
 from django.db import models
-from e_operator_requirement import EDeviceRequirement
-from a_attribute import ACompliance
-from e_operator_testplan import ETestPlan
-from e_operator_ta import ETechnicalAcceptance
-from e_operator_requirement import EDeviceRequirement
+
+from .e_operator_requirement import EDeviceRequirement
+from .a_attribute import ACompliance
+from .e_operator_testplan import ETestPlan
+from .e_operator_ta import ETechnicalAcceptance
+from .e_operator_requirement import EDeviceRequirement
 
 class RTaComplyDeviceRequirement(models.Model):
     operator = models.OneToOneField(EDeviceRequirement, models.DO_NOTHING, primary_key=True)

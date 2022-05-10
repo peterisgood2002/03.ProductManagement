@@ -13,7 +13,22 @@
                 "runserver"
             ],
             "django": true,
-            "justMyCode": true
+            "justMyCode": false
+        },
+        {
+            "name": "Python: UnitTest",
+            "type": "python",
+            "request": "launch",
+            "program": "${workspaceFolder}\\pms_backend\\manage.py",
+            "env": {"DJANGO_SETTINGS_MODULE": "pms_backend.settings"},
+            "purpose": ["debug-test"],
+            "args": [
+                "test",
+                "pms_be",
+                "--keepdb"
+            ],
+            "django": true,
+            "justMyCode": false
         }
     ]
 }

@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'pms_be.apps.PmsBeConfig'
 ]
 
 MIDDLEWARE = [
@@ -69,7 +70,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pms_backend.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
@@ -80,7 +80,12 @@ DATABASES = {
         'PORT': '3306',
         'NAME': 'django_admin',
         'USER': 'root',
-        'PASSWORD': os.getenv("SQL_PWD")
+        'PASSWORD': os.getenv("SQL_PWD"),
+        'TEST':{
+            'NAME':'pms',
+            'MIGRATION':'False'
+            
+        }
     },
     'pms_db': {
         'ENGINE': 'django.db.backends.mysql',
@@ -88,8 +93,9 @@ DATABASES = {
         'PORT': '3306',
         'NAME': 'pms',
         'USER': 'root',
-        'PASSWORD': os.getenv("SQL_PWD")
-    }
+        'PASSWORD': os.getenv("SQL_PWD"),
+    },
+    
 }
 
 DATABASE_ROUTERS = ['pms_backend.database_router.PmsDBRouter']
@@ -134,3 +140,17 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'DEBUG',
+    },
+}

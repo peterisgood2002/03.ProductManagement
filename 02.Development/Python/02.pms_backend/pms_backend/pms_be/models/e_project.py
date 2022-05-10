@@ -1,7 +1,7 @@
 from django.db import models
 
-from e_employee import EEmployee
-from e_customers import ECustomer
+from .e_employee import EEmployee
+from .e_customers import ECustomer
 
 class EProject(models.Model):
     id = models.IntegerField(primary_key=True)

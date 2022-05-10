@@ -1,5 +1,5 @@
 from django.db import models
-from a_attribute import ACategory
+from .a_attribute import ACategory
 
 
 class EMilestone(models.Model):

@@ -1,6 +1,6 @@
 from django.db import models
 
-from e_employee import EEmployee
+from .e_employee import EEmployee
 
 class ECustomer(models.Model):
     name = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
