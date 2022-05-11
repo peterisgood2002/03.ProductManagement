@@ -83,10 +83,12 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': os.getenv("SQL_PWD"),
         'TEST':{
-            'NAME':'pms',
-            'MIGRATION':'False'
+            'NAME':'pms_test',
+            'MIGRATE':False
             
-        }
+        },
+        'MIGRATE':False
+        
     },
     'pms_db': {
         'ENGINE': 'django.db.backends.mysql',

@@ -25,7 +25,6 @@
             "args": [
                 "test",
                 "pms_be",
-                "--keepdb"
             ],
             "django": true,
             "justMyCode": false
