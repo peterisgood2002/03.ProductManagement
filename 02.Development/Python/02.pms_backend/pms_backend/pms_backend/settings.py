@@ -149,6 +149,13 @@ LOGGING = {
             'class': 'logging.StreamHandler',
         },
     },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'INFO',
+            'propagate': True,
+        },
+    },
     'root': {
         'handlers': ['console'],
         'level': 'DEBUG',
