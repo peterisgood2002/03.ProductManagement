@@ -18,6 +18,7 @@ from django.urls import include, path
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('pms', include('pms_be.urls') )
+    path('pms/', include('pms_be.urls') ),
+    path('operator/', include('pms_operator.urls') )
 ]
 

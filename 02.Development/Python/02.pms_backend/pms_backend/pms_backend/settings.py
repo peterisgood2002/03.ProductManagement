@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'pms_be.apps.PmsBeConfig'
+    'pms_be.apps.PmsBeConfig',
+    'pms_operator.apps.PmsOperatorConfig'
 ]
 
 MIDDLEWARE = [
