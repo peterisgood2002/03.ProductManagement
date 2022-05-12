@@ -227,6 +227,7 @@ CREATE TABLE `e_device_requirement` (
   `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `description` longtext,
+  `doc_loc` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `note` varchar(2048) DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
@@ -408,14 +409,11 @@ CREATE TABLE `e_operator` (
   `name` varchar(45) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  `spm` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
   `area_id` int NOT NULL,
   `url` longtext,
   PRIMARY KEY (`id`),
-  KEY `fk_e_operator_e_employee1_idx` (`spm`),
   KEY `fk_e_operator_e_area1_idx` (`area_id`),
-  CONSTRAINT `fk_e_operator_e_area1` FOREIGN KEY (`area_id`) REFERENCES `e_area` (`id`),
-  CONSTRAINT `fk_e_operator_e_employee1` FOREIGN KEY (`spm`) REFERENCES `e_employee` (`id`)
+  CONSTRAINT `fk_e_operator_e_area1` FOREIGN KEY (`area_id`) REFERENCES `e_area` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -441,14 +439,14 @@ CREATE TABLE `e_platform` (
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   `ppm` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
-  `category_id` int NOT NULL,
   `platform_family_id` int NOT NULL,
   `code_name` varchar(45) DEFAULT NULL,
+  `category` int NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_e_platform_e_employee1_idx` (`ppm`),
-  KEY `fk_e_platform_e_category1_idx` (`category_id`),
   KEY `fk_e_platform_e_platform_family1_idx` (`platform_family_id`),
-  CONSTRAINT `fk_e_platform_e_category1` FOREIGN KEY (`category_id`) REFERENCES `a_category` (`id`),
+  KEY `fk_e_platform_a_category1_idx` (`category`),
+  CONSTRAINT `fk_e_platform_a_category1` FOREIGN KEY (`category`) REFERENCES `a_category` (`id`),
   CONSTRAINT `fk_e_platform_e_employee1` FOREIGN KEY (`ppm`) REFERENCES `e_employee` (`id`),
   CONSTRAINT `fk_e_platform_e_platform_family1` FOREIGN KEY (`platform_family_id`) REFERENCES `e_platform_family` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -486,36 +484,6 @@ CREATE TABLE `e_platform_family` (
 LOCK TABLES `e_platform_family` WRITE;
 /*!40000 ALTER TABLE `e_platform_family` DISABLE KEYS */;
 /*!40000 ALTER TABLE `e_platform_family` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `e_platform_fwversion`
---
-
-DROP TABLE IF EXISTS `e_platform_fwversion`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `e_platform_fwversion` (
-  `version` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `create_date` date DEFAULT NULL,
-  `update_date` date DEFAULT NULL,
-  `e_platform_id` int NOT NULL,
-  `ta_id` int DEFAULT NULL,
-  PRIMARY KEY (`version`,`e_platform_id`),
-  KEY `fk_e_platform_version_e_platform1_idx` (`e_platform_id`),
-  KEY `fk_e_platform_version_e_technical_acceptance1_idx` (`ta_id`),
-  CONSTRAINT `fk_e_platform_version_e_platform1` FOREIGN KEY (`e_platform_id`) REFERENCES `e_platform` (`id`),
-  CONSTRAINT `fk_e_platform_version_e_technical_acceptance1` FOREIGN KEY (`ta_id`) REFERENCES `e_technical_acceptance` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `e_platform_fwversion`
---
-
-LOCK TABLES `e_platform_fwversion` WRITE;
-/*!40000 ALTER TABLE `e_platform_fwversion` DISABLE KEYS */;
-/*!40000 ALTER TABLE `e_platform_fwversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -578,6 +546,36 @@ CREATE TABLE `e_project` (
 LOCK TABLES `e_project` WRITE;
 /*!40000 ALTER TABLE `e_project` DISABLE KEYS */;
 /*!40000 ALTER TABLE `e_project` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `e_project_fwversion`
+--
+
+DROP TABLE IF EXISTS `e_project_fwversion`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `e_project_fwversion` (
+  `project_id` int NOT NULL,
+  `version` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `create_date` date DEFAULT NULL,
+  `update_date` date DEFAULT NULL,
+  `ta_id` int DEFAULT NULL,
+  PRIMARY KEY (`project_id`,`version`),
+  KEY `fk_e_platform_version_e_technical_acceptance1_idx` (`ta_id`),
+  KEY `fk_e_project_fwversion_e_project1_idx` (`project_id`),
+  CONSTRAINT `fk_e_platform_version_e_technical_acceptance1` FOREIGN KEY (`ta_id`) REFERENCES `e_technical_acceptance` (`id`),
+  CONSTRAINT `fk_e_project_fwversion_e_project1` FOREIGN KEY (`project_id`) REFERENCES `e_project` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `e_project_fwversion`
+--
+
+LOCK TABLES `e_project_fwversion` WRITE;
+/*!40000 ALTER TABLE `e_project_fwversion` DISABLE KEYS */;
+/*!40000 ALTER TABLE `e_project_fwversion` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -720,66 +718,6 @@ LOCK TABLES `r_op_rfp` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `r_platform_fwversion_feature`
---
-
-DROP TABLE IF EXISTS `r_platform_fwversion_feature`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `r_platform_fwversion_feature` (
-  `platform_version` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `platform_id` int NOT NULL,
-  `feature_id` int NOT NULL,
-  PRIMARY KEY (`platform_version`,`platform_id`,`feature_id`),
-  KEY `fk_e_platform_version_has_e_feature_e_feature1_idx` (`feature_id`),
-  KEY `fk_e_platform_version_has_e_feature_e_platform_version1_idx` (`platform_version`,`platform_id`),
-  CONSTRAINT `fk_e_platform_version_has_e_feature_e_feature1` FOREIGN KEY (`feature_id`) REFERENCES `e_feature` (`id`),
-  CONSTRAINT `fk_e_platform_version_has_e_feature_e_platform_version1` FOREIGN KEY (`platform_version`, `platform_id`) REFERENCES `e_platform_fwversion` (`version`, `e_platform_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `r_platform_fwversion_feature`
---
-
-LOCK TABLES `r_platform_fwversion_feature` WRITE;
-/*!40000 ALTER TABLE `r_platform_fwversion_feature` DISABLE KEYS */;
-/*!40000 ALTER TABLE `r_platform_fwversion_feature` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `r_platform_schedule`
---
-
-DROP TABLE IF EXISTS `r_platform_schedule`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `r_platform_schedule` (
-  `platform_id` int NOT NULL,
-  `milestone_id` int NOT NULL,
-  `milestone_category` int NOT NULL,
-  `plan_start_dt` date DEFAULT NULL,
-  `plan_end_dt` date DEFAULT NULL,
-  `actual_start_dt` date DEFAULT NULL,
-  `actual_end_dt` date DEFAULT NULL,
-  PRIMARY KEY (`platform_id`,`milestone_id`,`milestone_category`),
-  KEY `fk_e_milestone_has_e_platform_e_platform1_idx` (`platform_id`),
-  KEY `fk_e_milestone_has_e_platform_e_milestone1_idx` (`milestone_id`,`milestone_category`),
-  CONSTRAINT `fk_e_milestone_has_e_platform_e_milestone1` FOREIGN KEY (`milestone_id`, `milestone_category`) REFERENCES `e_milestone` (`milestone_id`, `category_id`),
-  CONSTRAINT `fk_e_milestone_has_e_platform_e_platform1` FOREIGN KEY (`platform_id`) REFERENCES `e_platform` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `r_platform_schedule`
---
-
-LOCK TABLES `r_platform_schedule` WRITE;
-/*!40000 ALTER TABLE `r_platform_schedule` DISABLE KEYS */;
-/*!40000 ALTER TABLE `r_platform_schedule` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `r_product_feature`
 --
 
@@ -864,6 +802,34 @@ CREATE TABLE `r_project_customer` (
 LOCK TABLES `r_project_customer` WRITE;
 /*!40000 ALTER TABLE `r_project_customer` DISABLE KEYS */;
 /*!40000 ALTER TABLE `r_project_customer` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `r_project_fwversion_feature`
+--
+
+DROP TABLE IF EXISTS `r_project_fwversion_feature`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `r_project_fwversion_feature` (
+  `project_id` int NOT NULL,
+  `version` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `feature` int NOT NULL,
+  PRIMARY KEY (`project_id`,`version`,`feature`),
+  KEY `fk_e_project_fwversion_has_e_feature_e_feature1_idx` (`feature`),
+  KEY `fk_e_project_fwversion_has_e_feature_e_project_fwversion1_idx` (`project_id`,`version`),
+  CONSTRAINT `fk_e_project_fwversion_has_e_feature_e_feature1` FOREIGN KEY (`feature`) REFERENCES `e_feature` (`id`),
+  CONSTRAINT `fk_e_project_fwversion_has_e_feature_e_project_fwversion1` FOREIGN KEY (`project_id`, `version`) REFERENCES `e_project_fwversion` (`project_id`, `version`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `r_project_fwversion_feature`
+--
+
+LOCK TABLES `r_project_fwversion_feature` WRITE;
+/*!40000 ALTER TABLE `r_project_fwversion_feature` DISABLE KEYS */;
+/*!40000 ALTER TABLE `r_project_fwversion_feature` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -1055,4 +1021,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-05-04 17:55:42
+-- Dump completed on 2022-05-12  8:21:32
