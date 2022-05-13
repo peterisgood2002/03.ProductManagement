@@ -37,7 +37,6 @@ def getCNN5():
                 os.remove(file)
 
 def test():
-    folder = "C:\\Users\\mtk26734\\Desktop\\TEST\\"
     
     
     
