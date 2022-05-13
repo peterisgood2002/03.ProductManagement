@@ -2,9 +2,10 @@
 from datetime import datetime
 import glob
 import os
+import certifi
 from django.http import HttpResponse
 from pms_be.models.e_employee import EEmployee
-
+from urllib.parse import urlencode
 import requests
 from bs4 import BeautifulSoup, Tag
 
@@ -36,9 +37,25 @@ def getCNN5():
             for file in files:
                 os.remove(file)
 
-def test():
+def testCRSystem():
+    certifi.where()
     folder = "C:\\Users\\mtk26734\\Desktop\\TEST\\"
     
+    url = "http://172.21.101.232/secweb-web-script/mtk/mtkScriptLogin.action?"
     
+    data = {
+        "method":"login",
+        "repository": "DigitHome",
+        "userDb": "AUTO",
+        "password": "U0654t/6",
+        "loginId" : "MTK26734"
+    }
+    data = urlencode(data)
+    resp = requests.get(url+data)
+    #resp = requests.post(url, data = data)
+
+    output = open(folder + 'test.xls', 'wb')
+    output.write(resp.content)
+    output.close()
     
     
