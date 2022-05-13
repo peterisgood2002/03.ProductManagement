@@ -37,7 +37,7 @@ def getCNN5():
             for file in files:
                 os.remove(file)
 
-def testCRSystem():
+def testCRREST():
     certifi.where()
     folder = "C:\\Users\\mtk26734\\Desktop\\TEST\\"
     

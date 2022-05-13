@@ -11,6 +11,7 @@ from pms_be.models.e_employee import EEmployee
 
 class CNNTest(TestCase):
     def test_getCNN5(self):
+        print(sys.path)
         getCNN5()
 
     def test(self):
