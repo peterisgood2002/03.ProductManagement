@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'pms_be.apps.PmsBeConfig',
-    'pms_operator.apps.PmsOperatorConfig'
+    'pms_operator.apps.PmsOperatorConfig',
     'excel_common.apps.ExcelCommonConfig'
 ]
 
