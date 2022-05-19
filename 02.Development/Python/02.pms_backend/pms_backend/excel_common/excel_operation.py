@@ -192,36 +192,5 @@ class ExcelParser:
 
 # END class ExcelParser
 
-
-#
-def getColumnsBasedOnList( sheet, row, cellValueList: list):
-    if( isinstance(cellValueList, list) != True ):
-         raise Exception("Note that cellValueList is a list")
-
-    result = cellValueList.copy()
-
-    for col in sheet[row]:
-        if col.value:
-           index = cellValueList.index(col.value) if col.value in cellValueList else -1
-           if index != -1:
-                result[index] = col.column_letter
-                
-    return result
-
-def getColumnsBasedOnString( sheet, row, cellValue: str):   
-    if( isinstance(cellValue, str) != True ):
-        raise Exception("Note that cellValueList is a list")
-    for col in sheet[row]:
-        if col.value and col.value == cellValue:
-            return col.column_letter
-def getColumnsIdxBasedOnString( sheet, row, cellValue: str):   
-    if( isinstance(cellValue, str) != True ):
-        raise Exception("Note that cellValueList is a list")
-    for col in sheet[row]:
-        if col.value and col.value == cellValue:
-            return col.col_idx - 1
-
-
-
    
 
