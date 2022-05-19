@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'pms_be.apps.PmsBeConfig',
     'pms_operator.apps.PmsOperatorConfig'
+    'excel_common.apps.ExcelCommonConfig'
 ]
 
 MIDDLEWARE = [
