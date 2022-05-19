@@ -143,7 +143,7 @@ CREATE TABLE `e_area` (
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -152,6 +152,7 @@ CREATE TABLE `e_area` (
 
 LOCK TABLES `e_area` WRITE;
 /*!40000 ALTER TABLE `e_area` DISABLE KEYS */;
+INSERT INTO `e_area` VALUES (1,'US','2022-05-19','2022-05-19'),(2,'JP','2022-05-19','2022-05-19'),(3,'EU','2022-05-19','2022-05-19'),(4,'CN','2022-05-19','2022-05-19');
 /*!40000 ALTER TABLE `e_area` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -407,14 +408,14 @@ DROP TABLE IF EXISTS `e_operator`;
 CREATE TABLE `e_operator` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(45) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
-  `create_date` date DEFAULT NULL,
-  `update_date` date DEFAULT NULL,
   `area_id` int NOT NULL,
   `url` longtext,
+  `create_date` date DEFAULT NULL,
+  `update_date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_e_operator_e_area1_idx` (`area_id`),
   CONSTRAINT `fk_e_operator_e_area1` FOREIGN KEY (`area_id`) REFERENCES `e_area` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -423,6 +424,7 @@ CREATE TABLE `e_operator` (
 
 LOCK TABLES `e_operator` WRITE;
 /*!40000 ALTER TABLE `e_operator` DISABLE KEYS */;
+INSERT INTO `e_operator` VALUES (1,'ATT',1,'Z:\\AT_and_T','2022-05-19','2022-05-19');
 /*!40000 ALTER TABLE `e_operator` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1021,4 +1023,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-05-12  8:21:32
+-- Dump completed on 2022-05-19  9:47:40
