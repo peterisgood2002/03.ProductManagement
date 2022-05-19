@@ -1,3 +1,5 @@
+from asyncio.log import logger
+import logging
 import string
 import openpyxl
 from openpyxl.worksheet.worksheet import Worksheet
@@ -72,6 +74,7 @@ class Item:
 """
 class ExcelParser:
     
+    logger = logging.getLogger("ExcelParser")
     def  __init__(self, keyRow = 0, originalKeyMap = {}, typeRow = 0, originalProductTypeList = []):
         self.initEmpty()
         self.initialize(keyRow, originalKeyMap, typeRow, originalProductTypeList)
@@ -165,16 +168,16 @@ class ExcelParser:
         excel = openpyxl.load_workbook(fileName)
         sheet = excel[sheetName]
         
-        print("[ExcelParser.parse][BEGIN]: " + fileName +" MAX ROW = " + str(sheet.max_row))
+        logger.info("[ExcelParser.parse][BEGIN]: " + fileName +" MAX ROW = " + str(sheet.max_row))
         result = self.parseExcel(fileName, dataRow, sheet)
-        print("[ExcelParser.parse][END]: " + fileName)
+        logger.info("[ExcelParser.parse][END]: " + fileName)
         
         excel.close()
         return result
 
     def parseExcel(self, fileName, dataRow, sheet: Worksheet) -> list[Item]:
         result = []
-        print("[ExcelParser.parseExcel][BEGIN]: MAX ROW = " + str(sheet.max_row))
+        logger.info("[ExcelParser.parseExcel][BEGIN]: MAX ROW = " + str(sheet.max_row))
         idx = 0
         for row in sheet.iter_rows(min_row= dataRow): 
             item = Item(fileName, self.getProductTypeList() )
@@ -185,7 +188,7 @@ class ExcelParser:
             if idx % 500 == 0:
                 print(" processing: " + str(idx) )
                 
-        print("[ExcelParser.parseExcel][END]:")
+        logger.info("[ExcelParser.parseExcel][END]:")
         return result
 
 # END class ExcelParser
