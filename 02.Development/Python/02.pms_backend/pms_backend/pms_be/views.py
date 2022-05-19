@@ -8,10 +8,14 @@ from pms_be.models.e_employee import EEmployee
 from urllib.parse import urlencode
 import requests
 from bs4 import BeautifulSoup, Tag
-
+import webbrowser
 def index( request):
     return HttpResponse("Hello World:")
 
+def getCNN5Things(request):
+    getCNN5()
+    return HttpResponse("Hello World:")
+    
 def getCNN5():
  
     folder = "C:\\Users\\mtk26734\\Music\\"
@@ -22,20 +26,28 @@ def getCNN5():
     soup = BeautifulSoup(r.text, 'html.parser')
      
     f = open(folder+ "audio.txt", "w")
+    links = []
     for tag in  soup.find(id = "episodes").find_all("audio-player-wc"):
         t = Tag.__copy__(tag)
-        link = t.attrs.get("src") + "\n"
-        f.write(link)
+        link = t.attrs.get("src")
+        links.append(link)
+        
+        f.write(link + "\n")
         
     f.close()
     
     #2. remove files
     t = datetime.now().time()
     if t.hour < 9:
+        #2. remove files before 9:00
         if os.path.exists( folder) :
             files = glob.glob(folder + "*.mp3")
             for file in files:
                 os.remove(file)
+        
+        #3. open website
+        for i in [0, 1, 2]:
+            webbrowser.open(links[i])
 
 def testCRSystem():
     certifi.where()
