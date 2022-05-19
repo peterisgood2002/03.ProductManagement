@@ -1,8 +1,6 @@
-from itertools import product
 import string
 import openpyxl
 from openpyxl.worksheet.worksheet import Worksheet
-import re
 from enum import Enum
 
 class KEYINFO(Enum):
@@ -163,7 +161,7 @@ class ExcelParser:
         The List of keyColumn should follow the sequence: status, capability, id, desc, section.
         The Priority value depends on the List of productColumn
     """
-    def parse( self, fileName, sheetName, dataRow) :
+    def parse( self, fileName: string, sheetName: string, dataRow) :
         excel = openpyxl.load_workbook(fileName)
         sheet = excel[sheetName]
         
