@@ -13,8 +13,8 @@ def index( request):
     return HttpResponse("Hello World:")
 
 def getCNN5Things(request):
-    getCNN5()
-    return HttpResponse("Hello World:")
+    result = getCNN5()
+    return HttpResponse(result)
     
 def getCNN5():
  
@@ -44,10 +44,14 @@ def getCNN5():
             files = glob.glob(folder + "*.mp3")
             for file in files:
                 os.remove(file)
-        
-        #3. open website
-        for i in [0, 1, 2]:
-            webbrowser.open(links[i])
+    
+    result = "TEST <BR />" 
+    #3. open website
+    for i in [0, 1, 2]:
+        html = '<a href={link} target="_blank"> {index} </a> <br />'
+        result += html.format(link = links[i], index = i)
+    
+    return result
 
 def testCRREST():
     certifi.where()
