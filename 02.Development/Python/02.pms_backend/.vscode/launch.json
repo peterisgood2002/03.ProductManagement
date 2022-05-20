@@ -24,7 +24,7 @@
             "purpose": ["debug-test"],
             "args": [
                 "test",
-                "excel_common",
+                "pms_operator",
             ],
             "django": true,
             "justMyCode": false
