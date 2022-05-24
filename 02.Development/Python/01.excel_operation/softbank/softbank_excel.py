@@ -32,7 +32,7 @@ def addToMap( items: list[ excel_operation.Item ], itemMap: dict ):
     for item in items:
         id = item.getKeyInfo(excel_operation.KEYINFO.Id)
         if id != None:
-            status = item.getKeyInfo("Status")
+            status = item.getKeyInfo(excel_operation.KEYINFO.Status)
             if status != "Delete":
                 itemMap[id] = item
 #End addToMap Function
@@ -40,7 +40,7 @@ def getItemsFromExcel( fileName: list, sheetName, excelParser: excel_operation.E
     result = {}
   
     beginT = str(datetime.datetime.now())
-    fileName = ["D:\\02.Operator\\02.Softbank\\02.Operator Terminal Requirements\\OTR-2022.Q2.Q3\\OTR-20210730_FullPackage\\02_Conformance_sheet\\OTR-MTC-MTC_RF-CONF-RevD01-20210226_E.xlsx"]
+    #fileName = ["D:\\02.Operator\\02.Softbank\\02.Operator Terminal Requirements\\OTR-2022.Q2.Q3\\OTR-20210730_FullPackage\\02_Conformance_sheet\\OTR-MTC-MTC_RF-CONF-RevD01-20210226_E.xlsx"]
     for f in fileName:
         items = excelParser.parse(f, sheetName, 5)
         print("addToMap: " + f)
@@ -91,7 +91,7 @@ End outputExcel
 
 def softbank_parser():
     #0. Paramters
-    folder="D:\\02.Operator\\02.Softbank\\02.Operator Terminal Requirements\\OTR-2022.Q2.Q3\OTR-20210730_FullPackage\\02_Conformance_sheet\\"
+    folder="D:\\02.Operator\\02.Softbank\\02.Operator Terminal Requirements\\OTR-2022Q4.2023Q1\\OTR-20220131_FullPackage\\02_Conformance_sheet\\"
     prefix="OTR-M2M|OTR-MTC" #regular expression
     
     #1. Get fileName in the folder
