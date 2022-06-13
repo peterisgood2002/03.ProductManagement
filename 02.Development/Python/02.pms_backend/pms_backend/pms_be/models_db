@@ -8,115 +8,443 @@
 from django.db import models
 
 
-class AuthGroup(models.Model):
-    name = models.CharField(unique=True, max_length=150)
+class ACategory(models.Model):
+    id = models.IntegerField(primary_key=True)
+    category_name = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'auth_group'
+        db_table = 'a_category'
 
 
-class AuthGroupPermissions(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-    permission = models.ForeignKey('AuthPermission', models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_group_permissions'
-        unique_together = (('group', 'permission'),)
-
-
-class AuthPermission(models.Model):
-    name = models.CharField(max_length=255)
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING)
-    codename = models.CharField(max_length=100)
+class ACompliance(models.Model):
+    compliance_id = models.IntegerField(primary_key=True)
+    compliance_name = models.CharField(max_length=45, blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+    compliance_desc = models.TextField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'auth_permission'
-        unique_together = (('content_type', 'codename'),)
+        db_table = 'a_compliance'
 
 
-class AuthUser(models.Model):
-    password = models.CharField(max_length=128)
-    last_login = models.DateTimeField(blank=True, null=True)
-    is_superuser = models.IntegerField()
-    username = models.CharField(unique=True, max_length=150)
-    first_name = models.CharField(max_length=150)
-    last_name = models.CharField(max_length=150)
-    email = models.CharField(max_length=254)
-    is_staff = models.IntegerField()
-    is_active = models.IntegerField()
-    date_joined = models.DateTimeField()
+class APriority(models.Model):
+    priority_id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=45, blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'auth_user'
+        db_table = 'a_priority'
 
 
-class AuthUserGroups(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    group = models.ForeignKey(AuthGroup, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'auth_user_groups'
-        unique_together = (('user', 'group'),)
-
-
-class AuthUserUserPermissions(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
-    permission = models.ForeignKey(AuthPermission, models.DO_NOTHING)
+class EAction(models.Model):
+    project = models.ForeignKey('RProjectSchedule', models.DO_NOTHING)
+    milestone = models.ForeignKey('RProjectSchedule', models.DO_NOTHING)
+    milestone_category = models.ForeignKey('RProjectSchedule', models.DO_NOTHING, db_column='milestone_category')
+    action_id = models.IntegerField(primary_key=True)
+    action_desc = models.TextField(blank=True, null=True)
+    owner = models.ForeignKey('EEmployee', models.DO_NOTHING)
+    deadline = models.DateField(blank=True, null=True)
+    finish_date = models.DateField(blank=True, null=True)
+    priority = models.ForeignKey(APriority, models.DO_NOTHING)
+    comment = models.TextField(blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'auth_user_user_permissions'
-        unique_together = (('user', 'permission'),)
+        db_table = 'e_action'
 
 
-class DjangoAdminLog(models.Model):
-    action_time = models.DateTimeField()
-    object_id = models.TextField(blank=True, null=True)
-    object_repr = models.CharField(max_length=200)
-    action_flag = models.PositiveSmallIntegerField()
-    change_message = models.TextField()
-    content_type = models.ForeignKey('DjangoContentType', models.DO_NOTHING, blank=True, null=True)
-    user = models.ForeignKey(AuthUser, models.DO_NOTHING)
+class EArea(models.Model):
+    name = models.CharField(max_length=45, blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'django_admin_log'
+        db_table = 'e_area'
 
 
-class DjangoContentType(models.Model):
-    app_label = models.CharField(max_length=100)
-    model = models.CharField(max_length=100)
-
-    class Meta:
-        managed = False
-        db_table = 'django_content_type'
-        unique_together = (('app_label', 'model'),)
-
-
-class DjangoMigrations(models.Model):
-    id = models.BigAutoField(primary_key=True)
-    app = models.CharField(max_length=255)
-    name = models.CharField(max_length=255)
-    applied = models.DateTimeField()
+class EComplianceVersion(models.Model):
+    version_no = models.CharField(primary_key=True, max_length=45)
+    operator = models.ForeignKey('EOperator', models.DO_NOTHING)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+    doc_url = models.CharField(max_length=45, blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'django_migrations'
+        db_table = 'e_compliance_version'
+        unique_together = (('version_no', 'operator'),)
 
 
-class DjangoSession(models.Model):
-    session_key = models.CharField(primary_key=True, max_length=40)
-    session_data = models.TextField()
-    expire_date = models.DateTimeField()
+class ECustomer(models.Model):
+    name = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+    cpm = models.ForeignKey('EEmployee', models.DO_NOTHING, db_column='cpm', blank=True, null=True)
+    is_alpha = models.IntegerField()
 
     class Meta:
         managed = False
-        db_table = 'django_session'
+        db_table = 'e_customer'
+
+
+class EDeviceRequirement(models.Model):
+    operator = models.OneToOneField('EDocStructure', models.DO_NOTHING, primary_key=True)
+    version_no = models.ForeignKey('EDocStructure', models.DO_NOTHING, db_column='version_no')
+    id = models.IntegerField()
+    priority = models.ForeignKey(APriority, models.DO_NOTHING, db_column='priority', blank=True, null=True)
+    title = models.CharField(max_length=255, db_collation='utf8_general_ci', blank=True, null=True)
+    name = models.CharField(max_length=255, db_collation='utf8_general_ci', blank=True, null=True)
+    description = models.TextField(blank=True, null=True)
+    doc_loc = models.CharField(max_length=255, db_collation='utf8_general_ci', blank=True, null=True)
+    note = models.CharField(max_length=2048, blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+    structure = models.ForeignKey('EDocStructure', models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'e_device_requirement'
+        unique_together = (('operator', 'version_no', 'id'),)
+
+
+class EDocStructure(models.Model):
+    operator = models.OneToOneField('self', models.DO_NOTHING, primary_key=True)
+    version_no = models.ForeignKey('self', models.DO_NOTHING, db_column='version_no')
+    id = models.CharField(max_length=45, db_collation='utf8_general_ci')
+    name = models.CharField(max_length=45, blank=True, null=True)
+    tagid = models.CharField(db_column='tagId', max_length=45, blank=True, null=True)  # Field name made lowercase.
+    category = models.ForeignKey('EDocStructureCategory', models.DO_NOTHING, db_column='category')
+    parent_structure = models.ForeignKey('self', models.DO_NOTHING)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'e_doc_structure'
+        unique_together = (('operator', 'version_no', 'id'),)
+
+
+class EDocStructureCategory(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=45, blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'e_doc_structure_category'
+
+
+class EEmployee(models.Model):
+    id = models.CharField(primary_key=True, max_length=10, db_collation='utf8_general_ci')
+    chinese_name = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
+    english_name = models.CharField(max_length=255, blank=True, null=True)
+    nt_account = models.CharField(max_length=255, blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'e_employee'
+
+
+class EFeature(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=45, blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'e_feature'
+
+
+class EMilestone(models.Model):
+    milestone_id = models.IntegerField(primary_key=True)
+    category = models.ForeignKey(ACategory, models.DO_NOTHING)
+    milestone_name = models.TextField(blank=True, null=True)
+    deliverable = models.TextField(blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+    estimated = models.FloatField(blank=True, null=True)
+    estimated_baseline = models.ForeignKey(ACategory, models.DO_NOTHING, db_column='estimated_baseline', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'e_milestone'
+        unique_together = (('milestone_id', 'category'),)
+
+
+class EOperator(models.Model):
+    name = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
+    area = models.ForeignKey(EArea, models.DO_NOTHING)
+    url = models.TextField(blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'e_operator'
+
+
+class EPlatform(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+    ppm = models.ForeignKey(EEmployee, models.DO_NOTHING, db_column='ppm', blank=True, null=True)
+    platform_family = models.ForeignKey('EPlatformFamily', models.DO_NOTHING)
+    code_name = models.CharField(max_length=45, blank=True, null=True)
+    category = models.ForeignKey(ACategory, models.DO_NOTHING, db_column='category')
+
+    class Meta:
+        managed = False
+        db_table = 'e_platform'
+
+
+class EPlatformFamily(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=45, blank=True, null=True)
+    create_date = models.DateField(db_column='create_Date', blank=True, null=True)  # Field name made lowercase.
+    update_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'e_platform_family'
+
+
+class EProduct(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+    category = models.ForeignKey(ACategory, models.DO_NOTHING)
+    ta = models.ForeignKey('ETechnicalAcceptance', models.DO_NOTHING, blank=True, null=True)
+    forecast_qty = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'e_product'
+
+
+class EProject(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+    pm = models.ForeignKey(EEmployee, models.DO_NOTHING, db_column='pm', blank=True, null=True)
+    note = models.CharField(max_length=255, blank=True, null=True)
+    alpha_project = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'e_project'
+
+
+class EProjectFwversion(models.Model):
+    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)
+    version = models.CharField(max_length=255, db_collation='utf8_general_ci')
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+    ta = models.ForeignKey('ETechnicalAcceptance', models.DO_NOTHING, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'e_project_fwversion'
+        unique_together = (('project', 'version'),)
+
+
+class ERequirementCategory(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=45, blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'e_requirement_category'
+
+
+class ETechnicalAcceptance(models.Model):
+    id = models.IntegerField(primary_key=True)
+    issue_date = models.DateField(blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'e_technical_acceptance'
+
+
+class ETestPlan(models.Model):
+    operator = models.OneToOneField(EComplianceVersion, models.DO_NOTHING, primary_key=True)
+    version_no = models.ForeignKey(EComplianceVersion, models.DO_NOTHING, db_column='version_no')
+    test_id = models.IntegerField()
+    title = models.CharField(max_length=255, db_collation='utf8_general_ci', blank=True, null=True)
+    test_description = models.CharField(max_length=2048, blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'e_test_plan'
+        unique_together = (('operator', 'version_no', 'test_id'),)
+
+
+class RDeviceRequirementCategory(models.Model):
+    requirement_operator = models.OneToOneField(EDeviceRequirement, models.DO_NOTHING, primary_key=True)
+    requirement_version_no = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, db_column='requirement_version_no')
+    requirement = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING)
+    category = models.ForeignKey(ERequirementCategory, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'r_device_requirement_category'
+        unique_together = (('requirement_operator', 'requirement_version_no', 'requirement', 'category'),)
+
+
+class ROpRfp(models.Model):
+    operator = models.OneToOneField(EOperator, models.DO_NOTHING, primary_key=True)
+    product = models.ForeignKey(EProduct, models.DO_NOTHING)
+    version_no = models.CharField(max_length=45)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+    quantity = models.IntegerField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'r_op_rfp'
+        unique_together = (('operator', 'product', 'version_no'),)
+
+
+class RProductFeature(models.Model):
+    product = models.OneToOneField(EProduct, models.DO_NOTHING, primary_key=True)
+    feature = models.ForeignKey(EFeature, models.DO_NOTHING)
+    parameters = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'r_product_feature'
+        unique_together = (('product', 'feature'),)
+
+
+class RProductSchedule(models.Model):
+    product = models.OneToOneField(EProduct, models.DO_NOTHING, primary_key=True)
+    milestone = models.ForeignKey(EMilestone, models.DO_NOTHING)
+    milestone_category = models.ForeignKey(EMilestone, models.DO_NOTHING, db_column='milestone_category')
+    plan_start_dt = models.DateField(blank=True, null=True)
+    plan_end_dt = models.DateField(blank=True, null=True)
+    actual_start_dt = models.DateField(blank=True, null=True)
+    actual_end_dt = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'r_product_schedule'
+        unique_together = (('product', 'milestone', 'milestone_category'),)
+
+
+class RProjectCustomer(models.Model):
+    customer = models.OneToOneField(ECustomer, models.DO_NOTHING, primary_key=True)
+    project = models.ForeignKey(EProject, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'r_project_customer'
+        unique_together = (('customer', 'project'),)
+
+
+class RProjectFwversionFeature(models.Model):
+    project = models.OneToOneField(EProjectFwversion, models.DO_NOTHING, primary_key=True)
+    version = models.ForeignKey(EProjectFwversion, models.DO_NOTHING, db_column='version')
+    feature = models.ForeignKey(EFeature, models.DO_NOTHING, db_column='feature')
+
+    class Meta:
+        managed = False
+        db_table = 'r_project_fwversion_feature'
+        unique_together = (('project', 'version', 'feature'),)
+
+
+class RProjectPlatform(models.Model):
+    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)
+    platform = models.ForeignKey(EPlatform, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'r_project_platform'
+        unique_together = (('project', 'platform'),)
+
+
+class RProjectSchedule(models.Model):
+    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)
+    milestone = models.ForeignKey(EMilestone, models.DO_NOTHING)
+    milestone_category = models.ForeignKey(EMilestone, models.DO_NOTHING, db_column='milestone_category')
+    plan_start_dt = models.DateField(blank=True, null=True)
+    plan_end_dt = models.DateField(blank=True, null=True)
+    actual_start_dt = models.DateField(blank=True, null=True)
+    actual_end_dt = models.DateField(blank=True, null=True)
+    note = models.TextField(blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'r_project_schedule'
+        unique_together = (('project', 'milestone', 'milestone_category'),)
+
+
+class RProjectTargetProduct(models.Model):
+    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)
+    product = models.ForeignKey(EProduct, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'r_project_target_product'
+        unique_together = (('project', 'product'),)
+
+
+class RTaComplyDeviceRequirement(models.Model):
+    operator = models.OneToOneField(EDeviceRequirement, models.DO_NOTHING, primary_key=True)
+    version_no = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, db_column='version_no')
+    requirement = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING)
+    technical_acceptance = models.ForeignKey(ETechnicalAcceptance, models.DO_NOTHING)
+    compliance = models.ForeignKey(ACompliance, models.DO_NOTHING, db_column='compliance')
+
+    class Meta:
+        managed = False
+        db_table = 'r_ta_comply_device_requirement'
+        unique_together = (('operator', 'version_no', 'requirement', 'technical_acceptance'),)
+
+
+class RTaComplyTestPlan(models.Model):
+    technical_acceptance = models.OneToOneField(ETechnicalAcceptance, models.DO_NOTHING, primary_key=True)
+    test = models.ForeignKey(ETestPlan, models.DO_NOTHING)
+    version_no = models.ForeignKey(ETestPlan, models.DO_NOTHING, db_column='version_no')
+    operator = models.ForeignKey(ETestPlan, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'r_ta_comply_test_plan'
+        unique_together = (('technical_acceptance', 'test', 'version_no', 'operator'),)
+
+
+class RTestPlanExamineDeviceRequirement(models.Model):
+    operator = models.OneToOneField(ETestPlan, models.DO_NOTHING, primary_key=True)
+    version_no = models.ForeignKey(ETestPlan, models.DO_NOTHING, db_column='version_no')
+    requirement = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING)
+    test = models.ForeignKey(ETestPlan, models.DO_NOTHING)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'r_test_plan_examine_device_requirement'
+        unique_together = (('operator', 'version_no', 'requirement', 'test'),)
