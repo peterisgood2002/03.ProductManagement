@@ -7,19 +7,7 @@ from .e_product import EProduct
 from .e_employee import EEmployee
 from .a_attribute import APriority
        
-class RPlatformSchedule(models.Model):
-    platform = models.OneToOneField(EPlatform, models.DO_NOTHING, primary_key=True)
-    milestone = models.ForeignKey(EMilestone, models.DO_NOTHING)
-    milestone_category = models.ForeignKey(EMilestone, models.DO_NOTHING, db_column='milestone_category')
-    plan_start_dt = models.DateField(blank=True, null=True)
-    plan_end_dt = models.DateField(blank=True, null=True)
-    actual_start_dt = models.DateField(blank=True, null=True)
-    actual_end_dt = models.DateField(blank=True, null=True)
 
-    class Meta:
-        managed = False
-        db_table = 'r_platform_schedule'
-        unique_together = (('platform', 'milestone', 'milestone_category'),)
 
 class RProductSchedule(models.Model):
     product = models.OneToOneField(EProduct, models.DO_NOTHING, primary_key=True)
@@ -55,7 +43,7 @@ class RProjectSchedule(models.Model):
 class EAction(models.Model):
     project = models.ForeignKey(RProjectSchedule, models.DO_NOTHING)
     milestone = models.ForeignKey(RProjectSchedule, models.DO_NOTHING)
-    milestone_category = models.ForeignKey('RProjectSchedule', models.DO_NOTHING, db_column='milestone_category')
+    milestone_category = models.ForeignKey(RProjectSchedule, models.DO_NOTHING, db_column='milestone_category')
     action_id = models.IntegerField(primary_key=True)
     action_desc = models.TextField(blank=True, null=True)
     owner = models.ForeignKey(EEmployee, models.DO_NOTHING)

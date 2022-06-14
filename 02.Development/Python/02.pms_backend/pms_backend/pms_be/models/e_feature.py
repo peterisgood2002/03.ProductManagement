@@ -1,6 +1,7 @@
 from django.db import models
-from .e_platform import EPlatformFwversion
 from .e_product import EProduct
+from .e_project import EProject
+from .e_operator_ta import ETechnicalAcceptance
 
 class EFeature(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -22,12 +23,14 @@ class RProductFeature(models.Model):
         db_table = 'r_product_feature'
         unique_together = (('product', 'feature'),)
 
-class RPlatformFwversionFeature(models.Model):
-    platform_version = models.OneToOneField(EPlatformFwversion, models.DO_NOTHING, db_column='platform_version', primary_key=True)
-    platform = models.ForeignKey(EPlatformFwversion, models.DO_NOTHING)
-    feature = models.ForeignKey(EFeature, models.DO_NOTHING)
+class EProjectFwversion(models.Model):
+    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)
+    version = models.CharField(max_length=255, db_collation='utf8_general_ci')
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+    ta = models.ForeignKey(ETechnicalAcceptance, models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'r_platform_fwversion_feature'
-        unique_together = (('platform_version', 'platform', 'feature'),)
+        db_table = 'e_project_fwversion'
+        unique_together = (('project', 'version'),)
