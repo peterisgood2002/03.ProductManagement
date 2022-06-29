@@ -1,5 +1,5 @@
 class PmsDBRouter:
-    route_app_labels = {'pms_be', 'pms_operator'}
+    route_app_labels = {'pms_be', 'pms_operator', 'pms_dbmodel'}
     
     def db_for_read(self, model, **hints):
         """

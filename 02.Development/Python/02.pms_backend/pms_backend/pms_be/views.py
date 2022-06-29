@@ -4,7 +4,6 @@ import glob
 import os
 import certifi
 from django.http import HttpResponse
-from pms_dbmodel.models.e_employee import EEmployee
 from urllib.parse import urlencode
 import requests
 from bs4 import BeautifulSoup, Tag
