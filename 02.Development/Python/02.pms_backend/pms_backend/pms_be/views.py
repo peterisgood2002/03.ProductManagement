@@ -3,7 +3,6 @@ from datetime import datetime
 import glob
 import os
 from django.http import HttpResponse
-from pms_dbmodel.models.e_employee import EEmployee
 from urllib.parse import urlencode
 import requests
 from bs4 import BeautifulSoup, Tag
@@ -17,7 +16,7 @@ def getCNN5Things(request):
     
 def getCNN5():
 
-    folder = "C:\\Users\\mtk26734\\Music\\"
+    folder = "output"
     #folder = "C:\\Users\\mtk26734\\Desktop\\TEST\\"
     #1. Get link from CNN 5 things 
     r = requests.get("https://edition.cnn.com/audio/podcasts/5-things", verify=False)
@@ -51,9 +50,6 @@ def getCNN5():
         result += html.format(link = links[i], index = i)
     
     return result
-
-def test():
-    
     
     
     
