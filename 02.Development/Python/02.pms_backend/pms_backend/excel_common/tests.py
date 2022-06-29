@@ -92,12 +92,12 @@ class ExcelParserTest(TestCase):
         self.t.createMap(self.sheet)
         items = self.t.parse( self.fileName, "TEST", 4)
         self.assertEqual("TEST_ID",items[0].getId() )
-        self.assertEqual("TEST_DESC", items[0].getKeyInfo( KEYINFO.Description) )
+        self.assertEqual("TEST_DESC", items[0].getKey( KEYINFO.Description) )
         self.assertEqual(3.1, items[0].getChapterId() )
         self.assertEqual("TEST_Name", items[0].getChapter() )
-        self.assertEqual("TEST_TRD", items[0].getKeyInfo(KEYINFO.DocLocation) )
+        self.assertEqual("TEST_TRD", items[0].getKey(KEYINFO.DocLocation) )
         self.assertEqual("Mandatory", items[0].getPriority() )
-        self.assertEqual("Yes", items[0].getKeyInfo(KEYINFO.Note) )
+        self.assertEqual("Yes", items[0].getKey(KEYINFO.Note) )
         i = 0    
     
     def tearDown(self) -> None:
