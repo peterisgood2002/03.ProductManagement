@@ -16,6 +16,7 @@ class KEYINFO(Enum):
     DocLocation = 7
     Priority = 8
     Note = 9
+    Title = 10
 
 NOCOLUMNINX = -1
 
@@ -52,21 +53,21 @@ class Item:
     def addType( self, t):
         self.type.append(t)
         
-    def getKeyInfo( self, key: KEYINFO):
+    def getKey( self, key: KEYINFO):
         value = self.keyValueList[key.value]
         return value
     
     def getPriority( self):
-        return self.getKeyInfo(KEYINFO.Priority)
+        return self.getKey(KEYINFO.Priority)
         
     def getId(self):
-        return self.getKeyInfo(KEYINFO.Id)
+        return self.getKey(KEYINFO.Id)
     
     def getChapterId(self):
-        return self.getKeyInfo(KEYINFO.ChapterId)
+        return self.getKey(KEYINFO.ChapterId)
     
     def getChapter(self):
-        return self.getKeyInfo(KEYINFO.Chapter)
+        return self.getKey(KEYINFO.Chapter)
 # End Class Items
 
 """
