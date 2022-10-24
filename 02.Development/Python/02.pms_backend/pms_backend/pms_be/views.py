@@ -8,6 +8,8 @@ from urllib.parse import urlencode
 import requests
 from bs4 import BeautifulSoup, Tag
 import webbrowser
+
+from pms_dbmodel.operator_models import getArea
 def index( request):
     return HttpResponse("Hello World:")
 
@@ -73,4 +75,7 @@ def testCRREST():
     output.write(resp.content)
     output.close()
     
+def testDB(request):
+    getArea('TEST')
     
+    return HttpResponse("TEST")
