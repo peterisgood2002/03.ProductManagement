@@ -24,7 +24,7 @@
             "purpose": ["debug-test"],
             "args": [
                 "test",
-                "pms_operator",
+                "pms_dbmodel",
             ],
             "django": true,
             "justMyCode": false

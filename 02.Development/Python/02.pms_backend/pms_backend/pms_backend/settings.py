@@ -85,9 +85,7 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': os.getenv("SQL_PWD"),
         'TEST':{
-            'NAME':'pms_test',
-            'MIGRATE':False
-            
+            'MIGRATE':True    
         },
         'MIGRATE':False
         
@@ -99,6 +97,9 @@ DATABASES = {
         'NAME': 'pms',
         'USER': 'root',
         'PASSWORD': os.getenv("SQL_PWD"),
+        'TEST':{
+            'MIGRATE':False    
+        },
     },
     
 }

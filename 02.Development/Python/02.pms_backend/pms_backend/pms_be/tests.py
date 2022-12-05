@@ -11,6 +11,6 @@ from pms_be.views import getCNN5
 class CNNTest(TestCase):
     def test_getCNN5(self):
         print(sys.path)
-        getCNN5()
+        getCNN5()    
         
         

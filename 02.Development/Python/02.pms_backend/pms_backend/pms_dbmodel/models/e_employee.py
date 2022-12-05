@@ -12,3 +12,4 @@ class EEmployee(models.Model):
         managed = False
         db_table = 'e_employee'
         
+        

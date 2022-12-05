@@ -7,6 +7,8 @@ from urllib.parse import urlencode
 import requests
 from bs4 import BeautifulSoup, Tag
 import webbrowser
+
+from pms_dbmodel.operator_models import getArea
 def index( request):
     return HttpResponse("Hello World:")
 
@@ -50,6 +52,8 @@ def getCNN5():
         result += html.format(link = links[i], index = i)
     
     return result
+
+def testDB(request):
+    getArea('TEST')
     
-    
-    
+    return HttpResponse("TEST")
