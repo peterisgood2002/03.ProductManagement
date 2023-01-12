@@ -9,9 +9,11 @@ def getFileNameList( folder, prefix ):
     fileName = []
     for f in listdir( folder ):
         if isfile(join(folder, f)) :
-            s = re.search(prefix, f)
-            if s and s.start() == 0:
-                fileName.append(folder + f)
+            if prefix != "":
+                s = re.search(prefix, f)
+                if s and s.start() == 0:
+                    fileName.append(folder + f)
+            else: fileName.append(folder + f)
     return fileName
 """
 End getFileNameList

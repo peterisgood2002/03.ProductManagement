@@ -91,8 +91,8 @@ End outputExcel
 
 def softbank_parser():
     #0. Paramters
-    folder="D:\\02.Operator\\02.Softbank\\02.Operator Terminal Requirements\\OTR-2022Q4.2023Q1\\OTR-20220131_FullPackage\\02_Conformance_sheet\\"
-    prefix="OTR-M2M|OTR-MTC" #regular expression
+    folder="D:\\02.Operator\\02.Softbank\\02.Operator Terminal Requirements\\OTR.for.2023.Q2.2023.Q3_SB.CPE_20221130\\02_Conformance_sheet\\"
+    prefix="" #regular expression
     
     #1. Get fileName in the folder
     fileName = file_operation.getFileNameList(folder, prefix)
@@ -107,7 +107,7 @@ def softbank_parser():
         excel_operation.KEYINFO.SectionId: "Reference\n(Section Info.)", 
         excel_operation.KEYINFO.Section: "Reference\n(Section Name)"
     }
-    productType = ["M2M", "Manufacturer brand M2M"]
+    productType = ["M2M", "Manufacturer brand M2M", "Air"]
     #2.1 Get Critical Column
     excelIndex = getExcelParser( fileName[0], sheetName, keyColumnName, productType)
     itemMap = getItemsFromExcel(fileName, sheetName, excelIndex)
