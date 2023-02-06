@@ -5,19 +5,20 @@ from pms_dbmodel.models.e_operator import EOperator
 from pms_dbmodel.models.e_operator import EArea
 
 # Create your models here.
-def getArea(area) -> EArea:
-    r = EArea.objects.get_or_create(name = area)
-    if r[1] == True:
-        r[0].create_date = date.today()
-        r[0].update_date = date.today()
-        r[0].save()
-        
-    return r[0]
-
 class OperatorOperation:
     @classmethod
+    def getArea(area) -> EArea:
+        r = EArea.objects.get_or_create(name = area)
+        if r[1] == True:
+            r[0].create_date = date.today()
+            r[0].update_date = date.today()
+            r[0].save()
+        
+        return r[0]
+
+    @classmethod
     def getOperator(cls, area, operator) -> EOperator:
-        a = getArea(area)
+        a = cls.getArea(area)
         
         r = EOperator.objects.get_or_create(name = operator, area = a )
         if r[1] == True:
