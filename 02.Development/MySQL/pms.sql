@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.27, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.32, for Win64 (x86_64)
 --
 -- Host: localhost    Database: pms
 -- ------------------------------------------------------
--- Server version	8.0.27
+-- Server version	8.0.32
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -24,7 +24,7 @@ DROP TABLE IF EXISTS `a_category`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `a_category` (
   `id` int NOT NULL,
-  `category_name` varchar(45) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `category_name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   PRIMARY KEY (`id`)
@@ -104,7 +104,7 @@ CREATE TABLE `e_action` (
   `milestone_category` int NOT NULL,
   `action_id` int NOT NULL,
   `action_desc` longtext,
-  `owner_id` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `owner_id` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `deadline` date DEFAULT NULL,
   `finish_date` date DEFAULT NULL,
   `priority_id` int NOT NULL,
@@ -193,10 +193,10 @@ DROP TABLE IF EXISTS `e_customer`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_customer` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  `cpm` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `cpm` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `is_alpha` tinyint NOT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_e_customer_e_employee_idx` (`cpm`),
@@ -223,21 +223,19 @@ DROP TABLE IF EXISTS `e_device_requirement`;
 CREATE TABLE `e_device_requirement` (
   `operator_id` int NOT NULL,
   `version_no` varchar(45) NOT NULL,
-  `id` int NOT NULL,
+  `desc_id` int NOT NULL,
   `priority` int DEFAULT NULL,
-  `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
-  `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
-  `description` longtext,
-  `doc_loc` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
-  `note` varchar(2048) DEFAULT NULL,
+  `structure_id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  `structure_id` varchar(45) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  PRIMARY KEY (`operator_id`,`version_no`,`id`),
+  `tag_id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  PRIMARY KEY (`operator_id`,`version_no`,`desc_id`),
   KEY `fk_e_device_requirement_e_priority1_idx` (`priority`),
   KEY `fk_e_device_requirement_e_compliance_version1_idx` (`version_no`,`operator_id`),
   KEY `fk_e_device_requirement_e_doc_structure1_idx` (`operator_id`,`version_no`,`structure_id`),
+  KEY `fk_e_device_requirement_e_device_requirement_desc1_idx` (`desc_id`),
   CONSTRAINT `fk_e_device_requirement_e_compliance_version1` FOREIGN KEY (`version_no`, `operator_id`) REFERENCES `e_compliance_version` (`version_no`, `operator_id`),
+  CONSTRAINT `fk_e_device_requirement_e_device_requirement_desc1` FOREIGN KEY (`desc_id`) REFERENCES `e_device_requirement_desc` (`id`),
   CONSTRAINT `fk_e_device_requirement_e_doc_structure1` FOREIGN KEY (`operator_id`, `version_no`, `structure_id`) REFERENCES `e_doc_structure` (`operator_id`, `version_no`, `id`),
   CONSTRAINT `fk_e_device_requirement_e_priority1` FOREIGN KEY (`priority`) REFERENCES `a_priority` (`priority_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -253,6 +251,35 @@ LOCK TABLES `e_device_requirement` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `e_device_requirement_desc`
+--
+
+DROP TABLE IF EXISTS `e_device_requirement_desc`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `e_device_requirement_desc` (
+  `id` int NOT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `description` longtext,
+  `doc_loc` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `note` varchar(2048) DEFAULT NULL,
+  `create_date` date DEFAULT NULL,
+  `update_date` date DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `e_device_requirement_desc`
+--
+
+LOCK TABLES `e_device_requirement_desc` WRITE;
+/*!40000 ALTER TABLE `e_device_requirement_desc` DISABLE KEYS */;
+/*!40000 ALTER TABLE `e_device_requirement_desc` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `e_doc_structure`
 --
 
@@ -262,11 +289,10 @@ DROP TABLE IF EXISTS `e_doc_structure`;
 CREATE TABLE `e_doc_structure` (
   `operator_id` int NOT NULL,
   `version_no` varchar(45) NOT NULL,
-  `id` varchar(45) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `name` varchar(45) DEFAULT NULL,
-  `tagId` varchar(45) DEFAULT NULL,
   `category` int NOT NULL,
-  `parent_structure_id` varchar(45) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `parent_structure_id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   PRIMARY KEY (`operator_id`,`version_no`,`id`),
@@ -321,8 +347,8 @@ DROP TABLE IF EXISTS `e_employee`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_employee` (
-  `id` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
-  `chinese_name` varchar(45) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `id` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `chinese_name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `english_name` varchar(255) DEFAULT NULL,
   `nt_account` varchar(255) DEFAULT NULL,
   `create_date` date DEFAULT NULL,
@@ -407,7 +433,7 @@ DROP TABLE IF EXISTS `e_operator`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_operator` (
   `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(45) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `area_id` int NOT NULL,
   `url` longtext,
   `create_date` date DEFAULT NULL,
@@ -437,10 +463,10 @@ DROP TABLE IF EXISTS `e_platform`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_platform` (
   `id` int NOT NULL,
-  `name` varchar(45) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  `ppm` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `ppm` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `platform_family_id` int NOT NULL,
   `code_name` varchar(45) DEFAULT NULL,
   `category` int NOT NULL,
@@ -497,7 +523,7 @@ DROP TABLE IF EXISTS `e_product`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_product` (
   `id` int NOT NULL,
-  `name` varchar(45) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   `category_id` int NOT NULL,
@@ -529,10 +555,10 @@ DROP TABLE IF EXISTS `e_project`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_project` (
   `id` int NOT NULL,
-  `name` varchar(45) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  `pm` varchar(10) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `pm` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `note` varchar(255) DEFAULT NULL,
   `alpha_project` tinyint DEFAULT NULL,
   PRIMARY KEY (`id`),
@@ -559,7 +585,7 @@ DROP TABLE IF EXISTS `e_project_fwversion`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_project_fwversion` (
   `project_id` int NOT NULL,
-  `version` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `version` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   `ta_id` int DEFAULT NULL,
@@ -641,7 +667,7 @@ CREATE TABLE `e_test_plan` (
   `operator_id` int NOT NULL,
   `version_no` varchar(45) NOT NULL,
   `test_id` int NOT NULL,
-  `title` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+  `title` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `test_description` varchar(2048) DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
@@ -674,7 +700,7 @@ CREATE TABLE `r_device_requirement_category` (
   `category_id` int NOT NULL,
   PRIMARY KEY (`requirement_operator_id`,`requirement_version_no`,`requirement_id`,`category_id`),
   KEY `fk_e_requirement_category_has_e_device_requirement_e_requir_idx` (`category_id`),
-  CONSTRAINT `fk_e_requirement_category_has_e_device_requirement_e_device_r1` FOREIGN KEY (`requirement_operator_id`, `requirement_version_no`, `requirement_id`) REFERENCES `e_device_requirement` (`operator_id`, `version_no`, `id`),
+  CONSTRAINT `fk_e_requirement_category_has_e_device_requirement_e_device_r1` FOREIGN KEY (`requirement_operator_id`, `requirement_version_no`, `requirement_id`) REFERENCES `e_device_requirement` (`operator_id`, `version_no`, `desc_id`),
   CONSTRAINT `fk_e_requirement_category_has_e_device_requirement_e_requirem1` FOREIGN KEY (`category_id`) REFERENCES `e_requirement_category` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -815,7 +841,7 @@ DROP TABLE IF EXISTS `r_project_fwversion_feature`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `r_project_fwversion_feature` (
   `project_id` int NOT NULL,
-  `version` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL,
+  `version` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `feature` int NOT NULL,
   PRIMARY KEY (`project_id`,`version`,`feature`),
   KEY `fk_e_project_fwversion_has_e_feature_e_feature1_idx` (`feature`),
@@ -939,7 +965,7 @@ CREATE TABLE `r_ta_comply_device_requirement` (
   PRIMARY KEY (`operator_id`,`version_no`,`requirement_id`,`technical_acceptance_id`),
   KEY `fk_e_technical_acceptance_has_e_device_requirement_e_techni_idx` (`technical_acceptance_id`),
   KEY `fk_r_ta_comply_device_requirement_a_compliance1_idx` (`compliance`),
-  CONSTRAINT `fk_e_technical_acceptance_has_e_device_requirement_e_device_r1` FOREIGN KEY (`operator_id`, `version_no`, `requirement_id`) REFERENCES `e_device_requirement` (`operator_id`, `version_no`, `id`),
+  CONSTRAINT `fk_e_technical_acceptance_has_e_device_requirement_e_device_r1` FOREIGN KEY (`operator_id`, `version_no`, `requirement_id`) REFERENCES `e_device_requirement` (`operator_id`, `version_no`, `desc_id`),
   CONSTRAINT `fk_e_technical_acceptance_has_e_device_requirement_e_technica1` FOREIGN KEY (`technical_acceptance_id`) REFERENCES `e_technical_acceptance` (`id`),
   CONSTRAINT `fk_r_ta_comply_device_requirement_a_compliance1` FOREIGN KEY (`compliance`) REFERENCES `a_compliance` (`compliance_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -998,9 +1024,8 @@ CREATE TABLE `r_test_plan_examine_device_requirement` (
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   PRIMARY KEY (`operator_id`,`version_no`,`requirement_id`,`test_id`),
-  KEY `fk_e_device_requirement_has_e_test_plan_e_device_requiremen_idx` (`operator_id`,`version_no`,`requirement_id`),
   KEY `fk_e_device_requirement_has_e_test_plan_e_test_plan1_idx` (`operator_id`,`version_no`,`test_id`),
-  CONSTRAINT `fk_e_device_requirement_has_e_test_plan_e_device_requirement1` FOREIGN KEY (`operator_id`, `version_no`, `requirement_id`) REFERENCES `e_device_requirement` (`operator_id`, `version_no`, `id`),
+  CONSTRAINT `fk_e_device_requirement_has_e_test_plan_e_device_requirement1` FOREIGN KEY (`operator_id`, `version_no`, `requirement_id`) REFERENCES `e_device_requirement` (`operator_id`, `version_no`, `desc_id`),
   CONSTRAINT `fk_e_device_requirement_has_e_test_plan_e_test_plan1` FOREIGN KEY (`operator_id`, `version_no`, `test_id`) REFERENCES `e_test_plan` (`operator_id`, `version_no`, `test_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1023,4 +1048,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2022-05-19  9:47:40
+-- Dump completed on 2023-02-14 22:02:51
