@@ -42,7 +42,9 @@ class Item:
         #add priority
         for t in self.type:
             idx = typeMap[t]
-            self.addPriority( row[idx].value )
+            if idx >= 0 :
+                self.addPriority( row[idx].value )
+            else: self.addPriority("")
     
     def setKey(self, key: KEYINFO, value):
         self.keyValueList[key.value] = value
