@@ -138,12 +138,12 @@ DROP TABLE IF EXISTS `e_area`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_area` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL,
   `name` varchar(45) DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -152,7 +152,7 @@ CREATE TABLE `e_area` (
 
 LOCK TABLES `e_area` WRITE;
 /*!40000 ALTER TABLE `e_area` DISABLE KEYS */;
-INSERT INTO `e_area` VALUES (1,'US','2022-05-19','2022-05-19'),(2,'JP','2022-05-19','2022-05-19'),(3,'EU','2022-05-19','2022-05-19'),(4,'CN','2022-05-19','2022-05-19');
+INSERT INTO `e_area` VALUES (100,'US','2022-05-19','2022-05-19'),(200,'JP','2022-05-19','2022-05-19'),(300,'EU','2022-05-19','2022-05-19'),(400,'CN','2022-05-19','2022-05-19');
 /*!40000 ALTER TABLE `e_area` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -181,6 +181,7 @@ CREATE TABLE `e_compliance_version` (
 
 LOCK TABLES `e_compliance_version` WRITE;
 /*!40000 ALTER TABLE `e_compliance_version` DISABLE KEYS */;
+INSERT INTO `e_compliance_version` VALUES ('TEST_Version1',101,'2023-02-22','2023-02-22',NULL),('TEST_Version2',101,'2023-02-22','2023-02-22',NULL);
 /*!40000 ALTER TABLE `e_compliance_version` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -192,7 +193,7 @@ DROP TABLE IF EXISTS `e_customer`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_customer` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL,
   `name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
@@ -226,9 +227,9 @@ CREATE TABLE `e_device_requirement` (
   `desc_id` int NOT NULL,
   `priority` int DEFAULT NULL,
   `structure_id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `tag_id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  `tag_id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   PRIMARY KEY (`operator_id`,`version_no`,`desc_id`),
   KEY `fk_e_device_requirement_e_priority1_idx` (`priority`),
   KEY `fk_e_device_requirement_e_compliance_version1_idx` (`version_no`,`operator_id`),
@@ -258,7 +259,7 @@ DROP TABLE IF EXISTS `e_device_requirement_desc`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_device_requirement_desc` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `name` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `description` longtext,
@@ -432,7 +433,7 @@ DROP TABLE IF EXISTS `e_operator`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_operator` (
-  `id` int NOT NULL AUTO_INCREMENT,
+  `id` int NOT NULL,
   `name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `area_id` int NOT NULL,
   `url` longtext,
@@ -440,8 +441,8 @@ CREATE TABLE `e_operator` (
   `update_date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_e_operator_e_area1_idx` (`area_id`),
-  CONSTRAINT `fk_e_operator_e_area1` FOREIGN KEY (`area_id`) REFERENCES `e_area` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  CONSTRAINT `fk_e_operator_e_area1` FOREIGN KEY (`area_id`) REFERENCES `e_area` (`id`) ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -450,7 +451,7 @@ CREATE TABLE `e_operator` (
 
 LOCK TABLES `e_operator` WRITE;
 /*!40000 ALTER TABLE `e_operator` DISABLE KEYS */;
-INSERT INTO `e_operator` VALUES (1,'ATT',1,'Z:\\AT_and_T','2022-05-19','2022-05-19');
+INSERT INTO `e_operator` VALUES (101,'ATT',100,'Z:\\AT_and_T','2022-05-19','2022-05-19'),(102,'TMO',100,NULL,'2022-02-22','2022-02-22');
 /*!40000 ALTER TABLE `e_operator` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1038,6 +1039,38 @@ LOCK TABLES `r_test_plan_examine_device_requirement` WRITE;
 /*!40000 ALTER TABLE `r_test_plan_examine_device_requirement` DISABLE KEYS */;
 /*!40000 ALTER TABLE `r_test_plan_examine_device_requirement` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Temporary view structure for view `v_area_operator`
+--
+
+DROP TABLE IF EXISTS `v_area_operator`;
+/*!50001 DROP VIEW IF EXISTS `v_area_operator`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `v_area_operator` AS SELECT 
+ 1 AS `area`,
+ 1 AS `operator_id`,
+ 1 AS `operator`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Final view structure for view `v_area_operator`
+--
+
+/*!50001 DROP VIEW IF EXISTS `v_area_operator`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `v_area_operator` AS select `a`.`name` AS `area`,`o`.`id` AS `operator_id`,`o`.`name` AS `operator` from (`e_area` `a` join `e_operator` `o`) where (`a`.`id` = `o`.`area_id`) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -1048,4 +1081,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-02-14 22:02:51
+-- Dump completed on 2023-02-22 22:54:40
