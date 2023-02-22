@@ -25,10 +25,10 @@ class RProductFeature(models.Model):
 
 class EProjectFwversion(models.Model):
     project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)
-    version = models.CharField(max_length=255, db_collation='utf8_general_ci')
+    version = models.CharField(max_length=255, db_collation='utf8mb3_general_ci')
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
-    ta = models.ForeignKey(ETechnicalAcceptance, models.DO_NOTHING, blank=True, null=True)
+    ta = models.ForeignKey('ETechnicalAcceptance', models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False

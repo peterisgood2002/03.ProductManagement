@@ -13,6 +13,10 @@ class RProjectPlatform(models.Model):
         db_table = 'r_project_platform'
         unique_together = (('project', 'platform'),)
 
+
+
+
+
 class RProjectTargetProduct(models.Model):
     project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)
     product = models.ForeignKey(EProduct, models.DO_NOTHING)

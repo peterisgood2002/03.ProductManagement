@@ -17,7 +17,7 @@ class EPlatformFamily(models.Model):
 
 class EPlatform(models.Model):
     id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=45, db_collation='utf8_general_ci', blank=True, null=True)
+    name = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
     ppm = models.ForeignKey(EEmployee, models.DO_NOTHING, db_column='ppm', blank=True, null=True)

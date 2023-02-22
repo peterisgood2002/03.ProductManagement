@@ -8,8 +8,8 @@ from .e_operator_requirement import EDeviceRequirement
 
 class RTaComplyDeviceRequirement(models.Model):
     operator = models.OneToOneField(EDeviceRequirement, models.DO_NOTHING, primary_key=True)
-    version_no = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, db_column='version_no')
-    requirement = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING)
+    version_no = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, db_column='version_no', to_field='version_no')
+    requirement = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, to_field='desc_id')
     technical_acceptance = models.ForeignKey(ETechnicalAcceptance, models.DO_NOTHING)
     compliance = models.ForeignKey(ACompliance, models.DO_NOTHING, db_column='compliance')
 
@@ -21,8 +21,8 @@ class RTaComplyDeviceRequirement(models.Model):
 
 class RTaComplyTestPlan(models.Model):
     technical_acceptance = models.OneToOneField(ETechnicalAcceptance, models.DO_NOTHING, primary_key=True)
-    test = models.ForeignKey(ETestPlan, models.DO_NOTHING)
-    version_no = models.ForeignKey(ETestPlan, models.DO_NOTHING, db_column='version_no')
+    test = models.ForeignKey(ETestPlan, models.DO_NOTHING, to_field='test_id')
+    version_no = models.ForeignKey(ETestPlan, models.DO_NOTHING, db_column='version_no', to_field='version_no')
     operator = models.ForeignKey(ETestPlan, models.DO_NOTHING)
 
     class Meta:
@@ -30,11 +30,12 @@ class RTaComplyTestPlan(models.Model):
         db_table = 'r_ta_comply_test_plan'
         unique_together = (('technical_acceptance', 'test', 'version_no', 'operator'),)
 
+
 class RTestPlanExamineDeviceRequirement(models.Model):
     operator = models.OneToOneField(ETestPlan, models.DO_NOTHING, primary_key=True)
-    version_no = models.ForeignKey(ETestPlan, models.DO_NOTHING, db_column='version_no')
-    requirement = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING)
-    test = models.ForeignKey(ETestPlan, models.DO_NOTHING)
+    version_no = models.ForeignKey(ETestPlan, models.DO_NOTHING, db_column='version_no', to_field='version_no')
+    requirement = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, to_field='desc_id')
+    test = models.ForeignKey(ETestPlan, models.DO_NOTHING, to_field='test_id')
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
 
