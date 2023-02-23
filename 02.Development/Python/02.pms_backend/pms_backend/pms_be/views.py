@@ -8,7 +8,7 @@ import requests
 from bs4 import BeautifulSoup, Tag
 import webbrowser
 
-from pms_dbmodel.operator_models import getArea
+from pms_dbmodel.operator_models import OperatorOperation
 def index( request):
     return HttpResponse("Hello World:")
 
@@ -54,6 +54,6 @@ def getCNN5():
     return result
 
 def testDB(request):
-    getArea('TEST')
+    OperatorOperation.getArea('TEST')
     
     return HttpResponse("TEST")
