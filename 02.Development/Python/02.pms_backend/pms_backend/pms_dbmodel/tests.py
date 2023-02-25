@@ -1,5 +1,5 @@
 from django.test import TestCase
-from pms_dbmodel.models.e_employee import EEmployee
+
 # Create your tests here.
 from contextlib import contextmanager
 from django.test import TestCase
@@ -7,6 +7,7 @@ from pms_dbmodel.models.e_operator import EComplianceVersion
 from pms_dbmodel.models.e_operator import EOperator
 from pms_dbmodel.operator_models import OperatorOperation
 from pms_dbmodel.models.e_operator import EArea
+from pms_dbmodel.models.e_operator import VAreaOperator
 from pms_dbmodel.models.e_employee import EEmployee
 from django.db import connection
 from django.db import connections
@@ -59,11 +60,20 @@ class OperatorOperationTest(PMSDbTest):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        super().setManaged(EArea, EOperator, EComplianceVersion)
+        super().setManaged(EArea, EOperator, EComplianceVersion, VAreaOperator)
     
     area = 'NA'
     operator = 'ATT'
     
+    def testGetArea(self):
+        a = OperatorOperation.getArea(self.area)
+        self.assertIsInstance(a, EArea)
+        self.assertEqual(a.name, self.area)
+
+        b = OperatorOperation.getArea(self.area)
+        self.assertEqual(a, b)
+
+
     def testGetOperator(self):
         o = OperatorOperation.getOperator(self.area, self.operator)
         

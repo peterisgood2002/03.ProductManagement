@@ -3,7 +3,6 @@ from django.db import models
 from .e_employee import EEmployee
 
 class EArea(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=45, blank=True, null=True)
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
@@ -40,6 +39,7 @@ class EComplianceVersion(models.Model):
         unique_together = (('version_no', 'operator'),)
 
 class VAreaOperator(models.Model):
+    area_id = models.IntegerField()
     area = models.CharField(max_length=45, db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)
     operator_id = models.IntegerField()
     operator = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
