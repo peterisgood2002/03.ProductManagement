@@ -138,12 +138,12 @@ DROP TABLE IF EXISTS `e_area`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_area` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(45) DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -152,7 +152,7 @@ CREATE TABLE `e_area` (
 
 LOCK TABLES `e_area` WRITE;
 /*!40000 ALTER TABLE `e_area` DISABLE KEYS */;
-INSERT INTO `e_area` VALUES (100,'US','2022-05-19','2022-05-19'),(200,'JP','2022-05-19','2022-05-19'),(300,'EU','2022-05-19','2022-05-19'),(400,'CN','2022-05-19','2022-05-19');
+INSERT INTO `e_area` VALUES (1,'US','2022-05-19','2022-05-19'),(2,'JP','2022-05-19','2022-05-19'),(3,'EU','2022-05-19','2022-05-19'),(4,'CN','2022-05-19','2022-05-19');
 /*!40000 ALTER TABLE `e_area` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -451,7 +451,7 @@ CREATE TABLE `e_operator` (
 
 LOCK TABLES `e_operator` WRITE;
 /*!40000 ALTER TABLE `e_operator` DISABLE KEYS */;
-INSERT INTO `e_operator` VALUES (101,'ATT',100,'Z:\\AT_and_T','2022-05-19','2022-05-19'),(102,'TMO',100,NULL,'2022-02-22','2022-02-22');
+INSERT INTO `e_operator` VALUES (101,'ATT',1,'Z:\\AT_and_T','2022-05-19','2022-05-19'),(102,'TMO',1,NULL,'2022-02-22','2022-02-22');
 /*!40000 ALTER TABLE `e_operator` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1049,6 +1049,7 @@ DROP TABLE IF EXISTS `v_area_operator`;
 SET @saved_cs_client     = @@character_set_client;
 /*!50503 SET character_set_client = utf8mb4 */;
 /*!50001 CREATE VIEW `v_area_operator` AS SELECT 
+ 1 AS `area_id`,
  1 AS `area`,
  1 AS `operator_id`,
  1 AS `operator`*/;
@@ -1067,7 +1068,7 @@ SET character_set_client = @saved_cs_client;
 /*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `v_area_operator` AS select `a`.`name` AS `area`,`o`.`id` AS `operator_id`,`o`.`name` AS `operator` from (`e_area` `a` join `e_operator` `o`) where (`a`.`id` = `o`.`area_id`) */;
+/*!50001 VIEW `v_area_operator` AS select `a`.`id` AS `area_id`,`a`.`name` AS `area`,`o`.`id` AS `operator_id`,`o`.`name` AS `operator` from (`e_area` `a` join `e_operator` `o`) where (`a`.`id` = `o`.`area_id`) */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -1081,4 +1082,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-02-22 22:54:40
+-- Dump completed on 2023-02-25  8:27:48
