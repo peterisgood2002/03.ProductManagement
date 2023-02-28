@@ -6,6 +6,7 @@ import openpyxl
 
 from excel_common.excel_operation import ExcelParser
 from excel_common.excel_operation import KEYINFO
+from excel_common.excel_operation import NOCOLUMNINX
 # Create your tests here.
 
 class ExcelParserTest(TestCase):
@@ -84,7 +85,13 @@ class ExcelParserTest(TestCase):
             KEYINFO.Note: 17
         }
         typeResult = {"TEST": 6}
-        self.assertEqual( keyResult, self.t.keyMap)
+        
+        for k in self.t.keyMap.keys():
+            if keyResult.get(k) != None:
+                self.assertEqual( keyResult[k], self.t.keyMap[k])
+            else: 
+                self.assertEqual( NOCOLUMNINX, self.t.keyMap[k])
+            
         self.assertEqual( typeResult, self.t.typeMap)
         
     
