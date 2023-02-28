@@ -1,3 +1,4 @@
+from unittest import skip
 from django.test import TestCase
 
 # Create your tests here.
@@ -7,7 +8,6 @@ from pms_dbmodel.models.e_operator import EComplianceVersion
 from pms_dbmodel.models.e_operator import EOperator
 from pms_dbmodel.operator_models import OperatorOperation
 from pms_dbmodel.models.e_operator import EArea
-from pms_dbmodel.models.e_operator import VAreaOperator
 from pms_dbmodel.models.e_employee import EEmployee
 from django.db import connection
 from django.db import connections
@@ -60,10 +60,9 @@ class OperatorOperationTest(PMSDbTest):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        super().setManaged(EArea, EOperator, EComplianceVersion, VAreaOperator)
+        super().setManaged(EArea, EOperator, EComplianceVersion)
     
     area = 'NA'
-    operator = 'ATT'
     
     def testGetArea(self):
         a = OperatorOperation.getArea(self.area)
@@ -73,23 +72,33 @@ class OperatorOperationTest(PMSDbTest):
         b = OperatorOperation.getArea(self.area)
         self.assertEqual(a, b)
 
-
+    operator1 = 'ATT'
+    operator2 = 'TMO'
     def testGetOperator(self):
-        o = OperatorOperation.getOperator(self.area, self.operator)
-        
+        #1. Insert ATT
+        o = OperatorOperation.getOperator(self.area, self.operator1)
         self.assertIsInstance(o, EOperator)
-        self.assertEqual(o.name, self.operator )
+        self.assertEqual(o.name, self.operator1 )
         self.assertEqual(o.area.name, self.area)
         
+        #2. Insert TMO
+        tmo = OperatorOperation.getOperator(self.area, self.operator2)
+        self.assertEqual(tmo.name, self.operator2 )
+        self.assertEqual(tmo.area.name, self.area)
+        
+        #3. Get TMO again
+        o = OperatorOperation.getOperator(self.area, self.operator2)
+        self.assertEqual(tmo, o)
+
     def testGetVersions(self):
-        r = OperatorOperation.getVersions(self.area, self.operator)
+        r = OperatorOperation.getVersions(self.area, self.operator1)
         self.assertEqual(0, len(r) )
         
-        suceed = OperatorOperation.addVersion(self.area, self.operator, '19.3')
+        suceed = OperatorOperation.addVersion(self.area, self.operator1, '19.3')
         self.assertTrue(suceed)
-        suceed = OperatorOperation.addVersion(self.area, self.operator, '22.1')
+        suceed = OperatorOperation.addVersion(self.area, self.operator1, '22.1')
         self.assertTrue(suceed)
-        r = OperatorOperation.getVersions(self.area, self.operator)
+        r = OperatorOperation.getVersions(self.area, self.operator1)
         self.assertEqual(2, len(r) )
         self.assertIn('19.3', r)
         self.assertIn('22.1', r)

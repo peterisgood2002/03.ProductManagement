@@ -1,6 +1,6 @@
 from datetime import date
 from django.db import models
-from pms_dbmodel.models.e_operator import VAreaOperator
+
 from pms_dbmodel.models.e_operator import EComplianceVersion
 from pms_dbmodel.models.e_operator import EOperator
 from pms_dbmodel.models.e_operator import EArea
@@ -19,9 +19,23 @@ class OperatorOperation:
 
     @classmethod
     def getOperator(cls, area, operator) -> EOperator:
-        a = cls.getArea(area)
-        operators  = VAreaOperator.objects.all()
-        return None
+        a:EArea = cls.getArea(area)
+        operators = EOperator.objects.filter(area = a).order_by('-id')
+        
+        result = None
+        
+        for o in operators:
+            if o.name == operator:
+               result = o
+        
+        if result == None:
+            index = a.id * 100
+            if len( operators ) != 0:
+                index = operators[0].id + 1
+            r = EOperator.objects.get_or_create(id = index, name = operator, area = a )
+            result = r[0]
+
+        return result
     
     @classmethod
     def addVersion( cls, area, operator, version):
