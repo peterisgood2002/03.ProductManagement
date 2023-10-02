@@ -4,21 +4,37 @@ from django.db import models
 from pms_dbmodel.models.e_operator import EComplianceVersion
 from pms_dbmodel.models.e_operator import EOperator
 from pms_dbmodel.models.e_operator import EArea
+from pms_dbmodel.models.e_operator_requirement import EDocStructureCategory, EDocStructure
 import logging
 
+class OperatorRequirement:
+   def __init__(self, Id, title, description, chapterId, chapter, sectionId, section):
+       self._id = Id
+       self._title = title
+       self._description = description
+       self._chapterId = chapterId
+       self._sectionId = sectionId
+       self._section = section
+    
 
 # Create your models here.
 class OperatorOperation:
    
     logger = logging.getLogger("OperatorOperation")
     @classmethod
+    def _setDate( cls, data ):
+        if data[1] == True:
+            data[0].create_date = date.today()
+            data[0].update_date = date.today()
+            data[0].save()
+        else:
+            data[0].update_date = date.today()
+            data[0].save()
+    
+    @classmethod
     def getArea(cls, area) -> EArea:
         r = EArea.objects.get_or_create(name = area)
-        if r[1] == True:
-            r[0].create_date = date.today()
-            r[0].update_date = date.today()
-            r[0].save()
-        
+        cls._setDate(r)
         
         return r[0]
 
@@ -44,20 +60,21 @@ class OperatorOperation:
         return result
     
     @classmethod
-    def addVersion( cls, area, operator, version):
-        cls.logger.info("[addVersion][BEGIN] AREA = %s, Operator = %s, Version = %s", area, operator, version )
+    def _addVersion( cls, area, operator, version):
         o = cls.getOperator(area, operator)
         
-        v = EComplianceVersion.objects.get_or_create(operator = o, version_no = version)
-        if v[1] == True:
-            v[0].create_date = date.today()
-            v[0].update_date = date.today()
-            v[0].save()
+        result = EComplianceVersion.objects.get_or_create(operator = o, version_no = version)
+        cls._setDate(result)
         
-        else:
-            return False
-            
-        return True
+        return result
+    
+    @classmethod
+    def addVersion( cls, area, operator, version):
+        
+        v = cls._addVersion(area, operator, version)
+        cls.logger.info("[addVersion][END] AREA = %s, Operator = %s, Version = %s, Insert/Update(True/False) = %s", area, operator, version, v[1] )
+
+        return v[1]
         
     
     @classmethod
@@ -72,4 +89,38 @@ class OperatorOperation:
             r.append( v.version_no)
             
         return r
+    
+    @classmethod
+    def getVersion( cls, area, operator, version):
+        cls.logger.info("[getVersion][BEGIN] AREA = %s, Operator = %s, Version = %s", area, operator, version )
+        
+        v = cls._addVersion(area, operator, version)
+        
+        return v[0]
+
+    @classmethod
+    def addDocStructureCategory(cls, category) -> EDocStructureCategory:
+        cls.logger.info("[addDocStructureCategory][BEGIN] Category = %s", category )
+        r = EDocStructureCategory.objects.get_or_create(name = category)
+        
+        cls._setDate(r)
+        
+        return r[0]
+    
+    @classmethod
+    def getDocStructureCategory(cls, category):
+        r = EDocStructureCategory.objects.get_or_create(name = category)
+        cls._setDate(r)
+        
+        return r[0]
+    
+    @classmethod
+    def addDocStructure(cls, area, operator, version, category, id, title):
+        cls.logger.info("[getVersion][BEGIN] AREA = %s, Operator = %s, Version = %s, Id = %s", area, operator, version, id )
+        version = cls.getVersion(area, operator, version )
+        cate = cls.getDocStructureCategory(category)
+        r = EDocStructure.objects.get_or_create(operator = version.operator, version = version, category = cate, id = id)
+        
+        cls._setDate(r)
+
         

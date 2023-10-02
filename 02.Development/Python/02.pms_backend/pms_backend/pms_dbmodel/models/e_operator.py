@@ -27,7 +27,7 @@ class EOperator(models.Model):
 
 
 class EComplianceVersion(models.Model):
-    version_no = models.CharField(primary_key=True, max_length=45)
+    version_no = models.CharField( primary_key=True, max_length=45)
     operator = models.ForeignKey('EOperator', models.DO_NOTHING)
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
@@ -37,6 +37,7 @@ class EComplianceVersion(models.Model):
         managed = False
         db_table = 'e_compliance_version'
         unique_together = (('version_no', 'operator'),)
+        
 
 class VAreaOperator(models.Model):
     area_id = models.IntegerField()

@@ -10,6 +10,7 @@ from pms_dbmodel.models.e_operator import EOperator
 from pms_dbmodel.operator_models import OperatorOperation
 from pms_dbmodel.models.e_operator import EArea
 from pms_dbmodel.models.e_employee import EEmployee
+from pms_dbmodel.models.e_operator_requirement import EDocStructureCategory, EDocStructure
 from django.db import connection
 from django.db import connections
 from django.db import models
@@ -64,7 +65,7 @@ class OperatorOperationTest(PMSDbTest):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        super().setManaged(EArea, EOperator, EComplianceVersion)
+        super().setManaged(EArea, EOperator, EComplianceVersion, EDocStructureCategory, EDocStructure)
     
     area = 'NA'
     
@@ -103,11 +104,14 @@ class OperatorOperationTest(PMSDbTest):
         self.logger.info("[testGetOperator][END]")
 
     def testGetVersions(self):
+        self.logger.info("[testGetVersions][BEGIN]")
         r = OperatorOperation.getVersions(self.area, self.operator1)
         assert 0 == len(r)
         
         succeed = OperatorOperation.addVersion(self.area, self.operator1, '19.3')
         assert succeed == True
+        succeed = OperatorOperation.addVersion(self.area, self.operator1, '19.3')
+        assert succeed == False
         succeed = OperatorOperation.addVersion(self.area, self.operator1, '22.1')
         assert succeed == True
         
@@ -115,13 +119,18 @@ class OperatorOperationTest(PMSDbTest):
         assert 2 == len(r)
         assert '19.3' in r
         assert '22.1' in r
-     
-        
-        
+        self.logger.info("[testGetVersions][END]")
 
-    def test_insertEmployee(self):
-        e = EEmployee( id = 1, english_name = "test")
-        e.save()
-        teste = EEmployee.objects.get(id = 1)
-        print(teste)
-        self.assertNotEqual(teste, None)
+   
+    def testInsertChapterAndSection(self):
+        self.logger.info("[testInsertChapterAndSection][BEGIN]")
+        categories = ['Document', 'Chapter', 'Section']
+        for c in categories:
+            category = OperatorOperation.addDocStructureCategory(c)
+            assert category.name == c
+            
+        OperatorOperation.addDocStructure("NA", "ATT", "19.3", 'Chapter', "1.1", "TEST")
+
+        
+   
+        

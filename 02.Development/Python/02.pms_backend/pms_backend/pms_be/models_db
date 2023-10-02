@@ -42,8 +42,26 @@ class APriority(models.Model):
         db_table = 'a_priority'
 
 
+class EAction(models.Model):
+    project = models.ForeignKey('RProjectSchedule', models.DO_NOTHING)
+    milestone = models.ForeignKey('RProjectSchedule', models.DO_NOTHING, to_field='milestone_id', related_name='eaction_milestone_set')
+    milestone_category = models.ForeignKey('RProjectSchedule', models.DO_NOTHING, db_column='milestone_category', to_field='milestone_category', related_name='eaction_milestone_category_set')
+    action_id = models.IntegerField(primary_key=True)
+    action_desc = models.TextField(blank=True, null=True)
+    owner = models.ForeignKey('EEmployee', models.DO_NOTHING)
+    deadline = models.DateField(blank=True, null=True)
+    finish_date = models.DateField(blank=True, null=True)
+    priority = models.ForeignKey(APriority, models.DO_NOTHING)
+    comment = models.TextField(blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'e_action'
+
+
 class EArea(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=45, blank=True, null=True)
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
@@ -53,22 +71,8 @@ class EArea(models.Model):
         db_table = 'e_area'
 
 
-class EOperator(models.Model):
-    id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
-    area = models.ForeignKey(EArea, models.DO_NOTHING)
-    url = models.TextField(blank=True, null=True)
-    create_date = models.DateField(blank=True, null=True)
-    update_date = models.DateField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'e_operator'
-
-
-
 class EComplianceVersion(models.Model):
-    version_no = models.CharField(primary_key=True, max_length=45)
+    version_no = models.CharField(primary_key=True, max_length=45)  # The composite primary key (version_no, operator_id) found, that is not supported. The first column is selected.
     operator = models.ForeignKey('EOperator', models.DO_NOTHING)
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
@@ -78,8 +82,6 @@ class EComplianceVersion(models.Model):
         managed = False
         db_table = 'e_compliance_version'
         unique_together = (('version_no', 'operator'),)
-
-
 
 
 class ECustomer(models.Model):
@@ -95,41 +97,12 @@ class ECustomer(models.Model):
         db_table = 'e_customer'
 
 
-
-class EDocStructureCategory(models.Model):
-    id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=45, blank=True, null=True)
-    create_date = models.DateField(blank=True, null=True)
-    update_date = models.DateField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'e_doc_structure_category'
-
-
-class EDocStructure(models.Model):
-    operator = models.OneToOneField('self', models.DO_NOTHING, primary_key=True)
-    version_no = models.ForeignKey('self', models.DO_NOTHING, db_column='version_no', to_field='version_no')
-    id = models.CharField(max_length=45, db_collation='utf8mb3_general_ci')
-    name = models.CharField(max_length=45, blank=True, null=True)
-    category = models.ForeignKey('EDocStructureCategory', models.DO_NOTHING, db_column='category')
-    parent_structure = models.ForeignKey('self', models.DO_NOTHING, to_field='id')
-    create_date = models.DateField(blank=True, null=True)
-    update_date = models.DateField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'e_doc_structure'
-        unique_together = (('operator', 'version_no', 'id'),)
-
-
-
 class EDeviceRequirement(models.Model):
-    operator = models.OneToOneField('EDocStructure', models.DO_NOTHING, primary_key=True)
-    version_no = models.ForeignKey('EDocStructure', models.DO_NOTHING, db_column='version_no', to_field='version_no')
+    operator = models.OneToOneField('EDocStructure', models.DO_NOTHING, primary_key=True)  # The composite primary key (operator_id, version_no, desc_id) found, that is not supported. The first column is selected.
+    version_no = models.ForeignKey('EDocStructure', models.DO_NOTHING, db_column='version_no', to_field='version_no', related_name='edevicerequirement_version_no_set')
     desc = models.ForeignKey('EDeviceRequirementDesc', models.DO_NOTHING)
     priority = models.ForeignKey(APriority, models.DO_NOTHING, db_column='priority', blank=True, null=True)
-    structure = models.ForeignKey('EDocStructure', models.DO_NOTHING, to_field='id')
+    structure = models.ForeignKey('EDocStructure', models.DO_NOTHING, to_field='id', related_name='edevicerequirement_structure_set')
     tag_id = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
@@ -137,7 +110,7 @@ class EDeviceRequirement(models.Model):
     class Meta:
         managed = False
         db_table = 'e_device_requirement'
-        unique_together = (('operator', 'version_no', 'desc'),)
+        unique_together = (('operator', 'version_no', 'structure'), ('operator', 'version_no', 'desc'),)
 
 
 class EDeviceRequirementDesc(models.Model):
@@ -154,7 +127,23 @@ class EDeviceRequirementDesc(models.Model):
         db_table = 'e_device_requirement_desc'
 
 
-class ERequirementCategory(models.Model):
+class EDocStructure(models.Model):
+    operator = models.OneToOneField('self', models.DO_NOTHING, primary_key=True)  # The composite primary key (operator_id, version_no, id) found, that is not supported. The first column is selected.
+    version_no = models.ForeignKey('self', models.DO_NOTHING, db_column='version_no', to_field='version_no', related_name='edocstructure_version_no_set')
+    id = models.CharField(max_length=45, db_collation='utf8mb3_general_ci')
+    name = models.CharField(max_length=45, blank=True, null=True)
+    category = models.ForeignKey('EDocStructureCategory', models.DO_NOTHING, db_column='category')
+    parent_structure = models.ForeignKey('self', models.DO_NOTHING, to_field='id', related_name='edocstructure_parent_structure_set')
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'e_doc_structure'
+        unique_together = (('operator', 'version_no', 'parent_structure'), ('operator', 'version_no', 'id'),)
+
+
+class EDocStructureCategory(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=45, blank=True, null=True)
     create_date = models.DateField(blank=True, null=True)
@@ -162,22 +151,7 @@ class ERequirementCategory(models.Model):
 
     class Meta:
         managed = False
-        db_table = 'e_requirement_category'
-
-        
-class RDeviceRequirementCategory(models.Model):
-    requirement_operator = models.OneToOneField(EDeviceRequirement, models.DO_NOTHING, primary_key=True)
-    requirement_version_no = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, db_column='requirement_version_no', to_field='version_no')
-    requirement = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, to_field='desc_id')
-    category = models.ForeignKey(ERequirementCategory, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'r_device_requirement_category'
-        unique_together = (('requirement_operator', 'requirement_version_no', 'requirement', 'category'),)
-
-
-
+        db_table = 'e_doc_structure_category'
 
 
 class EEmployee(models.Model):
@@ -193,7 +167,6 @@ class EEmployee(models.Model):
         db_table = 'e_employee'
 
 
-
 class EFeature(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=45, blank=True, null=True)
@@ -204,32 +177,16 @@ class EFeature(models.Model):
         managed = False
         db_table = 'e_feature'
 
-class EProjectFwversion(models.Model):
-    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)
-    version = models.CharField(max_length=255, db_collation='utf8mb3_general_ci')
-    create_date = models.DateField(blank=True, null=True)
-    update_date = models.DateField(blank=True, null=True)
-    ta = models.ForeignKey('ETechnicalAcceptance', models.DO_NOTHING, blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'e_project_fwversion'
-        unique_together = (('project', 'version'),)
-
-
-
-
-
 
 class EMilestone(models.Model):
-    milestone_id = models.IntegerField(primary_key=True)
+    milestone_id = models.IntegerField(primary_key=True)  # The composite primary key (milestone_id, category_id) found, that is not supported. The first column is selected.
     category = models.ForeignKey(ACategory, models.DO_NOTHING)
     milestone_name = models.TextField(blank=True, null=True)
     deliverable = models.TextField(blank=True, null=True)
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
     estimated = models.FloatField(blank=True, null=True)
-    estimated_baseline = models.ForeignKey(ACategory, models.DO_NOTHING, db_column='estimated_baseline', blank=True, null=True)
+    estimated_baseline = models.ForeignKey(ACategory, models.DO_NOTHING, db_column='estimated_baseline', related_name='emilestone_estimated_baseline_set', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -237,19 +194,17 @@ class EMilestone(models.Model):
         unique_together = (('milestone_id', 'category'),)
 
 
-
-
-
-
-class EPlatformFamily(models.Model):
+class EOperator(models.Model):
     id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=45, blank=True, null=True)
-    create_date = models.DateField(db_column='create_Date', blank=True, null=True)  # Field name made lowercase.
+    name = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
+    area = models.ForeignKey(EArea, models.DO_NOTHING)
+    url = models.TextField(blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'e_platform_family'
+        db_table = 'e_operator'
 
 
 class EPlatform(models.Model):
@@ -265,10 +220,17 @@ class EPlatform(models.Model):
     class Meta:
         managed = False
         db_table = 'e_platform'
-        
 
 
+class EPlatformFamily(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=45, blank=True, null=True)
+    create_date = models.DateField(db_column='create_Date', blank=True, null=True)  # Field name made lowercase.
+    update_date = models.DateField(blank=True, null=True)
 
+    class Meta:
+        managed = False
+        db_table = 'e_platform_family'
 
 
 class EProduct(models.Model):
@@ -298,18 +260,29 @@ class EProject(models.Model):
         managed = False
         db_table = 'e_project'
 
-class RProjectCustomer(models.Model):
-    customer = models.OneToOneField(ECustomer, models.DO_NOTHING, primary_key=True)
-    project = models.ForeignKey(EProject, models.DO_NOTHING)
+
+class EProjectFwversion(models.Model):
+    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)  # The composite primary key (project_id, version) found, that is not supported. The first column is selected.
+    version = models.CharField(max_length=255, db_collation='utf8mb3_general_ci')
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+    ta = models.ForeignKey('ETechnicalAcceptance', models.DO_NOTHING, blank=True, null=True)
 
     class Meta:
         managed = False
-        db_table = 'r_project_customer'
-        unique_together = (('customer', 'project'),)
+        db_table = 'e_project_fwversion'
+        unique_together = (('project', 'version'),)
 
 
+class ERequirementCategory(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=45, blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
 
-
+    class Meta:
+        managed = False
+        db_table = 'e_requirement_category'
 
 
 class ETechnicalAcceptance(models.Model):
@@ -324,8 +297,8 @@ class ETechnicalAcceptance(models.Model):
 
 
 class ETestPlan(models.Model):
-    operator = models.OneToOneField(EComplianceVersion, models.DO_NOTHING, primary_key=True)
-    version_no = models.ForeignKey(EComplianceVersion, models.DO_NOTHING, db_column='version_no')
+    operator = models.OneToOneField(EComplianceVersion, models.DO_NOTHING, primary_key=True)  # The composite primary key (operator_id, version_no, test_id) found, that is not supported. The first column is selected.
+    version_no = models.ForeignKey(EComplianceVersion, models.DO_NOTHING, db_column='version_no', related_name='etestplan_version_no_set')
     test_id = models.IntegerField()
     title = models.CharField(max_length=255, db_collation='utf8mb3_general_ci', blank=True, null=True)
     test_description = models.CharField(max_length=2048, blank=True, null=True)
@@ -338,14 +311,24 @@ class ETestPlan(models.Model):
         unique_together = (('operator', 'version_no', 'test_id'),)
 
 
+class RDeviceRequirementCategory(models.Model):
+    requirement_operator = models.OneToOneField(EDeviceRequirement, models.DO_NOTHING, primary_key=True)  # The composite primary key (requirement_operator_id, requirement_version_no, requirement_id, category_id) found, that is not supported. The first column is selected.
+    requirement_version_no = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, db_column='requirement_version_no', to_field='version_no', related_name='rdevicerequirementcategory_requirement_version_no_set')
+    requirement = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, to_field='desc_id', related_name='rdevicerequirementcategory_requirement_set')
+    category = models.ForeignKey(ERequirementCategory, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'r_device_requirement_category'
+        unique_together = (('requirement_operator', 'requirement_version_no', 'requirement', 'category'),)
 
 
 class ROpRfp(models.Model):
-    operator = models.OneToOneField(EOperator, models.DO_NOTHING, primary_key=True)
+    operator = models.OneToOneField(EOperator, models.DO_NOTHING, primary_key=True)  # The composite primary key (operator_id, product_id, version_no) found, that is not supported. The first column is selected.
     product = models.ForeignKey(EProduct, models.DO_NOTHING)
     version_no = models.CharField(max_length=45)
     create_date = models.DateField(blank=True, null=True)
-    update_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True, db_comment='This tables records the RFP')
     quantity = models.IntegerField(blank=True, null=True)
 
     class Meta:
@@ -355,7 +338,7 @@ class ROpRfp(models.Model):
 
 
 class RProductFeature(models.Model):
-    product = models.OneToOneField(EProduct, models.DO_NOTHING, primary_key=True)
+    product = models.OneToOneField(EProduct, models.DO_NOTHING, primary_key=True)  # The composite primary key (product_id, feature_id) found, that is not supported. The first column is selected.
     feature = models.ForeignKey(EFeature, models.DO_NOTHING)
     parameters = models.CharField(max_length=255, blank=True, null=True)
 
@@ -366,9 +349,9 @@ class RProductFeature(models.Model):
 
 
 class RProductSchedule(models.Model):
-    product = models.OneToOneField(EProduct, models.DO_NOTHING, primary_key=True)
+    product = models.OneToOneField(EProduct, models.DO_NOTHING, primary_key=True)  # The composite primary key (product_id, milestone_id, milestone_category) found, that is not supported. The first column is selected.
     milestone = models.ForeignKey(EMilestone, models.DO_NOTHING)
-    milestone_category = models.ForeignKey(EMilestone, models.DO_NOTHING, db_column='milestone_category', to_field='category_id')
+    milestone_category = models.ForeignKey(EMilestone, models.DO_NOTHING, db_column='milestone_category', to_field='category_id', related_name='rproductschedule_milestone_category_set')
     plan_start_dt = models.DateField(blank=True, null=True)
     plan_end_dt = models.DateField(blank=True, null=True)
     actual_start_dt = models.DateField(blank=True, null=True)
@@ -379,10 +362,42 @@ class RProductSchedule(models.Model):
         db_table = 'r_product_schedule'
         unique_together = (('product', 'milestone', 'milestone_category'),)
 
+
+class RProjectCustomer(models.Model):
+    customer = models.OneToOneField(ECustomer, models.DO_NOTHING, primary_key=True)  # The composite primary key (customer_id, project_id) found, that is not supported. The first column is selected.
+    project = models.ForeignKey(EProject, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'r_project_customer'
+        unique_together = (('customer', 'project'),)
+
+
+class RProjectFwversionFeature(models.Model):
+    project = models.OneToOneField(EProjectFwversion, models.DO_NOTHING, primary_key=True)  # The composite primary key (project_id, version, feature) found, that is not supported. The first column is selected.
+    version = models.ForeignKey(EProjectFwversion, models.DO_NOTHING, db_column='version', to_field='version', related_name='rprojectfwversionfeature_version_set')
+    feature = models.ForeignKey(EFeature, models.DO_NOTHING, db_column='feature')
+
+    class Meta:
+        managed = False
+        db_table = 'r_project_fwversion_feature'
+        unique_together = (('project', 'version', 'feature'),)
+
+
+class RProjectPlatform(models.Model):
+    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)  # The composite primary key (project_id, platform_id) found, that is not supported. The first column is selected.
+    platform = models.ForeignKey(EPlatform, models.DO_NOTHING)
+
+    class Meta:
+        managed = False
+        db_table = 'r_project_platform'
+        unique_together = (('project', 'platform'),)
+
+
 class RProjectSchedule(models.Model):
-    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)
+    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)  # The composite primary key (project_id, milestone_id, milestone_category) found, that is not supported. The first column is selected.
     milestone = models.ForeignKey(EMilestone, models.DO_NOTHING)
-    milestone_category = models.ForeignKey(EMilestone, models.DO_NOTHING, db_column='milestone_category', to_field='category_id')
+    milestone_category = models.ForeignKey(EMilestone, models.DO_NOTHING, db_column='milestone_category', to_field='category_id', related_name='rprojectschedule_milestone_category_set')
     plan_start_dt = models.DateField(blank=True, null=True)
     plan_end_dt = models.DateField(blank=True, null=True)
     actual_start_dt = models.DateField(blank=True, null=True)
@@ -396,56 +411,9 @@ class RProjectSchedule(models.Model):
         db_table = 'r_project_schedule'
         unique_together = (('project', 'milestone', 'milestone_category'),)
 
-class EAction(models.Model):
-    project = models.ForeignKey('RProjectSchedule', models.DO_NOTHING)
-    milestone = models.ForeignKey('RProjectSchedule', models.DO_NOTHING, to_field='milestone_id')
-    milestone_category = models.ForeignKey('RProjectSchedule', models.DO_NOTHING, db_column='milestone_category', to_field='milestone_category')
-    action_id = models.IntegerField(primary_key=True)
-    action_desc = models.TextField(blank=True, null=True)
-    owner = models.ForeignKey('EEmployee', models.DO_NOTHING)
-    deadline = models.DateField(blank=True, null=True)
-    finish_date = models.DateField(blank=True, null=True)
-    priority = models.ForeignKey(APriority, models.DO_NOTHING)
-    comment = models.TextField(blank=True, null=True)
-    create_date = models.DateField(blank=True, null=True)
-    update_date = models.DateField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = 'e_action'
-
-
-
-
-
-
-
-class RProjectFwversionFeature(models.Model):
-    project = models.OneToOneField(EProjectFwversion, models.DO_NOTHING, primary_key=True)
-    version = models.ForeignKey(EProjectFwversion, models.DO_NOTHING, db_column='version', to_field='version')
-    feature = models.ForeignKey(EFeature, models.DO_NOTHING, db_column='feature')
-
-    class Meta:
-        managed = False
-        db_table = 'r_project_fwversion_feature'
-        unique_together = (('project', 'version', 'feature'),)
-
-
-class RProjectPlatform(models.Model):
-    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)
-    platform = models.ForeignKey(EPlatform, models.DO_NOTHING)
-
-    class Meta:
-        managed = False
-        db_table = 'r_project_platform'
-        unique_together = (('project', 'platform'),)
-
-
-
-
 
 class RProjectTargetProduct(models.Model):
-    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)
+    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)  # The composite primary key (project_id, product_id) found, that is not supported. The first column is selected.
     product = models.ForeignKey(EProduct, models.DO_NOTHING)
 
     class Meta:
@@ -455,9 +423,9 @@ class RProjectTargetProduct(models.Model):
 
 
 class RTaComplyDeviceRequirement(models.Model):
-    operator = models.OneToOneField(EDeviceRequirement, models.DO_NOTHING, primary_key=True)
-    version_no = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, db_column='version_no', to_field='version_no')
-    requirement = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, to_field='desc_id')
+    operator = models.OneToOneField(EDeviceRequirement, models.DO_NOTHING, primary_key=True)  # The composite primary key (operator_id, version_no, requirement_id, technical_acceptance_id) found, that is not supported. The first column is selected.
+    version_no = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, db_column='version_no', to_field='version_no', related_name='rtacomplydevicerequirement_version_no_set')
+    requirement = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, to_field='desc_id', related_name='rtacomplydevicerequirement_requirement_set')
     technical_acceptance = models.ForeignKey(ETechnicalAcceptance, models.DO_NOTHING)
     compliance = models.ForeignKey(ACompliance, models.DO_NOTHING, db_column='compliance')
 
@@ -468,10 +436,10 @@ class RTaComplyDeviceRequirement(models.Model):
 
 
 class RTaComplyTestPlan(models.Model):
-    technical_acceptance = models.OneToOneField(ETechnicalAcceptance, models.DO_NOTHING, primary_key=True)
+    technical_acceptance = models.OneToOneField(ETechnicalAcceptance, models.DO_NOTHING, primary_key=True)  # The composite primary key (technical_acceptance_id, test_id, version_no, operator_id) found, that is not supported. The first column is selected.
     test = models.ForeignKey(ETestPlan, models.DO_NOTHING, to_field='test_id')
-    version_no = models.ForeignKey(ETestPlan, models.DO_NOTHING, db_column='version_no', to_field='version_no')
-    operator = models.ForeignKey(ETestPlan, models.DO_NOTHING)
+    version_no = models.ForeignKey(ETestPlan, models.DO_NOTHING, db_column='version_no', to_field='version_no', related_name='rtacomplytestplan_version_no_set')
+    operator = models.ForeignKey(ETestPlan, models.DO_NOTHING, related_name='rtacomplytestplan_operator_set')
 
     class Meta:
         managed = False
@@ -480,10 +448,10 @@ class RTaComplyTestPlan(models.Model):
 
 
 class RTestPlanExamineDeviceRequirement(models.Model):
-    operator = models.OneToOneField(ETestPlan, models.DO_NOTHING, primary_key=True)
-    version_no = models.ForeignKey(ETestPlan, models.DO_NOTHING, db_column='version_no', to_field='version_no')
+    operator = models.OneToOneField(ETestPlan, models.DO_NOTHING, primary_key=True)  # The composite primary key (operator_id, version_no, requirement_id, test_id) found, that is not supported. The first column is selected.
+    version_no = models.ForeignKey(ETestPlan, models.DO_NOTHING, db_column='version_no', to_field='version_no', related_name='rtestplanexaminedevicerequirement_version_no_set')
     requirement = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, to_field='desc_id')
-    test = models.ForeignKey(ETestPlan, models.DO_NOTHING, to_field='test_id')
+    test = models.ForeignKey(ETestPlan, models.DO_NOTHING, to_field='test_id', related_name='rtestplanexaminedevicerequirement_test_set')
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
 

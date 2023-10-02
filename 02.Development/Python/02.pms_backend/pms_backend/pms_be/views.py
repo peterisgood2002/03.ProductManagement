@@ -54,6 +54,6 @@ def getCNN5():
     return result
 
 def testDB(request):
-    OperatorOperation.getArea('TEST')
+    OperatorOperation.addDocStructure("NA", "ATT", "19.3","Chapter", "1.1", "TEST")
     
     return HttpResponse("TEST")
