@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'excel_common.apps.ExcelCommonConfig',
     'pms_dbmodel.apps.PmsDbmodelConfig',
     'pms_customer.apps.PmsCustomerConfig',
-    'pms_platform.apps.PmsPlatformConfig'
+    'pms_platform.apps.PmsPlatformConfig',
+    'pms_project.apps.PmsProjectConfig'
 ]
 
 MIDDLEWARE = [
