@@ -152,7 +152,7 @@ CREATE TABLE `e_area` (
 
 LOCK TABLES `e_area` WRITE;
 /*!40000 ALTER TABLE `e_area` DISABLE KEYS */;
-INSERT INTO `e_area` VALUES (1,'US','2022-05-19','2022-05-19'),(2,'JP','2022-05-19','2022-05-19'),(3,'EU','2022-05-19','2022-05-19'),(4,'CN','2022-05-19','2022-05-19');
+INSERT INTO `e_area` VALUES (1,'NA','2022-05-19','2023-10-18'),(2,'JP','2022-05-19','2022-05-19'),(3,'EU','2022-05-19','2022-05-19'),(4,'CN','2022-05-19','2022-05-19');
 /*!40000 ALTER TABLE `e_area` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -231,10 +231,10 @@ CREATE TABLE `e_device_requirement` (
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   PRIMARY KEY (`operator_id`,`version_no`,`desc_id`),
+  UNIQUE KEY `fk_e_device_requirement_e_doc_structure1_idx` (`operator_id`,`version_no`,`structure_id`) /*!80000 INVISIBLE */,
   KEY `fk_e_device_requirement_e_priority1_idx` (`priority`),
-  KEY `fk_e_device_requirement_e_compliance_version1_idx` (`version_no`,`operator_id`),
-  KEY `fk_e_device_requirement_e_doc_structure1_idx` (`operator_id`,`version_no`,`structure_id`),
-  KEY `fk_e_device_requirement_e_device_requirement_desc1_idx` (`desc_id`),
+  KEY `fk_e_device_requirement_e_compliance_version1_idx` (`version_no`,`operator_id`) /*!80000 INVISIBLE */,
+  KEY `fk_e_device_requirement_e_device_requirement_desc1_idx` (`desc_id`) /*!80000 INVISIBLE */,
   CONSTRAINT `fk_e_device_requirement_e_compliance_version1` FOREIGN KEY (`version_no`, `operator_id`) REFERENCES `e_compliance_version` (`version_no`, `operator_id`),
   CONSTRAINT `fk_e_device_requirement_e_device_requirement_desc1` FOREIGN KEY (`desc_id`) REFERENCES `e_device_requirement_desc` (`id`),
   CONSTRAINT `fk_e_device_requirement_e_doc_structure1` FOREIGN KEY (`operator_id`, `version_no`, `structure_id`) REFERENCES `e_doc_structure` (`operator_id`, `version_no`, `id`),
@@ -293,10 +293,11 @@ CREATE TABLE `e_doc_structure` (
   `id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `name` varchar(45) DEFAULT NULL,
   `category` int NOT NULL,
-  `parent_structure_id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `parent_structure_id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   PRIMARY KEY (`operator_id`,`version_no`,`id`),
+  UNIQUE KEY `fk_doc_structure_has_parent_doc_structure_idx` (`operator_id`,`version_no`,`parent_structure_id`) /*!80000 INVISIBLE */,
   KEY `fk_e_doc_structure_e_doc_structure_category1_idx` (`category`),
   KEY `fk_e_doc_structure_e_compliance_version1_idx` (`version_no`,`operator_id`),
   KEY `fk_doc_structure_has_parent_doc_structure_idx` (`operator_id`,`version_no`,`parent_structure_id`),
@@ -1082,4 +1083,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-02-25  8:27:48
+-- Dump completed on 2023-10-18 21:14:37
