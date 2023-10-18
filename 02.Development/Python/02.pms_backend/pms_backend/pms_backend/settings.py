@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'pms_be.apps.PmsBeConfig',
     'pms_operator.apps.PmsOperatorConfig',
     'excel_common.apps.ExcelCommonConfig',
-    'pms_dbmodel.apps.PmsDbmodelConfig'
+    'pms_dbmodel.apps.PmsDbmodelConfig',
+    'pms_customer.apps.PmsCustomerConfig'
 ]
 
 MIDDLEWARE = [
@@ -167,6 +168,7 @@ LOGGING = {
             'level': 'DEBUG',
             'handlers': ['console'],
         }
+        
     },
     'root': {
         'handlers': ['console'],
