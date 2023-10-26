@@ -166,10 +166,10 @@ LOGGING = {
             'propagate': True,
         },
         #SQL Debug
-        'django.db.backends': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-        }
+        #'django.db.backends': {
+        #    'level': 'DEBUG',
+        #    'handlers': ['console'],
+        #}
         
     },
     'root': {
