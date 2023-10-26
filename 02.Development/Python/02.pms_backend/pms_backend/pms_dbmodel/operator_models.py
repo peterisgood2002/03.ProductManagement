@@ -7,6 +7,8 @@ from pms_dbmodel.models.e_operator import EArea
 from pms_dbmodel.models.e_operator_requirement import (
     EDocStructureCategory,
     EDocStructure,
+    EDeviceRequirementDesc,
+    EDeviceRequirement,
 )
 import logging
 
@@ -236,17 +238,37 @@ class DocOperation:
 
 class RequirementOperation:
     @classmethod
-    def _addDeviceRequirementDesc(cls, title, name, desc):
-        i = 0
+    def addDeviceRequirementDesc(cls, title, name, desc) -> EDeviceRequirementDesc:
+        r = EDeviceRequirementDesc.objects.get_or_create(
+            title=title, name=name, description=desc
+        )
+        _setDateAndSave(r)
 
+        return r
+
+    @classmethod
     def getDeviceRequirementDesc(cls, id):
         logger.info("[getDeviceRequirementDesc][BEGIN],ID = %s", id)
+        result = EDeviceRequirementDesc.objects.filter(id=id)
+        if len(result) == 0:
+            return None
+
+        return result[0]
 
     @classmethod
     def addDeviceRequirement(
         cls, area, operator, version_no, tag, description, docStucture: EDocStructure
-    ):
+    ) -> EDeviceRequirement:
+        logger.info(
+            "[addDeviceRequirement][BEGIN] Operator = %s, Version = %s, TAG = %s",
+            operator,
+            version_no,
+            tag,
+        )
         version = VersionOperation.getOrAddVersion(area, operator, version_no)
+
+        return cls.addDeviceRequirement(version, tag, description, docStucture)
+        logger.info("[addDeviceRequirement][END]")
 
     @classmethod
     def addDeviceRequirement(

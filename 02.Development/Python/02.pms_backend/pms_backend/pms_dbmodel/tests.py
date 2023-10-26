@@ -218,5 +218,23 @@ class OperatorOperationTest(PMSDbTest):
         )
         self.logger.info("[testInsertChapterAndSection][END]")
 
-    def testInsertDeviceRequirement(self):
-        i = 0
+    def _checkDeviceRequirmentDesc(
+        self, data: EDeviceRequirementDesc, title, name, desc
+    ):
+        assert data.title == title
+        assert data.name == name
+        assert data.description == desc
+
+    def testInsertDeviceRequirementDesc(self):
+        self.logger.info("[testInsertDeviceRequirementDesc][BEGIN]")
+
+        rTitle = "Requirement 1"
+        rName = "Requirement1 Name"
+        rDesc = "Requirement1 Desc"
+        [data, success] = RequirementOperation.addDeviceRequirementDesc(
+            rTitle, rName, rDesc
+        )
+        assert success == True
+        result = RequirementOperation.getDeviceRequirementDesc(data.id)
+        self._checkDeviceRequirmentDesc(result, rTitle, rName, rDesc)
+        self.logger.info("[testInsertDeviceRequirement][END]")
