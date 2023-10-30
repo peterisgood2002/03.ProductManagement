@@ -219,22 +219,77 @@ class OperatorOperationTest(PMSDbTest):
         self.logger.info("[testInsertChapterAndSection][END]")
 
     def _checkDeviceRequirmentDesc(
-        self, data: EDeviceRequirementDesc, title, name, desc
+        self, data: EDeviceRequirementDesc, title, name, desc=""
     ):
         assert data.title == title
         assert data.name == name
         assert data.description == desc
 
-    def testInsertDeviceRequirementDesc(self):
+    def testInsertDeviceRequirement(self):
         self.logger.info("[testInsertDeviceRequirementDesc][BEGIN]")
 
-        rTitle = "Requirement 1"
-        rName = "Requirement1 Name"
-        rDesc = "Requirement1 Desc"
+        # 1. New a requirement
+        requirement = [
+            [
+                "19.3",  # Version
+                "1.1",  # SectionId
+                " TEST 1",  # Section
+                "TAG_1",  # Tag
+                "Requirement Title",  # Title
+                "Requirement1 Name",  # Name
+                "Requirement Desc",  # Desc
+            ],
+            [
+                "19.3",  # Version
+                "1.2",  # SectionId
+                " TEST 2",  # Section
+                "TAG_2",  # Tag
+                "Requirement Title 2",  # Title
+                "Requirement1 Name 2",  # Name
+                "Requirement Desc 2",  # Desc
+            ],
+        ]
+
         [data, success] = RequirementOperation.addDeviceRequirementDesc(
-            rTitle, rName, rDesc
+            requirement[0][4], requirement[0][5], requirement[0][6]
         )
         assert success == True
         result = RequirementOperation.getDeviceRequirementDesc(data.id)
-        self._checkDeviceRequirmentDesc(result, rTitle, rName, rDesc)
+        self._checkDeviceRequirmentDesc(
+            result, requirement[0][4], requirement[0][5], requirement[0][6]
+        )
+
+        rList = RequirementOperation.getDeviceRequirmentDecList(
+            requirement[0][4], requirement[0][5], requirement[0][6]
+        )
+        assert 1 == len(rList)
+        self.logger.info("[testInsertDeviceRequirementDesc][END]")
+
+        self.logger.info("[testInsertDeviceRequirement][BEGIN]")
+        self._addCategories()
+        for req in requirement:
+            [section, succeed] = DocOperation.addDocStructure(
+                self.area,
+                self.operator1,
+                req[0],
+                self.categories[2],
+                req[1],
+                req[2],
+                None,
+            )
+
+            r = RequirementOperation.addNewDeviceRequirement(
+                self.area,
+                self.operator1,
+                req[0],
+                section,
+                req[3],
+                req[4],
+                req[5],
+                req[6],
+            )
+
+        assert 2 == EDeviceRequirementDesc.objects.count()
+        rList = RequirementOperation.getDeviceRequirementList(self.operator1, "19.3")
+        assert 2 == len(rList)
         self.logger.info("[testInsertDeviceRequirement][END]")

@@ -4,6 +4,7 @@ from django.db import models
 from pms_dbmodel.models.e_operator import EComplianceVersion
 from pms_dbmodel.models.e_operator import EOperator
 from pms_dbmodel.models.e_operator import EArea
+from pms_dbmodel.models.a_attribute import APriority
 from pms_dbmodel.models.e_operator_requirement import (
     EDocStructureCategory,
     EDocStructure,
@@ -238,7 +239,7 @@ class DocOperation:
 
 class RequirementOperation:
     @classmethod
-    def addDeviceRequirementDesc(cls, title, name, desc) -> EDeviceRequirementDesc:
+    def addDeviceRequirementDesc(cls, title, name, desc="") -> EDeviceRequirementDesc:
         r = EDeviceRequirementDesc.objects.get_or_create(
             title=title, name=name, description=desc
         )
@@ -256,22 +257,106 @@ class RequirementOperation:
         return result[0]
 
     @classmethod
-    def addDeviceRequirement(
-        cls, area, operator, version_no, tag, description, docStucture: EDocStructure
-    ) -> EDeviceRequirement:
+    def getDeviceRequirmentDecList(cls, title, name=None, desc=None):
+        result = EDeviceRequirementDesc.objects.filter(
+            title=title, name=name, description=desc
+        )
+
+        return result
+
+    @classmethod
+    def addNewDeviceRequirement(
+        cls,
+        area,
+        operator,
+        version_no,
+        docStucture: EDocStructure,
+        id,
+        title,
+        name,
+        description="",
+        priority: APriority = None,
+    ) -> list:
         logger.info(
-            "[addDeviceRequirement][BEGIN] Operator = %s, Version = %s, TAG = %s",
+            "[addDeviceRequirement][BEGIN] Operator = %s, Version = %s, ID = %s, Title = %s",
             operator,
             version_no,
-            tag,
+            id,
+            title,
         )
         version = VersionOperation.getOrAddVersion(area, operator, version_no)
 
-        return cls.addDeviceRequirement(version, tag, description, docStucture)
-        logger.info("[addDeviceRequirement][END]")
+        return cls.addDeviceRequirementWithVersion(
+            version,
+            docStucture,
+            id,
+            title,
+            name,
+            description=description,
+            priority=priority,
+        )
 
     @classmethod
-    def addDeviceRequirement(
-        cls, version, tag, description, docStucture: EDocStructure
-    ):
-        i = 0
+    def addDeviceRequirementWithVersion(
+        cls,
+        version: EComplianceVersion,
+        docStucture: EDocStructure,
+        id,
+        title,
+        name,
+        description="",
+        priority: APriority = None,
+    ) -> list:
+        [descId, succeed] = cls.addDeviceRequirementDesc(title, name, description)
+
+        r = cls.addDeviceRequirementWithKeys(version, docStucture, descId)
+
+        r[0].tag_id = id
+        r[0].structure = docStucture
+        if priority != None:
+            r[0].priority = priority
+        _setDateAndSave(r)
+
+        return r
+
+    @classmethod
+    def addDeviceRequirementWithKeys(
+        cls,
+        version: EComplianceVersion,
+        docStucture: EDocStructure,
+        descId: EDeviceRequirementDesc,
+    ) -> EDeviceRequirement:
+        result = EDeviceRequirement.objects.get_or_create(
+            operator=version.operator,
+            version=version,
+            structure=docStucture,
+            descId=descId,
+        )
+
+        return result
+
+    @classmethod
+    def getDeviceRequirementList(cls, operator, version_no):
+        rList = EDeviceRequirement.objects.filter(
+            operator__name=operator, version__version_no=version_no
+        )
+        logger.info(
+            "[getDeviceRequirementList][END] Operator = %s, Version = %s, size = %s",
+            operator,
+            version_no,
+            len(rList),
+        )
+        return rList
+
+    @classmethod
+    def getDeviceRequirement(cls, operator, version_no, id):
+        logger.info(
+            "[getDeviceRequirement][BEGIN] Operator = %s, Version = %s, ID = %s",
+            operator,
+            version_no,
+            id,
+        )
+
+        r = EDeviceRequirement.objects.filter(
+            operator__name=operator, version__version_no=version_no, tag_id=id
+        )
