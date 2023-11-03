@@ -31,7 +31,7 @@ class OperatorRequirement:
         return self._sectionId
 
 
-def _setDateAndSave(data):
+def _setDateAndSave(data: list[models.Model,]):
     if data[1] == True:
         data[0].create_date = date.today()
         data[0].update_date = date.today()
@@ -210,12 +210,12 @@ class DocOperation:
             operator=version.operator,
             version=version,
             category=category,
-            id=id,
+            doc_id=id,
             name=title,
         )
 
         if parent != None:
-            r[0].parent_structure = parent
+            r[0].parent_structure_id = parent.doc_id
         _setDateAndSave(r)
 
         return r
@@ -229,7 +229,7 @@ class DocOperation:
             id,
         )
         result = EDocStructure.objects.filter(
-            operator__name=operator, version=version, id=id
+            operator__name=operator, version=version, doc_id=id
         )
         if len(result) == 0:
             return None
@@ -264,6 +264,7 @@ class RequirementOperation:
 
         return result
 
+    # BEGIN addNewDeviceRequirement
     @classmethod
     def addNewDeviceRequirement(
         cls,
@@ -278,7 +279,7 @@ class RequirementOperation:
         priority: APriority = None,
     ) -> list:
         logger.info(
-            "[addDeviceRequirement][BEGIN] Operator = %s, Version = %s, ID = %s, Title = %s",
+            "[addNewDeviceRequirement][BEGIN] Operator = %s, Version = %s, ID = %s, Title = %s",
             operator,
             version_no,
             id,
@@ -309,31 +310,61 @@ class RequirementOperation:
     ) -> list:
         [descId, succeed] = cls.addDeviceRequirementDesc(title, name, description)
 
-        r = cls.addDeviceRequirementWithKeys(version, docStucture, descId)
-
-        r[0].tag_id = id
-        r[0].structure = docStucture
-        if priority != None:
-            r[0].priority = priority
-        _setDateAndSave(r)
-
-        return r
+        return cls.createDeviceRequirementWithKeys(
+            version, docStucture, descId, id, priority
+        )
 
     @classmethod
-    def addDeviceRequirementWithKeys(
+    def createDeviceRequirementWithKeys(
         cls,
         version: EComplianceVersion,
         docStucture: EDocStructure,
         descId: EDeviceRequirementDesc,
+        id,
+        priority: APriority = None,
     ) -> EDeviceRequirement:
         result = EDeviceRequirement.objects.get_or_create(
             operator=version.operator,
             version=version,
-            structure=docStucture,
+            structure_id=docStucture.doc_id,
             descId=descId,
         )
 
+        result[0].tag_id = id
+
+        if priority != None:
+            result[0].priority = priority
+        _setDateAndSave(result)
         return result
+
+    # END addNewDeviceRequirement
+    @classmethod
+    def addNoChangeDeviceRequirement(
+        cls,
+        area,
+        operator,
+        version_no,
+        docStucture: EDocStructure,
+        id,
+        idMap: dict,
+        priority: APriority = None,
+    ):
+        logger.info(
+            "[addNoChangeDeviceRequirement][BEGIN] Operator = %s, Version = %s, ID = %s",
+            operator,
+            version_no,
+            id,
+        )
+        version = VersionOperation.getOrAddVersion(area, operator, version_no)
+        preReq = idMap.get(id)
+
+        if preReq != None:
+            descId = preReq.descId
+            return cls.createDeviceRequirementWithKeys(
+                version, docStucture, descId, id, priority
+            )
+        else:
+            return [None, False]
 
     @classmethod
     def getDeviceRequirementList(cls, operator, version_no):
@@ -347,6 +378,18 @@ class RequirementOperation:
             len(rList),
         )
         return rList
+
+    @classmethod
+    def getDeviceRequirementMapBasedOnTagId(cls, operator, version_no):
+        rList = cls.getDeviceRequirementList(operator, version_no)
+
+        result = {}
+
+        for r in rList:
+            key = r.tag_id
+            result[key] = r
+
+        return result
 
     @classmethod
     def getDeviceRequirement(cls, operator, version_no, id):

@@ -58,9 +58,9 @@ def getCNN5():
 
 def testDB(request):
     [chapter, succeed] = DocOperation.addDocStructure(
-        "NA", "ATT", "19.3", "Chapter", "1", "Chapter 1"
+        "NA", "ATT", "19.3", "Chapter", "2", "Chapter 1"
     )
     [section, succeed] = DocOperation.addDocStructure(
-        "NA", "ATT", "19.3", "Chapter", "1.1", "Section 1", chapter
+        "NA", "ATT", "19.3", "Chapter", "2.1", "Section 1", chapter
     )
     return HttpResponse("TEST")

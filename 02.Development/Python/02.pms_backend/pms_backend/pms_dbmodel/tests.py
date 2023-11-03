@@ -171,12 +171,11 @@ class OperatorOperationTest(PMSDbTest):
     ):
         self._checkOperator(data.operator, operator)
         self._checkVersion(data.version, operator, verison)
-        assert data.id == id
+        assert data.doc_id == id
         assert data.name == title
 
         if parent_id != None:
-            self.assertIsInstance(data.parent_structure, EDocStructure)
-            data.parent_structure.id = parent_id.id
+            assert data.parent_structure_id == parent_id.doc_id
 
     categories = ["Document", "Chapter", "Section"]
 
@@ -190,7 +189,7 @@ class OperatorOperationTest(PMSDbTest):
         self._addCategories()
 
         version = "19.3"
-        titleId = "1"
+        titleId = "2"
         title = "TEST"
         [chapter, succeed] = DocOperation.addDocStructure(
             self.area, self.operator1, version, self.categories[1], titleId, title
@@ -200,7 +199,7 @@ class OperatorOperationTest(PMSDbTest):
         chapter = DocOperation.getDocStructure(self.operator1, version, titleId)
         self._checkDocStructure(chapter, self.operator1, version, titleId, title, None)
 
-        sectionId = "1.1"
+        sectionId = "2.1"
         section = "TEST 1"
         [data, succeed] = DocOperation.addDocStructure(
             self.area,
@@ -229,7 +228,7 @@ class OperatorOperationTest(PMSDbTest):
         self.logger.info("[testInsertDeviceRequirementDesc][BEGIN]")
 
         # 1. New a requirement
-        requirement = [
+        requirement_19 = [
             [
                 "19.3",  # Version
                 "1.1",  # SectionId
@@ -251,22 +250,27 @@ class OperatorOperationTest(PMSDbTest):
         ]
 
         [data, success] = RequirementOperation.addDeviceRequirementDesc(
-            requirement[0][4], requirement[0][5], requirement[0][6]
+            requirement_19[0][4], requirement_19[0][5], requirement_19[0][6]
         )
         assert success == True
         result = RequirementOperation.getDeviceRequirementDesc(data.id)
         self._checkDeviceRequirmentDesc(
-            result, requirement[0][4], requirement[0][5], requirement[0][6]
+            result, requirement_19[0][4], requirement_19[0][5], requirement_19[0][6]
         )
 
         rList = RequirementOperation.getDeviceRequirmentDecList(
-            requirement[0][4], requirement[0][5], requirement[0][6]
+            requirement_19[0][4], requirement_19[0][5], requirement_19[0][6]
         )
         assert 1 == len(rList)
         self.logger.info("[testInsertDeviceRequirementDesc][END]")
-
-        self.logger.info("[testInsertDeviceRequirement][BEGIN]")
         self._addCategories()
+
+        self._testInsertNewRequirement(requirement_19)
+        self._testInsertNoChangeRequirement()
+
+    def _testInsertNewRequirement(self, requirement):
+        self.logger.info("[_testInsertNewRequirement][BEGIN]")
+
         for req in requirement:
             [section, succeed] = DocOperation.addDocStructure(
                 self.area,
@@ -292,4 +296,37 @@ class OperatorOperationTest(PMSDbTest):
         assert 2 == EDeviceRequirementDesc.objects.count()
         rList = RequirementOperation.getDeviceRequirementList(self.operator1, "19.3")
         assert 2 == len(rList)
-        self.logger.info("[testInsertDeviceRequirement][END]")
+        self.logger.info("[_testInsertNewRequirement][END]")
+
+    def _testInsertNoChangeRequirement(self):
+        self.logger.info("[_testInsertNoChangeRequirement][BEGIN]")
+        # Create a version with the same requirement based on TAG
+        rMap = RequirementOperation.getDeviceRequirementMapBasedOnTagId(
+            self.operator1, "19.3"
+        )
+        requirement = [
+            [
+                "20.0",  # Version
+                "1.1",  # SectionId
+                " TEST 1",  # Section
+                "TAG_1",  # Tag
+            ]
+        ]
+
+        for req in requirement:
+            [section, succeed] = DocOperation.addDocStructure(
+                self.area,
+                self.operator1,
+                req[0],
+                self.categories[2],
+                req[1],
+                req[2],
+                None,
+            )
+            RequirementOperation.addNoChangeDeviceRequirement(
+                self.area, self.operator1, req[0], section, req[3], rMap
+            )
+        assert 2 == EDeviceRequirementDesc.objects.count()
+        rList = RequirementOperation.getDeviceRequirementList(self.operator1, "20.0")
+        assert 1 == len(rList)
+        self.logger.info("[_testInsertNoChangeRequirement][END]")
