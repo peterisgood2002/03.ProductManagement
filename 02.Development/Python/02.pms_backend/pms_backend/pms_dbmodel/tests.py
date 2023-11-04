@@ -298,6 +298,14 @@ class OperatorOperationTest(PMSDbTest):
         assert 2 == len(rList)
         self.logger.info("[_testInsertNewRequirement][END]")
 
+    def _checkDeviceRequirement(
+        self, data: EDeviceRequirement, tag_id: str, preData: dict
+    ):
+        assert data.tag_id == tag_id
+        descId = preData[tag_id].descId
+        self.assertIsInstance(descId, EDeviceRequirementDesc)
+        assert data.descId == descId
+
     def _testInsertNoChangeRequirement(self):
         self.logger.info("[_testInsertNoChangeRequirement][BEGIN]")
         # Create a version with the same requirement based on TAG
@@ -323,9 +331,12 @@ class OperatorOperationTest(PMSDbTest):
                 req[2],
                 None,
             )
-            RequirementOperation.addNoChangeDeviceRequirement(
+            [result, succeed] = RequirementOperation.addNoChangeDeviceRequirement(
                 self.area, self.operator1, req[0], section, req[3], rMap
             )
+
+            self._checkDeviceRequirement(result, requirement[0][3], rMap)
+
         assert 2 == EDeviceRequirementDesc.objects.count()
         rList = RequirementOperation.getDeviceRequirementList(self.operator1, "20.0")
         assert 1 == len(rList)
