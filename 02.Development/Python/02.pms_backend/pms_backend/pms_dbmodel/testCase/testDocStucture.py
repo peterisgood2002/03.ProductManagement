@@ -6,7 +6,7 @@ from pms_dbmodel.models.e_operator_requirement import (
     EDocStructureCategory,
     EDocStructure,
 )
-from pms_dbmodel.operator_models import DocOperation
+from pms_dbmodel.operator_operation.doc_operation import DocOperation
 
 
 class DocOperationTest(PMSDbTest):

@@ -7,7 +7,7 @@ import requests
 from bs4 import BeautifulSoup, Tag
 import webbrowser
 
-from pms_dbmodel.operator_models import DocOperation
+from pms_dbmodel.operator_operation.doc_operation import DocOperation
 
 
 def index(request):

@@ -4,7 +4,7 @@ import logging
 from enum import Enum
 
 
-def setDateAndSave(data: list[models.Model,]):
+def setDateAndSave(data: tuple[models.Model, bool]):
     if data[1] == True:
         data[0].create_date = date.today()
         data[0].update_date = date.today()

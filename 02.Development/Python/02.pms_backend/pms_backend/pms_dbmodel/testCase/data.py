@@ -4,7 +4,7 @@ from pms_dbmodel.models.e_operator_requirement import (
     EDeviceRequirementDesc,
     EDeviceRequirement,
 )
-from pms_dbmodel.operator_models import DocOperation
+from pms_dbmodel.operator_operation.doc_operation import DocOperation
 from enum import Enum
 
 

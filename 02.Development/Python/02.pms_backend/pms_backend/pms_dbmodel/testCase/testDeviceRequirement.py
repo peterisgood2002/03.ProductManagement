@@ -1,3 +1,4 @@
+from pms_dbmodel.operator_operation.doc_operation import DocOperation
 from .base_test import PMSDbTest, logger
 from .data import TestData, CheckData, Util
 
@@ -10,7 +11,7 @@ from pms_dbmodel.models.e_operator_requirement import (
 )
 
 from pms_dbmodel.models.a_attribute import APriority
-from pms_dbmodel.operator_models import RequirementOperation, DocOperation
+from pms_dbmodel.operator_operation.requirement_operation import RequirementOperation
 from pms_dbmodel.common import logInfo, LOGTIME
 
 
