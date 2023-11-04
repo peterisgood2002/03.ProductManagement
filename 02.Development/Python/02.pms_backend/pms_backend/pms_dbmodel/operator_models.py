@@ -11,6 +11,8 @@ from pms_dbmodel.models.e_operator_requirement import (
     EDeviceRequirementDesc,
     EDeviceRequirement,
 )
+
+from pms_dbmodel.common import *
 import logging
 
 
@@ -31,23 +33,15 @@ class OperatorRequirement:
         return self._sectionId
 
 
-def _setDateAndSave(data: list[models.Model,]):
-    if data[1] == True:
-        data[0].create_date = date.today()
-        data[0].update_date = date.today()
-    else:
-        data[0].update_date = date.today()
-    data[0].save()
-
-
-logger = logging.getLogger("OperatorOperation")
+logger = logging.getLogger(__name__)
 
 
 class AreaOperation:
     @classmethod
     def getArea(cls, area) -> EArea:
+        logInfo(logger, LOGTIME.BEGIN, cls.getArea.__name__, "[%s]", "TEST")
         r = EArea.objects.get_or_create(name=area)
-        _setDateAndSave(r)
+        setDateAndSave(r)
 
         return r[0]
 
@@ -93,7 +87,7 @@ class VersionOperation:
         result = EComplianceVersion.objects.get_or_create(
             operator=o, version_no=version
         )
-        _setDateAndSave(result)
+        setDateAndSave(result)
 
         return result
 
@@ -163,14 +157,14 @@ class DocOperation:
         logger.info("[addDocStructureCategory][BEGIN] Category = %s", category)
         r = EDocStructureCategory.objects.get_or_create(name=category)
 
-        _setDateAndSave(r)
+        setDateAndSave(r)
 
         return r[0]
 
     @classmethod
     def getDocStructureCategory(cls, category):
         r = EDocStructureCategory.objects.get_or_create(name=category)
-        _setDateAndSave(r)
+        setDateAndSave(r)
 
         return r[0]
 
@@ -216,7 +210,7 @@ class DocOperation:
 
         if parent != None:
             r[0].parent_structure_id = parent.doc_id
-        _setDateAndSave(r)
+        setDateAndSave(r)
 
         return r
 
@@ -243,7 +237,7 @@ class RequirementOperation:
         r = EDeviceRequirementDesc.objects.get_or_create(
             title=title, name=name, description=desc
         )
-        _setDateAndSave(r)
+        setDateAndSave(r)
 
         return r
 
@@ -326,15 +320,17 @@ class RequirementOperation:
         result = EDeviceRequirement.objects.get_or_create(
             operator=version.operator,
             version=version,
-            structure_id=docStucture.doc_id,
             descId=descId,
         )
+
+        if docStucture != None:
+            result[0].structure_id = docStucture.doc_id
 
         result[0].tag_id = id
 
         if priority != None:
             result[0].priority = priority
-        _setDateAndSave(result)
+        setDateAndSave(result)
         return result
 
     # END addNewDeviceRequirement
@@ -400,6 +396,11 @@ class RequirementOperation:
             id,
         )
 
-        r = EDeviceRequirement.objects.filter(
+        rList = EDeviceRequirement.objects.filter(
             operator__name=operator, version__version_no=version_no, tag_id=id
         )
+
+        if len(rList) == 0:
+            return None
+
+        return rList[0]
