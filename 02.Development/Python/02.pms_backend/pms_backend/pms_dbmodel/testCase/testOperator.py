@@ -1,8 +1,9 @@
+from pms_dbmodel.tests import TestData, CheckData
 from .base_test import PMSDbTest
-from .data import TestData, CheckData
 
 from pms_dbmodel.models.e_operator import EOperator
 from pms_dbmodel.operator_operation.operator_operation import OperatorOperation
+from pms_dbmodel.operator_operation.requirement_operation import RequirementOperation
 
 
 class OperatorOperationTest(PMSDbTest):

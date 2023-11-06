@@ -1,5 +1,5 @@
+from pms_dbmodel.tests import TestData, Util, CheckData
 from .base_test import PMSDbTest
-from .data import TestData, CheckData, Util
 
 from pms_dbmodel.models.e_operator import EOperator, EComplianceVersion
 from pms_dbmodel.models.e_operator_requirement import (
@@ -7,6 +7,7 @@ from pms_dbmodel.models.e_operator_requirement import (
     EDocStructure,
 )
 from pms_dbmodel.operator_operation.doc_operation import DocOperation
+from pms_dbmodel.operator import OperatorRequirement
 
 
 class DocOperationTest(PMSDbTest):
@@ -22,8 +23,8 @@ class DocOperationTest(PMSDbTest):
 
     def testInsertChapterAndSection(self):
         Util.addCategories()
-        titleId = TestData.requirement_19[0][TestData.ARRAYINFO.ChapterId.value]
-        title = TestData.requirement_19[0][TestData.ARRAYINFO.Chapter.value]
+        titleId = TestData.requirement_19[0].getInfo(OperatorRequirement.INFO.ChapterId)
+        title = TestData.requirement_19[0].getInfo(OperatorRequirement.INFO.Chapter)
         [chapter, succeed] = DocOperation.addDocStructure(
             TestData.area,
             TestData.operator1,
@@ -41,8 +42,10 @@ class DocOperationTest(PMSDbTest):
             chapter, TestData.operator1, TestData.version19, titleId, title, None
         )
 
-        sectionId = TestData.requirement_19[0][TestData.ARRAYINFO.SectionId.value]
-        section = TestData.requirement_19[0][TestData.ARRAYINFO.Section.value]
+        sectionId = TestData.requirement_19[0].getInfo(
+            OperatorRequirement.INFO.SectionId
+        )
+        section = TestData.requirement_19[0].getInfo(OperatorRequirement.INFO.Section)
         [data, succeed] = DocOperation.addDocStructure(
             TestData.area,
             TestData.operator1,

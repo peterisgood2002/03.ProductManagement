@@ -6,7 +6,7 @@ from .operator_operation import OperatorOperation
 
 class VersionOperation:
     @classmethod
-    def _addVersion(cls, area, operator, version):
+    def _addVersion(cls, area, operator, version) -> list[EComplianceVersion, bool]:
         o = OperatorOperation.addOperator(area, operator)
 
         result = EComplianceVersion.objects.get_or_create(
@@ -17,7 +17,7 @@ class VersionOperation:
         return result
 
     @classmethod
-    def addVersion(cls, area, operator, version):
+    def addVersion(cls, area, operator, version) -> list[EComplianceVersion, bool]:
         v = cls._addVersion(area, operator, version)
 
         logInfo(
@@ -34,7 +34,7 @@ class VersionOperation:
         return v
 
     @classmethod
-    def getVersions(cls, area, operator):
+    def getVersions(cls, area, operator) -> list[str]:
         # 1. check whether this operator is the first one
         o = OperatorOperation.getOperator(operator)
         # 2. get the versions for this operator
@@ -47,7 +47,7 @@ class VersionOperation:
         return r
 
     @classmethod
-    def _getVersion(cls, area, operator, version):
+    def _getVersion(cls, area, operator, version) -> EComplianceVersion:
         logger.info(
             "[getVersion][BEGIN] AREA = %s, Operator = %s, Version = %s",
             area,
@@ -60,7 +60,7 @@ class VersionOperation:
         return v[0]
 
     @classmethod
-    def getVersion(cls, operator, version):
+    def getVersion(cls, operator, version) -> EComplianceVersion:
         logger.info(
             "[getVersion][BEGIN] Operator = %s, Version = %s", operator, version
         )
@@ -73,7 +73,9 @@ class VersionOperation:
         return version[0]
 
     @classmethod
-    def getOrAddVersion(cls, area, operator, version_no):
+    def getOrAddVersion(
+        cls, area, operator, version_no
+    ) -> list[EComplianceVersion, bool]:
         version = VersionOperation.getVersion(operator, version_no)
         if version == None:
             [version, succeed] = VersionOperation.addVersion(area, operator, version_no)

@@ -1,5 +1,5 @@
+from pms_dbmodel.tests import TestData, CheckData
 from .base_test import PMSDbTest
-from .data import TestData, CheckData
 from pms_dbmodel.models.e_operator import EComplianceVersion
 from pms_dbmodel.operator_operation.version_operation import VersionOperation
 

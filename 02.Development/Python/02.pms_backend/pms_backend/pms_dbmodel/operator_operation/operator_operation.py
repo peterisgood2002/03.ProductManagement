@@ -1,4 +1,5 @@
 # Create your models here.
+from pms_dbmodel.operator import OperatorRequirement
 from pms_dbmodel.models.e_operator import EArea, EOperator
 from pms_dbmodel.operator_operation import logger
 from .area_operation import AreaOperation
