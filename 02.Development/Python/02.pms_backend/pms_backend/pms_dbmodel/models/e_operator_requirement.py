@@ -52,7 +52,7 @@ class EDocStructure(models.Model):
 
 
 class EDeviceRequirement(models.Model):
-    # id = CompositeKey(columns=['operator', 'version', 'docId' ])
+    id = CompositeKey(columns=["operator", "version", "descId"])
     operator = models.ForeignKey(
         "EOperator", models.DO_NOTHING, db_column="operator_id", to_field="id"
     )
@@ -62,7 +62,9 @@ class EDeviceRequirement(models.Model):
         db_column="version_no",
         to_field="version_no",
     )
-    descId = models.ForeignKey("EDeviceRequirementDesc", models.DO_NOTHING)
+    descId = models.ForeignKey(
+        "EDeviceRequirementDesc", models.DO_NOTHING, db_column="desc_id", to_field="id"
+    )
     priority = models.ForeignKey(
         APriority, models.DO_NOTHING, db_column="priority", blank=True, null=True
     )
@@ -104,7 +106,6 @@ class EDeviceRequirementDesc(models.Model):
 
 
 class ERequirementCategory(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=45, blank=True, null=True)
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
@@ -115,10 +116,15 @@ class ERequirementCategory(models.Model):
 
 
 class RDeviceRequirementCategory(models.Model):
-    requirement = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING)
-    category = models.ForeignKey(ERequirementCategory, models.DO_NOTHING)
+    id = CompositeKey(columns=["descId", "category"])
+    descId = models.ForeignKey(
+        "EDeviceRequirementDesc", models.DO_NOTHING, db_column="desc_id", to_field="id"
+    )
+    category = models.ForeignKey(
+        ERequirementCategory, models.DO_NOTHING, db_column="catefory_id", to_field="id"
+    )
 
     class Meta:
         managed = False
         db_table = "r_device_requirement_category"
-        unique_together = (("requirement", "category"),)
+        unique_together = (("descId", "category"),)

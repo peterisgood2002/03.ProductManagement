@@ -7,6 +7,8 @@ from pms_dbmodel.models.e_operator_requirement import (
     EDocStructure,
     EDeviceRequirementDesc,
     EDeviceRequirement,
+    ERequirementCategory,
+    RDeviceRequirementCategory,
 )
 
 
@@ -166,7 +168,9 @@ class RequirementOperation:
         return rList
 
     @classmethod
-    def getDeviceRequirementMapBasedOnTagId(cls, operator, version_no):
+    def getDeviceRequirementMapBasedOnTagId(
+        cls, operator, version_no
+    ) -> dict[str, EDeviceRequirement]:
         rList = cls.getDeviceRequirementList(operator, version_no)
 
         result = {}
@@ -178,7 +182,7 @@ class RequirementOperation:
         return result
 
     @classmethod
-    def getDeviceRequirement(cls, operator, version_no, id):
+    def getDeviceRequirement(cls, operator, version_no, id) -> EDeviceRequirement:
         logInfo(
             logger,
             LOGTIME.BEGIN,
@@ -197,3 +201,46 @@ class RequirementOperation:
             return None
 
         return rList[0]
+
+    @classmethod
+    def addCategory(cls, name) -> list[ERequirementCategory, bool]:
+        result = ERequirementCategory.objects.get_or_create(name=name)
+
+        setDateAndSave(result)
+        return result
+
+    @classmethod
+    def addCategoryWithTagId(cls, operator, version_no, id, category):
+        logInfo(
+            logger,
+            LOGTIME.BEGIN,
+            cls.addCategoryWithTagId.__name__,
+            "Operator = %s, Version = %s, ID = %s, Category = %s",
+            operator,
+            version_no,
+            id,
+            category,
+        )
+        data = cls.getDeviceRequirement(operator, version_no, id)
+        [category, succeed] = cls.addCategory(category)
+
+        result = RDeviceRequirementCategory.objects.get_or_create(
+            descId=data.descId,
+            category=category,
+        )
+
+        setDateAndSave(result)
+        return result
+
+    @classmethod
+    def getCategories(cls, operator, version, id) -> list[str]:
+        data = cls.getDeviceRequirement(operator, version, id)
+        rList = RDeviceRequirementCategory.objects.filter(
+            descId=data.descId,
+        )
+
+        result = []
+        for l in rList:
+            result.append(l.category.name)
+
+        return result

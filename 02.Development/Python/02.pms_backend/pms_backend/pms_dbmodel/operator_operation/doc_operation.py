@@ -25,7 +25,7 @@ class DocOperation:
         return r[0]
 
     @classmethod
-    def getDocStructureCategory(cls, category):
+    def getDocStructureCategory(cls, category) -> EDocStructureCategory:
         r = EDocStructureCategory.objects.get_or_create(name=category)
         setDateAndSave(r)
 

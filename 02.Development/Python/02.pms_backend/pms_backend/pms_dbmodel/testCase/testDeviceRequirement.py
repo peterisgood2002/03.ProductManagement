@@ -8,6 +8,8 @@ from pms_dbmodel.models.e_operator_requirement import (
     EDeviceRequirement,
     EDocStructureCategory,
     EDocStructure,
+    ERequirementCategory,
+    RDeviceRequirementCategory,
 )
 
 from pms_dbmodel.models.a_attribute import APriority
@@ -27,6 +29,8 @@ class RequirementOperationTest(PMSDbTest):
             APriority,
             EDocStructureCategory,
             EDocStructure,
+            ERequirementCategory,
+            RDeviceRequirementCategory,
         )
 
     def testInsertDeviceRequirementDesc(self):
@@ -129,3 +133,27 @@ class RequirementOperationTest(PMSDbTest):
         )
         assert 1 == len(rList)
         logInfo(logger, LOGTIME.END, self._testInsertNoChangeRequirement.__name__)
+
+        req = TestData.requirement_22_No[0]
+        category = RequirementOperation.addCategoryWithTagId(
+            TestData.operator1,
+            req[TestData.ARRAYINFO.VERSION.value],
+            req[TestData.ARRAYINFO.TAG.value],
+            "TEST",
+        )
+
+        category = RequirementOperation.addCategoryWithTagId(
+            TestData.operator1,
+            req[TestData.ARRAYINFO.VERSION.value],
+            req[TestData.ARRAYINFO.TAG.value],
+            "TEST2",
+        )
+
+        categories = RequirementOperation.getCategories(
+            TestData.operator1,
+            req[TestData.ARRAYINFO.VERSION.value],
+            req[TestData.ARRAYINFO.TAG.value],
+        )
+        assert 2 == len(categories)
+        assert "TEST" in categories
+        assert "TEST2" in categories
