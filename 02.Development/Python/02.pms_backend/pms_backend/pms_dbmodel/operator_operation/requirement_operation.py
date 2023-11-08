@@ -12,9 +12,39 @@ from pms_dbmodel.models.e_operator_requirement import (
 )
 
 
+class PriorityOperation:
+    @classmethod
+    def addPriority(cls, priority) -> tuple[APriority, bool]:
+        logInfo(
+            logger, LOGTIME.BEGIN, cls.addPriority.__name__, "Priority = %s", priority
+        )
+
+        r = APriority.objects.get_or_create(name=priority)
+
+        setDateAndSave(r)
+
+        return r
+
+    @classmethod
+    def getPriorityMap(cls) -> dict[str, APriority]:
+        result = {}
+
+        data = APriority.objects.all()
+
+        for d in data:
+            result[d.name] = d
+
+        logInfo(
+            logger, LOGTIME.END, cls.getPriorityMap.__name__, "Size = %s", len(result)
+        )
+        return result
+
+
 class RequirementOperation:
     @classmethod
-    def addDeviceRequirementDesc(cls, title, name, desc="") -> EDeviceRequirementDesc:
+    def addDeviceRequirementDesc(
+        cls, title, name, desc=""
+    ) -> tuple[EDeviceRequirementDesc, bool]:
         r = EDeviceRequirementDesc.objects.get_or_create(
             title=title, name=name, description=desc
         )
@@ -59,11 +89,13 @@ class RequirementOperation:
             logger,
             LOGTIME.BEGIN,
             cls.addNewDeviceRequirement.__name__,
-            "Operator = %s, Version = %s, ID = %s, Title = %s",
+            "Operator = %s, Version = %s, ID = %s, Title = %s, Name = %s, Desc = %s",
             operator,
             version_no,
             id,
             title,
+            name,
+            description,
         )
         version = VersionOperation.getOrAddVersion(area, operator, version_no)
 

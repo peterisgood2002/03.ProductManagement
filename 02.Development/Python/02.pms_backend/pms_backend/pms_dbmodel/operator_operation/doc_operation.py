@@ -6,6 +6,13 @@ from pms_dbmodel.models.e_operator_requirement import (
 )
 from pms_dbmodel.operator_operation import logger
 from .version_operation import VersionOperation
+from enum import Enum
+
+
+class StructureCategory(Enum):
+    Document = 0
+    Chapter = 1
+    Section = 2
 
 
 class DocOperation:
@@ -26,10 +33,20 @@ class DocOperation:
 
     @classmethod
     def getDocStructureCategory(cls, category) -> EDocStructureCategory:
-        r = EDocStructureCategory.objects.get_or_create(name=category)
-        setDateAndSave(r)
+        r = EDocStructureCategory.objects.filter(name=category)
+
+        if len(r) == 0:
+            return cls.addDocStructureCategory(category)
 
         return r[0]
+
+    @classmethod
+    def getDocStructureCategoryMap(cls) -> dict[str, EDocStructureCategory]:
+        result = {}
+        for d in EDocStructureCategory.objects.all():
+            result[d.name] = d
+
+        return result
 
     @classmethod
     def addDocStructure(
@@ -41,7 +58,7 @@ class DocOperation:
         id,
         title,
         parent: EDocStructure = None,
-    ):
+    ) -> tuple[EDocStructure, bool]:
         logInfo(
             logger,
             LOGTIME.BEGIN,
@@ -65,15 +82,16 @@ class DocOperation:
         id,
         title,
         parent: EDocStructure = None,
-    ):
+    ) -> tuple[EDocStructure, bool]:
         r = EDocStructure.objects.get_or_create(
-            operator=version.operator,
-            version=version,
-            category=category,
-            doc_id=id,
-            name=title,
+            operator=version.operator, version=version, doc_id=id
         )
 
+        if r[1] == False:
+            # We insert this data previously so we return it directly and do not change anything
+            return r
+        r[0].name = title
+        r[0].category = category
         if parent != None:
             r[0].parent_structure_id = parent.doc_id
         setDateAndSave(r)

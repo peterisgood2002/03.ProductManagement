@@ -5,7 +5,7 @@ from django.test import TestCase
 from pms_dbmodel.operator import OperatorRequirement
 from pms_dbmodel.models.e_operator import EComplianceVersion
 from pms_dbmodel.models.e_operator import EOperator
-from pms_dbmodel.operator_operation.doc_operation import DocOperation
+from pms_dbmodel.operator_operation.doc_operation import DocOperation, StructureCategory
 from pms_dbmodel.models.e_operator import EArea
 from pms_dbmodel.models.e_employee import EEmployee
 from pms_dbmodel.models.e_operator_requirement import (
@@ -15,6 +15,10 @@ from pms_dbmodel.models.e_operator_requirement import (
     EDeviceRequirementDesc,
 )
 from pms_dbmodel.models.a_attribute import APriority
+from pms_dbmodel.testCase.base_test import PMSDbTest
+from pms_dbmodel.operator import OperatorService
+from pms_dbmodel.operator_operation.requirement_operation import RequirementOperation
+from pms_dbmodel.operator_operation.version_operation import VersionOperation
 
 from django.db import models
 
@@ -39,6 +43,20 @@ class TestData:
                 "Requirement T1",  # Title
                 "Requirement N1",  # Name
                 "Requirement Desc1",  # Desc
+                "TEST",
+            ]
+        ),
+        OperatorRequirement(
+            [
+                version19,  # Version
+                "1.1",  # ChapterId
+                "Section 1.1",  # Chapter
+                "1.1.1",  # SectionId
+                "Section 1.1.1",  # Section
+                "TAG_1.1",  # Tag
+                "Requirement T1.1",  # Title
+                "Requirement N1.1",  # Name
+                "Requirement Desc1.1",  # Desc
             ]
         ),
         OperatorRequirement(
@@ -89,7 +107,7 @@ class TestData:
 class Util:
     @staticmethod
     def addCategories():
-        for c in TestData.categories:
+        for c, memeber in StructureCategory.__members__.items():
             category = DocOperation.addDocStructureCategory(c)
             assert category.name == c
 
@@ -156,3 +174,42 @@ class CheckData:
         descId = preData[tag_id].descId
         assert isinstance(descId, EDeviceRequirementDesc) == True
         assert data.descId == descId
+
+
+class OperatorOperationTest(PMSDbTest):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        super().setManaged(
+            EOperator,
+        )
+
+    def testAddChapterAndSection(self):
+        Util.addCategories()
+        version = VersionOperation.getOrAddVersion(
+            TestData.area,
+            TestData.operator1,
+            TestData.version19,
+        )
+        result = OperatorService.createDocStructureMap(version, TestData.requirement_19)
+
+        for key, r in result.items():
+            if key == "1" or key == "2":
+                assert r.category.name == StructureCategory.Chapter.name
+            else:
+                assert r.category.name == StructureCategory.Section.name
+
+    def testAddOperatorRequirement(self):
+        Util.addCategories()
+        OperatorService.addOperatorRequirements(
+            TestData.area,
+            TestData.operator1,
+            TestData.version19,
+            TestData.requirement_19,
+        )
+
+        result = RequirementOperation.getDeviceRequirementList(
+            TestData.operator1, TestData.version19
+        )
+
+        assert len(result) == len(TestData.requirement_19)

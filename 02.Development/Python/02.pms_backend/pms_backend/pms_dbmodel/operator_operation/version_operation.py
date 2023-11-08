@@ -73,10 +73,9 @@ class VersionOperation:
         return version[0]
 
     @classmethod
-    def getOrAddVersion(
-        cls, area, operator, version_no
-    ) -> list[EComplianceVersion, bool]:
+    def getOrAddVersion(cls, area, operator, version_no) -> EComplianceVersion:
         version = VersionOperation.getVersion(operator, version_no)
         if version == None:
             [version, succeed] = VersionOperation.addVersion(area, operator, version_no)
+
         return version
