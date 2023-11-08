@@ -143,7 +143,7 @@ CREATE TABLE `e_area` (
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -164,12 +164,12 @@ DROP TABLE IF EXISTS `e_compliance_version`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_compliance_version` (
-  `version_no` varchar(45) NOT NULL,
   `operator_id` int NOT NULL,
+  `version_no` varchar(45) NOT NULL,
+  `doc_url` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  `doc_url` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`version_no`,`operator_id`),
+  PRIMARY KEY (`operator_id`,`version_no`),
   KEY `fk_e_version_e_operator1_idx` (`operator_id`),
   CONSTRAINT `fk_e_version_e_operator1` FOREIGN KEY (`operator_id`) REFERENCES `e_operator` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -226,18 +226,17 @@ CREATE TABLE `e_device_requirement` (
   `version_no` varchar(45) NOT NULL,
   `desc_id` int NOT NULL,
   `priority` int DEFAULT NULL,
-  `structure_id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `structure_id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `tag_id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   PRIMARY KEY (`operator_id`,`version_no`,`desc_id`),
   UNIQUE KEY `fk_e_device_requirement_e_doc_structure1_idx` (`operator_id`,`version_no`,`structure_id`) /*!80000 INVISIBLE */,
   KEY `fk_e_device_requirement_e_priority1_idx` (`priority`),
-  KEY `fk_e_device_requirement_e_compliance_version1_idx` (`version_no`,`operator_id`) /*!80000 INVISIBLE */,
   KEY `fk_e_device_requirement_e_device_requirement_desc1_idx` (`desc_id`) /*!80000 INVISIBLE */,
-  CONSTRAINT `fk_e_device_requirement_e_compliance_version1` FOREIGN KEY (`version_no`, `operator_id`) REFERENCES `e_compliance_version` (`version_no`, `operator_id`),
+  CONSTRAINT `fk_e_device_requirement_e_compliance_version1` FOREIGN KEY (`operator_id`, `version_no`) REFERENCES `e_compliance_version` (`operator_id`, `version_no`) ON DELETE CASCADE,
   CONSTRAINT `fk_e_device_requirement_e_device_requirement_desc1` FOREIGN KEY (`desc_id`) REFERENCES `e_device_requirement_desc` (`id`),
-  CONSTRAINT `fk_e_device_requirement_e_doc_structure1` FOREIGN KEY (`operator_id`, `version_no`, `structure_id`) REFERENCES `e_doc_structure` (`operator_id`, `version_no`, `id`),
+  CONSTRAINT `fk_e_device_requirement_e_doc_structure1` FOREIGN KEY (`operator_id`, `version_no`, `structure_id`) REFERENCES `e_doc_structure` (`operator_id`, `version_no`, `doc_id`),
   CONSTRAINT `fk_e_device_requirement_e_priority1` FOREIGN KEY (`priority`) REFERENCES `a_priority` (`priority_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -290,20 +289,18 @@ DROP TABLE IF EXISTS `e_doc_structure`;
 CREATE TABLE `e_doc_structure` (
   `operator_id` int NOT NULL,
   `version_no` varchar(45) NOT NULL,
-  `id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `doc_id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
   `name` varchar(45) DEFAULT NULL,
   `category` int NOT NULL,
   `parent_structure_id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  PRIMARY KEY (`operator_id`,`version_no`,`id`),
-  UNIQUE KEY `fk_doc_structure_has_parent_doc_structure_idx` (`operator_id`,`version_no`,`parent_structure_id`) /*!80000 INVISIBLE */,
+  PRIMARY KEY (`operator_id`,`version_no`,`doc_id`),
   KEY `fk_e_doc_structure_e_doc_structure_category1_idx` (`category`),
-  KEY `fk_e_doc_structure_e_compliance_version1_idx` (`version_no`,`operator_id`),
-  KEY `fk_doc_structure_has_parent_doc_structure_idx` (`operator_id`,`version_no`,`parent_structure_id`),
-  CONSTRAINT `fk_compliance_version_has_doc_structures` FOREIGN KEY (`version_no`, `operator_id`) REFERENCES `e_compliance_version` (`version_no`, `operator_id`),
-  CONSTRAINT `fk_doc_structure_has_parent_doc_structure` FOREIGN KEY (`operator_id`, `version_no`, `parent_structure_id`) REFERENCES `e_doc_structure` (`operator_id`, `version_no`, `id`),
-  CONSTRAINT `fk_doc_structure_is_doc_structure_category` FOREIGN KEY (`category`) REFERENCES `e_doc_structure_category` (`id`)
+  KEY `fk_doc_structure_has_parent_doc_structure_idx` (`operator_id`,`version_no`,`parent_structure_id`) /*!80000 INVISIBLE */,
+  CONSTRAINT `fk_compliance_version_has_doc_structures` FOREIGN KEY (`operator_id`, `version_no`) REFERENCES `e_compliance_version` (`operator_id`, `version_no`) ON DELETE CASCADE,
+  CONSTRAINT `fk_doc_structure_has_parent_doc_structure` FOREIGN KEY (`operator_id`, `version_no`, `parent_structure_id`) REFERENCES `e_doc_structure` (`operator_id`, `version_no`, `doc_id`) ON DELETE CASCADE,
+  CONSTRAINT `fk_doc_structure_is_doc_structure_category` FOREIGN KEY (`category`) REFERENCES `e_doc_structure_category` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -394,6 +391,32 @@ LOCK TABLES `e_feature` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `e_generation`
+--
+
+DROP TABLE IF EXISTS `e_generation`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `e_generation` (
+  `id` int NOT NULL,
+  `name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `external_name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `create_date` date DEFAULT NULL,
+  `update_date` date DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `e_generation`
+--
+
+LOCK TABLES `e_generation` WRITE;
+/*!40000 ALTER TABLE `e_generation` DISABLE KEYS */;
+/*!40000 ALTER TABLE `e_generation` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `e_milestone`
 --
 
@@ -466,12 +489,12 @@ DROP TABLE IF EXISTS `e_platform`;
 CREATE TABLE `e_platform` (
   `id` int NOT NULL,
   `name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
-  `create_date` date DEFAULT NULL,
-  `update_date` date DEFAULT NULL,
+  `external_name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `ppm` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `platform_family_id` int NOT NULL,
-  `code_name` varchar(45) DEFAULT NULL,
   `category` int NOT NULL,
+  `create_date` date DEFAULT NULL,
+  `update_date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_e_platform_e_employee1_idx` (`ppm`),
   KEY `fk_e_platform_e_platform_family1_idx` (`platform_family_id`),
@@ -500,10 +523,14 @@ DROP TABLE IF EXISTS `e_platform_family`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_platform_family` (
   `id` int NOT NULL,
-  `name` varchar(45) DEFAULT NULL,
+  `name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `external_name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `generation_id` int NOT NULL,
   `create_Date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `fk_e_platform_family_e_generation1_idx` (`generation_id`),
+  CONSTRAINT `fk_e_platform_family_e_generation1` FOREIGN KEY (`generation_id`) REFERENCES `e_generation` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -616,7 +643,7 @@ DROP TABLE IF EXISTS `e_requirement_category`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_requirement_category` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(45) DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
@@ -674,8 +701,7 @@ CREATE TABLE `e_test_plan` (
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   PRIMARY KEY (`operator_id`,`version_no`,`test_id`),
-  KEY `fk_e_test_plan_e_compliance_version1_idx` (`version_no`,`operator_id`),
-  CONSTRAINT `fk_e_test_plan_e_compliance_version1` FOREIGN KEY (`version_no`, `operator_id`) REFERENCES `e_compliance_version` (`version_no`, `operator_id`)
+  CONSTRAINT `fk_e_test_plan_e_compliance_version1` FOREIGN KEY (`operator_id`, `version_no`) REFERENCES `e_compliance_version` (`operator_id`, `version_no`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -696,14 +722,13 @@ DROP TABLE IF EXISTS `r_device_requirement_category`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `r_device_requirement_category` (
-  `requirement_operator_id` int NOT NULL,
-  `requirement_version_no` varchar(45) NOT NULL,
-  `requirement_id` int NOT NULL,
+  `desc_id` int NOT NULL,
   `category_id` int NOT NULL,
-  PRIMARY KEY (`requirement_operator_id`,`requirement_version_no`,`requirement_id`,`category_id`),
+  PRIMARY KEY (`desc_id`,`category_id`),
   KEY `fk_e_requirement_category_has_e_device_requirement_e_requir_idx` (`category_id`),
-  CONSTRAINT `fk_e_requirement_category_has_e_device_requirement_e_device_r1` FOREIGN KEY (`requirement_operator_id`, `requirement_version_no`, `requirement_id`) REFERENCES `e_device_requirement` (`operator_id`, `version_no`, `desc_id`),
-  CONSTRAINT `fk_e_requirement_category_has_e_device_requirement_e_requirem1` FOREIGN KEY (`category_id`) REFERENCES `e_requirement_category` (`id`)
+  KEY `fk_r_device_requirement_category_e_device_requirement_desc1_idx` (`desc_id`),
+  CONSTRAINT `fk_e_requirement_category_has_e_device_requirement_e_requirem1` FOREIGN KEY (`category_id`) REFERENCES `e_requirement_category` (`id`),
+  CONSTRAINT `fk_r_device_requirement_category_e_device_requirement_desc1` FOREIGN KEY (`desc_id`) REFERENCES `e_device_requirement_desc` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
