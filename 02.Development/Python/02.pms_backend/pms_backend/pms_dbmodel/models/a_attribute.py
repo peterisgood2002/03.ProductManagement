@@ -15,7 +15,6 @@ class ACategory(models.Model):
 
 
 class ACompliance(models.Model):
-    compliance_id = models.IntegerField(primary_key=True)
     compliance_name = models.CharField(max_length=45, blank=True, null=True)
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)

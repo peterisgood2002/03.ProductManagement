@@ -17,8 +17,13 @@ from pms_dbmodel.models.e_operator_requirement import (
 from pms_dbmodel.models.a_attribute import APriority
 from pms_dbmodel.testCase.base_test import PMSDbTest
 from pms_dbmodel.operator import OperatorService
-from pms_dbmodel.operator_operation.requirement_operation import RequirementOperation
+from pms_dbmodel.operator_operation.requirement_operation import (
+    RequirementOperation,
+    PriorityOperation,
+    PriorityCategory,
+)
 from pms_dbmodel.operator_operation.version_operation import VersionOperation
+
 
 from django.db import models
 
@@ -43,7 +48,7 @@ class TestData:
                 "Requirement T1",  # Title
                 "Requirement N1",  # Name
                 "Requirement Desc1",  # Desc
-                "TEST",
+                "Mandatory",
             ]
         ),
         OperatorRequirement(
@@ -107,9 +112,15 @@ class TestData:
 class Util:
     @staticmethod
     def addCategories():
-        for c, memeber in StructureCategory.__members__.items():
+        for c, member in StructureCategory.__members__.items():
             category = DocOperation.addDocStructureCategory(c)
             assert category.name == c
+
+    @staticmethod
+    def addPriority():
+        for c, member in PriorityCategory.__members__.items():
+            [priority, succeed] = PriorityOperation.addPriority(c)
+            assert priority
 
 
 class CheckData:
@@ -208,8 +219,21 @@ class OperatorOperationTest(PMSDbTest):
             TestData.requirement_19,
         )
 
-        result = RequirementOperation.getDeviceRequirementList(
+        result19 = RequirementOperation.getDeviceRequirementList(
             TestData.operator1, TestData.version19
         )
 
-        assert len(result) == len(TestData.requirement_19)
+        assert len(result19) == len(TestData.requirement_19)
+
+        OperatorService.addNoChangedRequirements(
+            TestData.area,
+            TestData.operator1,
+            TestData.version22,
+            TestData.requirement_22_No,
+        )
+
+        result22 = RequirementOperation.getDeviceRequirementList(
+            TestData.operator1, TestData.version22
+        )
+
+        assert len(result22) == len(TestData.requirement_22_No)

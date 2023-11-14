@@ -60,26 +60,45 @@ class OperatorService:
         # 2. Create a Map and insert doc structure
         structure = OperatorService.createDocStructureMap(version, requirements)
         # 3. Insert Device Requirement
-        OperatorService.createDeviceRequirement(version, requirements, structure)
+        OperatorService._createDeviceRequirement(version, requirements, structure)
 
     @staticmethod
     def createDocStructureMap(
         version, data: list[OperatorRequirement]
     ) -> dict[str, EDocStructure]:
-        result = {}  # <id, DocStructure>
+        """_summary_
+
+        Args:
+            version (_type_): _description_
+            data (list[OperatorRequirement]): _description_
+
+        Returns:
+            dict[str, EDocStructure]:<Sectionid, DocStructure>
+        """
+        result = {}  #
         catMap = DocOperation.getDocStructureCategoryMap()
 
         for d in data:
-            # if ChapterId does not exist in the dictionary, this data is Chapter. However if ChapterId exist in the dictionary, this means it inserted previously and can not be Chapter
-            parent = OperatorService._createDocStructureMap(
-                version,
-                d,
-                OperatorRequirement.INFO.ChapterId,
-                OperatorRequirement.INFO.Chapter,
-                None,
-                catMap,
-                result,
+            logInfo(
+                logger,
+                LOGTIME.MIDDLE,
+                "createDocStructureMap",
+                "Data = %s",
+                d._requirement,
             )
+
+            parent = result.get(d.getInfo(OperatorRequirement.INFO.ChapterId))
+            if parent == None:
+                # if ChapterId does not exist in the dictionary, this data is Chapter. However if ChapterId exist in the dictionary, this means it inserted previously and can not be Chapter
+                parent = OperatorService._createDocStructureMap(
+                    version,
+                    d,
+                    OperatorRequirement.INFO.ChapterId,
+                    OperatorRequirement.INFO.Chapter,
+                    None,
+                    catMap,
+                    result,
+                )
             OperatorService._createDocStructureMap(
                 version,
                 d,
@@ -116,13 +135,12 @@ class OperatorService:
             version, category, id, title, parent
         )
 
-        if succeed:
-            result[id] = r
+        result[id] = r
 
         return r
 
     @staticmethod
-    def createDeviceRequirement(
+    def _createDeviceRequirement(
         version,
         requirements: list[OperatorRequirement],
         strcture: dict[str, EDocStructure],
@@ -137,10 +155,54 @@ class OperatorService:
             desc = r.getInfo(OperatorRequirement.INFO.DESC)
             priority = r.getInfo(OperatorRequirement.INFO.PRIORITY)
 
-            if priority != None and pMap.get(priority) == None:
-                [p, succeed] = PriorityOperation.addPriority(priority)
-                pMap[priority] = p
+            OperatorService._getPriority(priority, pMap)
 
             RequirementOperation.addDeviceRequirementWithVersion(
                 version, strcture[section], tag, title, name, desc, pMap.get(priority)
+            )
+
+    @staticmethod
+    def _getPriority(priority, pMap):
+        if priority != None and pMap.get(priority) == None:
+            [p, succeed] = PriorityOperation.addPriority(priority)
+            pMap[priority] = p
+
+    @classmethod
+    def addNoChangedRequirements(
+        cls, area, operator, version_no, requirements: list[OperatorRequirement]
+    ):
+        logInfo(
+            logger,
+            LOGTIME.BEGIN,
+            cls.addNoChangedRequirements.__name__,
+            "Area=%s, Operator = %s, Version = %s, Size = %s",
+            area,
+            operator,
+            version_no,
+            len(requirements),
+        )
+
+        # 1. Get latest version and requirement
+        latestVersion = VersionOperation.getLatestVersion(area, operator)
+        preMap = RequirementOperation.getDeviceRequirementMapBasedOnTagId(
+            operator, latestVersion
+        )
+        pMap = PriorityOperation.getPriorityMap()
+        # 2. Insert this version
+        version = VersionOperation.getOrAddVersion(area, operator, version_no)
+
+        # 3. Create a Map and insert doc structure
+        structure = OperatorService.createDocStructureMap(version, requirements)
+
+        # TODO 4. need to add No changed Requirement
+        for r in requirements:
+            tagId = r.getInfo(OperatorRequirement.INFO.TAG)
+
+            sectionId = r.getInfo(OperatorRequirement.INFO.SectionId)
+            dosStructure = structure[sectionId]
+
+            priority = r.getInfo(OperatorRequirement.INFO.PRIORITY)
+            OperatorService._getPriority(priority, pMap)
+            RequirementOperation.addNoChangeDeviceRequirementWithVersion(
+                version, dosStructure, tagId, preMap, pMap.get(priority)
             )

@@ -10,6 +10,12 @@ from pms_dbmodel.models.e_operator_requirement import (
     ERequirementCategory,
     RDeviceRequirementCategory,
 )
+from enum import Enum
+
+
+class PriorityCategory(Enum):
+    Mandatory = 0
+    Optional = 1
 
 
 class PriorityOperation:
@@ -119,7 +125,7 @@ class RequirementOperation:
         name,
         description="",
         priority: APriority = None,
-    ) -> list:
+    ) -> tuple[EDeviceRequirement, bool]:
         [descId, succeed] = cls.addDeviceRequirementDesc(title, name, description)
 
         return cls.createDeviceRequirementWithKeys(
@@ -134,7 +140,7 @@ class RequirementOperation:
         descId: EDeviceRequirementDesc,
         id,
         priority: APriority = None,
-    ) -> EDeviceRequirement:
+    ) -> tuple[EDeviceRequirement, bool]:
         result = EDeviceRequirement.objects.get_or_create(
             operator=version.operator,
             version=version,
@@ -162,7 +168,7 @@ class RequirementOperation:
         id,
         idMap: dict,
         priority: APriority = None,
-    ):
+    ) -> tuple[EDeviceRequirement, bool]:
         logInfo(
             logger,
             LOGTIME.BEGIN,
@@ -173,8 +179,21 @@ class RequirementOperation:
             id,
         )
         version = VersionOperation.getOrAddVersion(area, operator, version_no)
-        preReq = idMap.get(id)
 
+        return cls.addNoChangeDeviceRequirementWithVersion(
+            version, docStucture, id, idMap, priority
+        )
+
+    @classmethod
+    def addNoChangeDeviceRequirementWithVersion(
+        cls,
+        version: EComplianceVersion,
+        docStucture: EDocStructure,
+        id,
+        idMap: dict,
+        priority: APriority = None,
+    ) -> tuple[EDeviceRequirement, bool]:
+        preReq = idMap.get(id)
         if preReq != None:
             descId = preReq.descId
             return cls.createDeviceRequirementWithKeys(
@@ -203,6 +222,15 @@ class RequirementOperation:
     def getDeviceRequirementMapBasedOnTagId(
         cls, operator, version_no
     ) -> dict[str, EDeviceRequirement]:
+        """_summary_
+
+        Args:
+            operator (_type_): _description_
+            version_no (_type_): _description_
+
+        Returns:
+            dict[str, EDeviceRequirement]: <tagId, EDeviceRequirement>
+        """
         rList = cls.getDeviceRequirementList(operator, version_no)
 
         result = {}
@@ -235,7 +263,7 @@ class RequirementOperation:
         return rList[0]
 
     @classmethod
-    def addCategory(cls, name) -> list[ERequirementCategory, bool]:
+    def addCategory(cls, name) -> tuple[ERequirementCategory, bool]:
         result = ERequirementCategory.objects.get_or_create(name=name)
 
         setDateAndSave(result)

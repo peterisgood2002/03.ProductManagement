@@ -8,6 +8,8 @@ from bs4 import BeautifulSoup, Tag
 import webbrowser
 
 from pms_dbmodel.operator_operation.doc_operation import DocOperation
+from pms_dbmodel.operator import OperatorService
+from pms_dbmodel.tests import TestData
 
 
 def index(request):
@@ -57,10 +59,17 @@ def getCNN5():
 
 
 def testDB(request):
-    [chapter, succeed] = DocOperation.addDocStructure(
-        "NA", "ATT", "19.3", "Chapter", "2", "Chapter 1"
+    OperatorService.addOperatorRequirements(
+        TestData.area,
+        TestData.operator1,
+        TestData.version19,
+        TestData.requirement_19,
     )
-    [section, succeed] = DocOperation.addDocStructure(
-        "NA", "ATT", "19.3", "Chapter", "2.1", "Section 1", chapter
+
+    OperatorService.addNoChangedRequirements(
+        TestData.area,
+        TestData.operator1,
+        TestData.version22,
+        TestData.requirement_22_No,
     )
     return HttpResponse("TEST")
