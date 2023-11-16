@@ -32,7 +32,6 @@ class ACompliance(models.Model):
 
 
 class APriority(models.Model):
-    priority_id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=45, blank=True, null=True)
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
@@ -72,16 +71,16 @@ class EArea(models.Model):
 
 
 class EComplianceVersion(models.Model):
-    version_no = models.CharField(primary_key=True, max_length=45)  # The composite primary key (version_no, operator_id) found, that is not supported. The first column is selected.
-    operator = models.ForeignKey('EOperator', models.DO_NOTHING)
+    operator = models.OneToOneField('EOperator', models.DO_NOTHING, primary_key=True)  # The composite primary key (operator_id, version_no) found, that is not supported. The first column is selected.
+    version_no = models.CharField(max_length=45)
+    doc_url = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
-    doc_url = models.CharField(max_length=45, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'e_compliance_version'
-        unique_together = (('version_no', 'operator'),)
+        unique_together = (('operator', 'version_no'),)
 
 
 class ECustomer(models.Model):
@@ -102,7 +101,7 @@ class EDeviceRequirement(models.Model):
     version_no = models.ForeignKey('EDocStructure', models.DO_NOTHING, db_column='version_no', to_field='version_no', related_name='edevicerequirement_version_no_set')
     desc = models.ForeignKey('EDeviceRequirementDesc', models.DO_NOTHING)
     priority = models.ForeignKey(APriority, models.DO_NOTHING, db_column='priority', blank=True, null=True)
-    structure = models.ForeignKey('EDocStructure', models.DO_NOTHING, to_field='doc_id', related_name='edevicerequirement_structure_set')
+    structure = models.ForeignKey('EDocStructure', models.DO_NOTHING, to_field='doc_id', related_name='edevicerequirement_structure_set', blank=True, null=True)
     tag_id = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
@@ -140,7 +139,7 @@ class EDocStructure(models.Model):
     class Meta:
         managed = False
         db_table = 'e_doc_structure'
-        unique_together = (('operator', 'version_no', 'parent_structure'), ('operator', 'version_no', 'doc_id'),)
+        unique_together = (('operator', 'version_no', 'doc_id'),)
 
 
 class EDocStructureCategory(models.Model):
@@ -178,6 +177,18 @@ class EFeature(models.Model):
         db_table = 'e_feature'
 
 
+class EGeneration(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
+    external_name = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'e_generation'
+
+
 class EMilestone(models.Model):
     milestone_id = models.IntegerField(primary_key=True)  # The composite primary key (milestone_id, category_id) found, that is not supported. The first column is selected.
     category = models.ForeignKey(ACategory, models.DO_NOTHING)
@@ -210,12 +221,12 @@ class EOperator(models.Model):
 class EPlatform(models.Model):
     id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
-    create_date = models.DateField(blank=True, null=True)
-    update_date = models.DateField(blank=True, null=True)
+    external_name = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
     ppm = models.ForeignKey(EEmployee, models.DO_NOTHING, db_column='ppm', blank=True, null=True)
     platform_family = models.ForeignKey('EPlatformFamily', models.DO_NOTHING)
-    code_name = models.CharField(max_length=45, blank=True, null=True)
     category = models.ForeignKey(ACategory, models.DO_NOTHING, db_column='category')
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -224,7 +235,9 @@ class EPlatform(models.Model):
 
 class EPlatformFamily(models.Model):
     id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=45, blank=True, null=True)
+    name = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
+    external_name = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
+    generation = models.ForeignKey(EGeneration, models.DO_NOTHING)
     create_date = models.DateField(db_column='create_Date', blank=True, null=True)  # Field name made lowercase.
     update_date = models.DateField(blank=True, null=True)
 
@@ -275,7 +288,6 @@ class EProjectFwversion(models.Model):
 
 
 class ERequirementCategory(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=45, blank=True, null=True)
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
@@ -298,7 +310,7 @@ class ETechnicalAcceptance(models.Model):
 
 class ETestPlan(models.Model):
     operator = models.OneToOneField(EComplianceVersion, models.DO_NOTHING, primary_key=True)  # The composite primary key (operator_id, version_no, test_id) found, that is not supported. The first column is selected.
-    version_no = models.ForeignKey(EComplianceVersion, models.DO_NOTHING, db_column='version_no', related_name='etestplan_version_no_set')
+    version_no = models.ForeignKey(EComplianceVersion, models.DO_NOTHING, db_column='version_no', to_field='version_no', related_name='etestplan_version_no_set')
     test_id = models.IntegerField()
     title = models.CharField(max_length=255, db_collation='utf8mb3_general_ci', blank=True, null=True)
     test_description = models.CharField(max_length=2048, blank=True, null=True)
@@ -312,15 +324,13 @@ class ETestPlan(models.Model):
 
 
 class RDeviceRequirementCategory(models.Model):
-    requirement_operator = models.OneToOneField(EDeviceRequirement, models.DO_NOTHING, primary_key=True)  # The composite primary key (requirement_operator_id, requirement_version_no, requirement_id, category_id) found, that is not supported. The first column is selected.
-    requirement_version_no = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, db_column='requirement_version_no', to_field='version_no', related_name='rdevicerequirementcategory_requirement_version_no_set')
-    requirement = models.ForeignKey(EDeviceRequirement, models.DO_NOTHING, to_field='desc_id', related_name='rdevicerequirementcategory_requirement_set')
+    desc = models.OneToOneField(EDeviceRequirementDesc, models.DO_NOTHING, primary_key=True)  # The composite primary key (desc_id, category_id) found, that is not supported. The first column is selected.
     category = models.ForeignKey(ERequirementCategory, models.DO_NOTHING)
 
     class Meta:
         managed = False
         db_table = 'r_device_requirement_category'
-        unique_together = (('requirement_operator', 'requirement_version_no', 'requirement', 'category'),)
+        unique_together = (('desc', 'category'),)
 
 
 class ROpRfp(models.Model):
@@ -459,3 +469,54 @@ class RTestPlanExamineDeviceRequirement(models.Model):
         managed = False
         db_table = 'r_test_plan_examine_device_requirement'
         unique_together = (('operator', 'version_no', 'requirement', 'test'),)
+
+
+class VOperatorDocStructure(models.Model):
+    operator_id = models.IntegerField()
+    version_no = models.CharField(max_length=45, db_collation='utf8mb4_0900_ai_ci')
+    chapterid = models.CharField(db_column='ChapterId', max_length=45, db_collation='utf8mb3_general_ci')  # Field name made lowercase.
+    chapter = models.CharField(db_column='Chapter', max_length=45, db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)  # Field name made lowercase.
+    sectionid = models.CharField(db_column='SectionId', max_length=45, db_collation='utf8mb3_general_ci')  # Field name made lowercase.
+    section = models.CharField(db_column='Section', max_length=45, db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = False  # Created from a view. Don't remove.
+        db_table = 'v_operator_doc_structure'
+        db_table_comment = 'VIEW'
+
+
+class VOperatorRequirement(models.Model):
+    area = models.CharField(max_length=45, db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)
+    operatorid = models.IntegerField(db_column='operatorId')  # Field name made lowercase.
+    operator = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
+    version_no = models.CharField(max_length=45, db_collation='utf8mb4_0900_ai_ci')
+    sectionid = models.CharField(db_column='SectionId', max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
+    tag_id = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
+    title = models.CharField(max_length=255, db_collation='utf8mb3_general_ci', blank=True, null=True)
+    name = models.CharField(max_length=255, db_collation='utf8mb3_general_ci', blank=True, null=True)
+    description = models.TextField(db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)
+
+    class Meta:
+        managed = False  # Created from a view. Don't remove.
+        db_table = 'v_operator_requirement'
+        db_table_comment = 'VIEW'
+
+
+class VOperatorRequirementWithStructure(models.Model):
+    area = models.CharField(max_length=45, db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)
+    operator = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
+    version_no = models.CharField(max_length=45, db_collation='utf8mb4_0900_ai_ci')
+    tag_id = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
+    chapterid = models.CharField(db_column='ChapterId', max_length=45, db_collation='utf8mb3_general_ci')  # Field name made lowercase.
+    chapter = models.CharField(db_column='Chapter', max_length=45, db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)  # Field name made lowercase.
+    sectionid = models.CharField(db_column='SectionId', max_length=45, db_collation='utf8mb3_general_ci')  # Field name made lowercase.
+    section = models.CharField(db_column='Section', max_length=45, db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)  # Field name made lowercase.
+    title = models.CharField(max_length=255, db_collation='utf8mb3_general_ci', blank=True, null=True)
+    name = models.CharField(max_length=255, db_collation='utf8mb3_general_ci', blank=True, null=True)
+    description = models.TextField(db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)
+    priority = models.CharField(max_length=45, db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)
+
+    class Meta:
+        managed = False  # Created from a view. Don't remove.
+        db_table = 'v_operator_requirement_with_structure'
+        db_table_comment = 'VIEW'
