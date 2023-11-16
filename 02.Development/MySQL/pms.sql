@@ -74,12 +74,12 @@ DROP TABLE IF EXISTS `a_priority`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `a_priority` (
-  `priority_id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(45) DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  PRIMARY KEY (`priority_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -88,6 +88,7 @@ CREATE TABLE `a_priority` (
 
 LOCK TABLES `a_priority` WRITE;
 /*!40000 ALTER TABLE `a_priority` DISABLE KEYS */;
+INSERT INTO `a_priority` VALUES (1,'Mandatory','2023-11-14','2023-11-14');
 /*!40000 ALTER TABLE `a_priority` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -116,7 +117,7 @@ CREATE TABLE `e_action` (
   KEY `fk_e_action_e_Priority1_idx` (`priority_id`),
   KEY `fk_e_action_r_project_schedule1_idx` (`project_id`,`milestone_id`,`milestone_category`),
   CONSTRAINT `fk_e_action_e_employee1` FOREIGN KEY (`owner_id`) REFERENCES `e_employee` (`id`),
-  CONSTRAINT `fk_e_action_e_Priority1` FOREIGN KEY (`priority_id`) REFERENCES `a_priority` (`priority_id`),
+  CONSTRAINT `fk_e_action_e_Priority1` FOREIGN KEY (`priority_id`) REFERENCES `a_priority` (`id`),
   CONSTRAINT `fk_e_action_r_project_schedule1` FOREIGN KEY (`project_id`, `milestone_id`, `milestone_category`) REFERENCES `r_project_schedule` (`project_id`, `milestone_id`, `milestone_category`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -152,7 +153,7 @@ CREATE TABLE `e_area` (
 
 LOCK TABLES `e_area` WRITE;
 /*!40000 ALTER TABLE `e_area` DISABLE KEYS */;
-INSERT INTO `e_area` VALUES (1,'NA','2022-05-19','2023-10-18'),(2,'JP','2022-05-19','2022-05-19'),(3,'EU','2022-05-19','2022-05-19'),(4,'CN','2022-05-19','2022-05-19');
+INSERT INTO `e_area` VALUES (1,'NA','2022-05-19','2023-11-16'),(2,'JP','2022-05-19','2022-05-19'),(3,'EU','2022-05-19','2022-05-19'),(4,'CN','2022-05-19','2022-05-19');
 /*!40000 ALTER TABLE `e_area` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -171,7 +172,7 @@ CREATE TABLE `e_compliance_version` (
   `update_date` date DEFAULT NULL,
   PRIMARY KEY (`operator_id`,`version_no`),
   KEY `fk_e_version_e_operator1_idx` (`operator_id`),
-  CONSTRAINT `fk_e_version_e_operator1` FOREIGN KEY (`operator_id`) REFERENCES `e_operator` (`id`)
+  CONSTRAINT `fk_e_version_e_operator1` FOREIGN KEY (`operator_id`) REFERENCES `e_operator` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -181,7 +182,7 @@ CREATE TABLE `e_compliance_version` (
 
 LOCK TABLES `e_compliance_version` WRITE;
 /*!40000 ALTER TABLE `e_compliance_version` DISABLE KEYS */;
-INSERT INTO `e_compliance_version` VALUES ('TEST_Version1',101,'2023-02-22','2023-02-22',NULL),('TEST_Version2',101,'2023-02-22','2023-02-22',NULL);
+
 /*!40000 ALTER TABLE `e_compliance_version` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -234,10 +235,10 @@ CREATE TABLE `e_device_requirement` (
   UNIQUE KEY `fk_e_device_requirement_e_doc_structure1_idx` (`operator_id`,`version_no`,`structure_id`) /*!80000 INVISIBLE */,
   KEY `fk_e_device_requirement_e_priority1_idx` (`priority`),
   KEY `fk_e_device_requirement_e_device_requirement_desc1_idx` (`desc_id`) /*!80000 INVISIBLE */,
-  CONSTRAINT `fk_e_device_requirement_e_compliance_version1` FOREIGN KEY (`operator_id`, `version_no`) REFERENCES `e_compliance_version` (`operator_id`, `version_no`) ON DELETE CASCADE,
-  CONSTRAINT `fk_e_device_requirement_e_device_requirement_desc1` FOREIGN KEY (`desc_id`) REFERENCES `e_device_requirement_desc` (`id`),
-  CONSTRAINT `fk_e_device_requirement_e_doc_structure1` FOREIGN KEY (`operator_id`, `version_no`, `structure_id`) REFERENCES `e_doc_structure` (`operator_id`, `version_no`, `doc_id`),
-  CONSTRAINT `fk_e_device_requirement_e_priority1` FOREIGN KEY (`priority`) REFERENCES `a_priority` (`priority_id`)
+  CONSTRAINT `fk_e_device_requirement_e_compliance_version1` FOREIGN KEY (`operator_id`, `version_no`) REFERENCES `e_compliance_version` (`operator_id`, `version_no`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_e_device_requirement_e_device_requirement_desc1` FOREIGN KEY (`desc_id`) REFERENCES `e_device_requirement_desc` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_e_device_requirement_e_doc_structure1` FOREIGN KEY (`operator_id`, `version_no`, `structure_id`) REFERENCES `e_doc_structure` (`operator_id`, `version_no`, `doc_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_e_device_requirement_e_priority1` FOREIGN KEY (`priority`) REFERENCES `a_priority` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -298,7 +299,7 @@ CREATE TABLE `e_doc_structure` (
   PRIMARY KEY (`operator_id`,`version_no`,`doc_id`),
   KEY `fk_e_doc_structure_e_doc_structure_category1_idx` (`category`),
   KEY `fk_doc_structure_has_parent_doc_structure_idx` (`operator_id`,`version_no`,`parent_structure_id`) /*!80000 INVISIBLE */,
-  CONSTRAINT `fk_compliance_version_has_doc_structures` FOREIGN KEY (`operator_id`, `version_no`) REFERENCES `e_compliance_version` (`operator_id`, `version_no`) ON DELETE CASCADE,
+  CONSTRAINT `fk_compliance_version_has_doc_structures` FOREIGN KEY (`operator_id`, `version_no`) REFERENCES `e_compliance_version` (`operator_id`, `version_no`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_doc_structure_has_parent_doc_structure` FOREIGN KEY (`operator_id`, `version_no`, `parent_structure_id`) REFERENCES `e_doc_structure` (`operator_id`, `version_no`, `doc_id`) ON DELETE CASCADE,
   CONSTRAINT `fk_doc_structure_is_doc_structure_category` FOREIGN KEY (`category`) REFERENCES `e_doc_structure_category` (`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -1067,25 +1068,70 @@ LOCK TABLES `r_test_plan_examine_device_requirement` WRITE;
 UNLOCK TABLES;
 
 --
--- Temporary view structure for view `v_area_operator`
+-- Temporary view structure for view `v_operator_doc_structure`
 --
 
-DROP TABLE IF EXISTS `v_area_operator`;
-/*!50001 DROP VIEW IF EXISTS `v_area_operator`*/;
+DROP TABLE IF EXISTS `v_operator_doc_structure`;
+/*!50001 DROP VIEW IF EXISTS `v_operator_doc_structure`*/;
 SET @saved_cs_client     = @@character_set_client;
 /*!50503 SET character_set_client = utf8mb4 */;
-/*!50001 CREATE VIEW `v_area_operator` AS SELECT 
- 1 AS `area_id`,
- 1 AS `area`,
+/*!50001 CREATE VIEW `v_operator_doc_structure` AS SELECT 
  1 AS `operator_id`,
- 1 AS `operator`*/;
+ 1 AS `version_no`,
+ 1 AS `ChapterId`,
+ 1 AS `Chapter`,
+ 1 AS `SectionId`,
+ 1 AS `Section`*/;
 SET character_set_client = @saved_cs_client;
 
 --
--- Final view structure for view `v_area_operator`
+-- Temporary view structure for view `v_operator_requirement`
 --
 
-/*!50001 DROP VIEW IF EXISTS `v_area_operator`*/;
+DROP TABLE IF EXISTS `v_operator_requirement`;
+/*!50001 DROP VIEW IF EXISTS `v_operator_requirement`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `v_operator_requirement` AS SELECT 
+ 1 AS `area`,
+ 1 AS `operatorId`,
+ 1 AS `operator`,
+ 1 AS `version_no`,
+ 1 AS `SectionId`,
+ 1 AS `tag_id`,
+ 1 AS `title`,
+ 1 AS `name`,
+ 1 AS `description`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary view structure for view `v_operator_requirement_with_structure`
+--
+
+DROP TABLE IF EXISTS `v_operator_requirement_with_structure`;
+/*!50001 DROP VIEW IF EXISTS `v_operator_requirement_with_structure`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `v_operator_requirement_with_structure` AS SELECT 
+ 1 AS `area`,
+ 1 AS `operator`,
+ 1 AS `version_no`,
+ 1 AS `tag_id`,
+ 1 AS `ChapterId`,
+ 1 AS `Chapter`,
+ 1 AS `SectionId`,
+ 1 AS `Section`,
+ 1 AS `title`,
+ 1 AS `name`,
+ 1 AS `description`,
+ 1 AS `priority`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Final view structure for view `v_operator_doc_structure`
+--
+
+/*!50001 DROP VIEW IF EXISTS `v_operator_doc_structure`*/;
 /*!50001 SET @saved_cs_client          = @@character_set_client */;
 /*!50001 SET @saved_cs_results         = @@character_set_results */;
 /*!50001 SET @saved_col_connection     = @@collation_connection */;
@@ -1094,7 +1140,43 @@ SET character_set_client = @saved_cs_client;
 /*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `v_area_operator` AS select `a`.`id` AS `area_id`,`a`.`name` AS `area`,`o`.`id` AS `operator_id`,`o`.`name` AS `operator` from (`e_area` `a` join `e_operator` `o`) where (`a`.`id` = `o`.`area_id`) */;
+/*!50001 VIEW `v_operator_doc_structure` AS select `section`.`operator_id` AS `operator_id`,`section`.`version_no` AS `version_no`,`chapter`.`doc_id` AS `ChapterId`,`chapter`.`name` AS `Chapter`,`section`.`doc_id` AS `SectionId`,`section`.`name` AS `Section` from (`e_doc_structure` `chapter` join `e_doc_structure` `section`) where ((`chapter`.`operator_id` = `section`.`operator_id`) and (`chapter`.`version_no` = `section`.`version_no`) and (`section`.`parent_structure_id` = `chapter`.`doc_id`)) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `v_operator_requirement`
+--
+
+/*!50001 DROP VIEW IF EXISTS `v_operator_requirement`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `v_operator_requirement` AS select `a`.`name` AS `area`,`o`.`id` AS `operatorId`,`o`.`name` AS `operator`,`v`.`version_no` AS `version_no`,`r`.`structure_id` AS `SectionId`,`r`.`tag_id` AS `tag_id`,`d`.`title` AS `title`,`d`.`name` AS `name`,`d`.`description` AS `description` from ((((`e_area` `a` join `e_operator` `o`) join `e_compliance_version` `v`) join `e_device_requirement` `r`) join `e_device_requirement_desc` `d`) where ((`a`.`id` = `o`.`area_id`) and (`o`.`id` = `v`.`operator_id`) and (`v`.`operator_id` = `r`.`operator_id`) and (`v`.`version_no` = `r`.`version_no`) and (`r`.`desc_id` = `d`.`id`)) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `v_operator_requirement_with_structure`
+--
+
+/*!50001 DROP VIEW IF EXISTS `v_operator_requirement_with_structure`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `v_operator_requirement_with_structure` AS select `a`.`name` AS `area`,`o`.`name` AS `operator`,`v`.`version_no` AS `version_no`,`r`.`tag_id` AS `tag_id`,`chapter`.`doc_id` AS `ChapterId`,`chapter`.`name` AS `Chapter`,`section`.`doc_id` AS `SectionId`,`section`.`name` AS `Section`,`d`.`title` AS `title`,`d`.`name` AS `name`,`d`.`description` AS `description`,`p`.`name` AS `priority` from (((((((`e_area` `a` join `e_operator` `o` on((`a`.`id` = `o`.`area_id`))) join `e_compliance_version` `v` on((`o`.`id` = `v`.`operator_id`))) join `e_device_requirement` `r` on(((`v`.`operator_id` = `r`.`operator_id`) and (`v`.`version_no` = `r`.`version_no`)))) left join `a_priority` `p` on((`r`.`priority` = `p`.`id`))) join `e_device_requirement_desc` `d` on((`r`.`desc_id` = `d`.`id`))) join `e_doc_structure` `section` on(((`r`.`operator_id` = `section`.`operator_id`) and (`r`.`version_no` = `section`.`version_no`) and (`r`.`structure_id` = `section`.`doc_id`)))) join `e_doc_structure` `chapter` on(((`chapter`.`operator_id` = `section`.`operator_id`) and (`chapter`.`version_no` = `section`.`version_no`) and (`section`.`parent_structure_id` = `chapter`.`doc_id`)))) */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -1108,4 +1190,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-10-18 21:14:37
+-- Dump completed on 2023-11-16 21:06:20
