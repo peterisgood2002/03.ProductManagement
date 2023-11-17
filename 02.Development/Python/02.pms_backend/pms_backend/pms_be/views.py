@@ -7,9 +7,8 @@ import requests
 from bs4 import BeautifulSoup, Tag
 import webbrowser
 
-from pms_dbmodel.operator_operation.doc_operation import DocOperation
-from pms_dbmodel.operator import OperatorService
-from pms_dbmodel.tests import TestData
+from pms_dbmodel.platform import PlatformService
+from pms_dbmodel.testplatformdata import TestPlatformData
 
 
 def index(request):
@@ -59,17 +58,9 @@ def getCNN5():
 
 
 def testDB(request):
-    OperatorService.addOperatorRequirements(
-        TestData.area,
-        TestData.operator1,
-        TestData.version19,
-        TestData.requirement_19,
-    )
-
-    OperatorService.addNoChangedRequirements(
-        TestData.area,
-        TestData.operator1,
-        TestData.version22,
-        TestData.requirement_22_No,
+    PlatformService.addPlatformsWithGeneration(
+        TestPlatformData.Gen1Id,
+        TestPlatformData.Gen1Name,
+        TestPlatformData.platform,
     )
     return HttpResponse("TEST")

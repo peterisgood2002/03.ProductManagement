@@ -1,4 +1,4 @@
-from pms_dbmodel.tests import TestData, CheckData
+from pms_dbmodel.testoperatordata import TestOperatiorData, CheckOperatorData
 from .base_test import PMSDbTest
 from pms_dbmodel.models.e_operator import EComplianceVersion
 from pms_dbmodel.operator_operation.version_operation import VersionOperation
@@ -13,35 +13,49 @@ class VersionOperationTest(PMSDbTest):
         )
 
     def testGetVersions(self):
-        r = VersionOperation.getVersions(TestData.area, TestData.operator1)
+        r = VersionOperation.getVersions(
+            TestOperatiorData.area, TestOperatiorData.operator1
+        )
         assert 0 == len(r)
 
         [version, succeed] = VersionOperation.addVersion(
-            TestData.area,
-            TestData.operator1,
-            TestData.version19,
+            TestOperatiorData.area,
+            TestOperatiorData.operator1,
+            TestOperatiorData.version19,
         )
-        CheckData.checkVersion(version, TestData.operator1, TestData.version19)
+        CheckOperatorData.checkVersion(
+            version, TestOperatiorData.operator1, TestOperatiorData.version19
+        )
         assert succeed == True
         [version, succeed] = VersionOperation.addVersion(
-            TestData.area,
-            TestData.operator1,
-            TestData.version19,
+            TestOperatiorData.area,
+            TestOperatiorData.operator1,
+            TestOperatiorData.version19,
         )
-        CheckData.checkVersion(version, TestData.operator1, TestData.version19)
+        CheckOperatorData.checkVersion(
+            version, TestOperatiorData.operator1, TestOperatiorData.version19
+        )
         assert succeed == False
         [version, succeed] = VersionOperation.addVersion(
-            TestData.area,
-            TestData.operator1,
-            TestData.version22,
+            TestOperatiorData.area,
+            TestOperatiorData.operator1,
+            TestOperatiorData.version22,
         )
-        CheckData.checkVersion(version, TestData.operator1, TestData.version22)
+        CheckOperatorData.checkVersion(
+            version, TestOperatiorData.operator1, TestOperatiorData.version22
+        )
         assert succeed == True
 
-        r = VersionOperation.getVersions(TestData.area, TestData.operator1)
+        r = VersionOperation.getVersions(
+            TestOperatiorData.area, TestOperatiorData.operator1
+        )
         assert 2 == len(r)
-        assert TestData.version19 in r
-        assert TestData.version22 in r
+        assert TestOperatiorData.version19 in r
+        assert TestOperatiorData.version22 in r
 
-        r = VersionOperation.getVersion(TestData.operator1, TestData.version19)
-        CheckData.checkVersion(r, TestData.operator1, TestData.version19)
+        r = VersionOperation.getVersion(
+            TestOperatiorData.operator1, TestOperatiorData.version19
+        )
+        CheckOperatorData.checkVersion(
+            r, TestOperatiorData.operator1, TestOperatiorData.version19
+        )

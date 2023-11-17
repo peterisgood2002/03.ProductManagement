@@ -1,4 +1,4 @@
-from pms_dbmodel.tests import TestData, CheckData
+from pms_dbmodel.testoperatordata import TestOperatiorData, CheckOperatorData
 from .base_test import PMSDbTest
 
 from pms_dbmodel.models.e_operator import EOperator
@@ -16,19 +16,25 @@ class OperatorOperationTest(PMSDbTest):
 
     def testGetOperator(self):
         # 1. Insert ATT
-        o = OperatorOperation.addOperator(TestData.area, TestData.operator1)
-        CheckData.checkOperator(o, TestData.operator1)
+        o = OperatorOperation.addOperator(
+            TestOperatiorData.area, TestOperatiorData.operator1
+        )
+        CheckOperatorData.checkOperator(o, TestOperatiorData.operator1)
 
-        o = OperatorOperation.getOperator(TestData.operator1)
-        CheckData.checkOperator(o, TestData.operator1)
-        assert TestData.operator1 == o.name
-        o = OperatorOperation.getOperator(TestData.operator2)
+        o = OperatorOperation.getOperator(TestOperatiorData.operator1)
+        CheckOperatorData.checkOperator(o, TestOperatiorData.operator1)
+        assert TestOperatiorData.operator1 == o.name
+        o = OperatorOperation.getOperator(TestOperatiorData.operator2)
         assert o == None
 
         # 2. Insert TMO
-        tmo = OperatorOperation.addOperator(TestData.area, TestData.operator2)
-        CheckData.checkOperator(tmo, TestData.operator2)
+        tmo = OperatorOperation.addOperator(
+            TestOperatiorData.area, TestOperatiorData.operator2
+        )
+        CheckOperatorData.checkOperator(tmo, TestOperatiorData.operator2)
 
         # 3. Get TMO again
-        o = OperatorOperation.addOperator(TestData.area, TestData.operator2)
+        o = OperatorOperation.addOperator(
+            TestOperatiorData.area, TestOperatiorData.operator2
+        )
         assert tmo == o

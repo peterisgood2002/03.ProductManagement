@@ -1,4 +1,5 @@
-from pms_dbmodel.tests import TestData, Util, CheckData
+from pms_dbmodel.tests import Util
+from pms_dbmodel.testoperatordata import TestOperatiorData, CheckOperatorData
 from pms_dbmodel.operator_operation.doc_operation import DocOperation
 from .base_test import PMSDbTest, logger
 
@@ -38,7 +39,7 @@ class RequirementOperationTest(PMSDbTest):
     def testInsertDeviceRequirementDesc(self):
         # 1. New a requirement
 
-        requirement = TestData.requirement_19[0]
+        requirement = TestOperatiorData.requirement_19[0]
         [data, success] = RequirementOperation.addDeviceRequirementDesc(
             requirement.getInfo(OperatorRequirement.INFO.TITLE),
             requirement.getInfo(OperatorRequirement.INFO.NAME),
@@ -46,7 +47,7 @@ class RequirementOperationTest(PMSDbTest):
         )
         assert success == True
         result = RequirementOperation.getDeviceRequirementDesc(data.id)
-        CheckData.checkDeviceRequirmentDesc(
+        CheckOperatorData.checkDeviceRequirmentDesc(
             result,
             requirement.getInfo(OperatorRequirement.INFO.TITLE),
             requirement.getInfo(OperatorRequirement.INFO.NAME),
@@ -61,10 +62,10 @@ class RequirementOperationTest(PMSDbTest):
         assert 1 == len(rList)
 
     def testInsertNewRequirement(self):
-        for req in TestData.requirement_19:
+        for req in TestOperatiorData.requirement_19:
             r = RequirementOperation.addNewDeviceRequirement(
-                TestData.area,
-                TestData.operator1,
+                TestOperatiorData.area,
+                TestOperatiorData.operator1,
                 req.getInfo(OperatorRequirement.INFO.VERSION),
                 None,
                 req.getInfo(OperatorRequirement.INFO.TAG),
@@ -74,17 +75,22 @@ class RequirementOperationTest(PMSDbTest):
             )
 
             result = RequirementOperation.getDeviceRequirement(
-                TestData.operator1,
+                TestOperatiorData.operator1,
                 req.getInfo(OperatorRequirement.INFO.VERSION),
                 req.getInfo(OperatorRequirement.INFO.TAG),
             )
 
-            CheckData.checkDeviceRequirement(result, TestData.operator1, req)
-        assert len(TestData.requirement_19) == EDeviceRequirementDesc.objects.count()
-        rList = RequirementOperation.getDeviceRequirementList(
-            TestData.operator1, TestData.version19
+            CheckOperatorData.checkDeviceRequirement(
+                result, TestOperatiorData.operator1, req
+            )
+        assert (
+            len(TestOperatiorData.requirement_19)
+            == EDeviceRequirementDesc.objects.count()
         )
-        assert len(TestData.requirement_19) == len(rList)
+        rList = RequirementOperation.getDeviceRequirementList(
+            TestOperatiorData.operator1, TestOperatiorData.version19
+        )
+        assert len(TestOperatiorData.requirement_19) == len(rList)
 
         self._testInsertNoChangeRequirement()
 
@@ -94,22 +100,22 @@ class RequirementOperationTest(PMSDbTest):
 
         # Create a version with the same requirement based on TAG
         rMap = RequirementOperation.getDeviceRequirementMapBasedOnTagId(
-            TestData.operator1, TestData.version19
+            TestOperatiorData.operator1, TestOperatiorData.version19
         )
 
-        for req in TestData.requirement_22_No:
+        for req in TestOperatiorData.requirement_22_No:
             [section, succeed] = DocOperation.addDocStructure(
-                TestData.area,
-                TestData.operator1,
+                TestOperatiorData.area,
+                TestOperatiorData.operator1,
                 req.getInfo(OperatorRequirement.INFO.VERSION),
-                TestData.categories[2],
+                TestOperatiorData.categories[2],
                 req.getInfo(OperatorRequirement.INFO.SectionId),
                 req.getInfo(OperatorRequirement.INFO.Section),
                 None,
             )
             [result, succeed] = RequirementOperation.addNoChangeDeviceRequirement(
-                TestData.area,
-                TestData.operator1,
+                TestOperatiorData.area,
+                TestOperatiorData.operator1,
                 req.getInfo(OperatorRequirement.INFO.VERSION),
                 section,
                 req.getInfo(OperatorRequirement.INFO.TAG),
@@ -117,42 +123,45 @@ class RequirementOperationTest(PMSDbTest):
             )
 
             result = RequirementOperation.getDeviceRequirement(
-                TestData.operator1,
+                TestOperatiorData.operator1,
                 req.getInfo(OperatorRequirement.INFO.VERSION),
                 req.getInfo(OperatorRequirement.INFO.TAG),
             )
-            CheckData.checkNoChangeDeviceRequirement(
+            CheckOperatorData.checkNoChangeDeviceRequirement(
                 result,
-                TestData.operator1,
+                TestOperatiorData.operator1,
                 req.getInfo(OperatorRequirement.INFO.TAG),
                 req,
                 rMap,
             )
 
-        assert len(TestData.requirement_19) == EDeviceRequirementDesc.objects.count()
+        assert (
+            len(TestOperatiorData.requirement_19)
+            == EDeviceRequirementDesc.objects.count()
+        )
         rList = RequirementOperation.getDeviceRequirementList(
-            TestData.operator1, TestData.version22
+            TestOperatiorData.operator1, TestOperatiorData.version22
         )
         assert 1 == len(rList)
         logInfo(logger, LOGTIME.END, self._testInsertNoChangeRequirement.__name__)
 
-        req = TestData.requirement_22_No[0]
+        req = TestOperatiorData.requirement_22_No[0]
         category = RequirementOperation.addCategoryWithTagId(
-            TestData.operator1,
+            TestOperatiorData.operator1,
             req.getInfo(OperatorRequirement.INFO.VERSION),
             req.getInfo(OperatorRequirement.INFO.TAG),
             "TEST",
         )
 
         category = RequirementOperation.addCategoryWithTagId(
-            TestData.operator1,
+            TestOperatiorData.operator1,
             req.getInfo(OperatorRequirement.INFO.VERSION),
             req.getInfo(OperatorRequirement.INFO.TAG),
             "TEST2",
         )
 
         categories = RequirementOperation.getCategories(
-            TestData.operator1,
+            TestOperatiorData.operator1,
             req.getInfo(OperatorRequirement.INFO.VERSION),
             req.getInfo(OperatorRequirement.INFO.TAG),
         )

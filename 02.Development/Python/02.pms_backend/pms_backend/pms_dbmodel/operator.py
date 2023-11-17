@@ -1,6 +1,6 @@
 from enum import Enum
 from pms_dbmodel.operator_operation import logger
-from pms_dbmodel.common import LOGTIME, logInfo
+from pms_dbmodel.common import LOGTIME, logInfo, ArrayDate
 from pms_dbmodel.operator_operation.version_operation import VersionOperation
 from pms_dbmodel.operator_operation.requirement_operation import (
     RequirementOperation,
@@ -13,7 +13,7 @@ from pms_dbmodel.models.e_operator_requirement import (
 )
 
 
-class OperatorRequirement:
+class OperatorRequirement(ArrayDate):
     class INFO(Enum):
         VERSION = 0
         ChapterId = 1
@@ -36,8 +36,8 @@ class OperatorRequirement:
             for i in range(remaining):
                 self._requirement.append(None)
 
-    def getInfo(self, info: INFO):
-        return self._requirement[info.value]
+    def getInfoLength(self):
+        return len(OperatorRequirement.INFO)
 
 
 class OperatorService:

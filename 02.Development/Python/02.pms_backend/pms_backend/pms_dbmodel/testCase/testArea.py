@@ -1,8 +1,9 @@
 from .base_test import PMSDbTest
-from pms_dbmodel.tests import TestData
+
 
 from pms_dbmodel.models.e_operator import EArea
 from pms_dbmodel.operator_operation.area_operation import AreaOperation
+from pms_dbmodel.testoperatordata import TestOperatiorData
 
 
 class AreaOperationTest(PMSDbTest):
@@ -14,9 +15,9 @@ class AreaOperationTest(PMSDbTest):
         )
 
     def testGetArea(self):
-        a = AreaOperation.getArea(TestData.area)
+        a = AreaOperation.getArea(TestOperatiorData.area)
         self.assertIsInstance(a, EArea)
-        assert a.name == TestData.area
+        assert a.name == TestOperatiorData.area
 
-        b = AreaOperation.getArea(TestData.area)
+        b = AreaOperation.getArea(TestOperatiorData.area)
         assert a == b

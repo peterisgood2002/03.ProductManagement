@@ -20,6 +20,9 @@ class OperatorOperation:
         )
 
         a: EArea = AreaOperation.getArea(area)
+
+        if a == None:
+            raise Exception("We do not have this area:" + area)
         operators = EOperator.objects.filter(area=a).order_by("-id")
 
         result = None
@@ -51,8 +54,8 @@ class OperatorOperation:
         logInfo(
             logger, LOGTIME.BEGIN, cls.getOperator.__name__, "Operator = %s", operator
         )
-        operator = EOperator.objects.filter(name=operator)
+        oList = EOperator.objects.filter(name=operator)
 
-        if len(operator) == 0:
+        if len(oList) == 0:
             return None
-        return operator[0]
+        return oList[0]
