@@ -13,11 +13,12 @@ class TestPlatformData:
     categoryId = 1
     category = "TEST"
     family = ["Family1", "Family2"]
+    pdata = ["Platform1", "Platform2", "Platform3", "Platform4"]
     platform = [
-        PlatformData([1, Gen1Name, family[0], "Platform1", "P1", category]),
-        PlatformData([2, Gen1Name, family[0], "Platform2", "P2", category]),
-        PlatformData([3, Gen1Name, family[0], "Platform3", "P3", category]),
-        PlatformData([4, Gen1Name, family[1], "Platform4", "P4", category]),
+        PlatformData([1, Gen1Name, family[0], pdata[0], "P1", category]),
+        PlatformData([2, Gen1Name, family[0], pdata[1], "P2", category]),
+        PlatformData([3, Gen1Name, family[0], pdata[2], "P3", category]),
+        PlatformData([4, Gen1Name, family[1], pdata[3], "P4", category]),
     ]
 
 

@@ -1,5 +1,5 @@
 from enum import Enum
-from pms_dbmodel.common import ArrayDate
+from pms_dbmodel.common import ArrayData
 from pms_dbmodel.models.e_platform import EPlatform, EPlatformFamily
 from pms_dbmodel.platform_operation.generation_operation import GenerationOperation
 from pms_dbmodel.platform_operation.platform_operation import (
@@ -11,7 +11,7 @@ from pms_dbmodel.operator_operation import logger
 from pms_dbmodel.common import LOGTIME, logInfo
 
 
-class PlatformData(ArrayDate):
+class PlatformData(ArrayData):
     class INFO(Enum):
         ID = 0
         GENERATION = 1

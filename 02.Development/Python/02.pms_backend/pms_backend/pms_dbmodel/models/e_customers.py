@@ -9,13 +9,13 @@ class ECustomer(models.Model):
     name = models.CharField(
         max_length=45, db_collation="utf8mb3_general_ci", blank=True, null=True
     )
-    create_date = models.DateField(blank=True, null=True)
-    update_date = models.DateField(blank=True, null=True)
+    area = models.ForeignKey(EArea, models.DO_NOTHING, db_column="area")
     cpm = models.ForeignKey(
-        "EEmployee", models.DO_NOTHING, db_column="cpm", blank=True, null=True
+        EEmployee, models.DO_NOTHING, db_column="cpm", blank=True, null=True
     )
     is_alpha = models.IntegerField()
-    area = models.ForeignKey(EArea, models.DO_NOTHING, db_column="area")
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
 
     class Meta:
         managed = False

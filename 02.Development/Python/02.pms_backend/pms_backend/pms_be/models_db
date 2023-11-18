@@ -84,18 +84,17 @@ class EComplianceVersion(models.Model):
 
 
 class ECustomer(models.Model):
-    area = models.OneToOneField(EArea, models.DO_NOTHING, db_column='area', primary_key=True)  # The composite primary key (area, id) found, that is not supported. The first column is selected.
-    id = models.IntegerField()
+    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
-    create_date = models.DateField(blank=True, null=True)
-    update_date = models.DateField(blank=True, null=True)
+    area = models.ForeignKey(EArea, models.DO_NOTHING, db_column='area')
     cpm = models.ForeignKey('EEmployee', models.DO_NOTHING, db_column='cpm', blank=True, null=True)
     is_alpha = models.IntegerField()
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'e_customer'
-        unique_together = (('area', 'id'),)
 
 
 class EDeviceRequirement(models.Model):
@@ -376,17 +375,16 @@ class RProductSchedule(models.Model):
 
 
 class RProjectCustomer(models.Model):
-    customer_area = models.ForeignKey(ECustomer, models.DO_NOTHING, db_column='customer_area')
-    customer = models.ForeignKey(ECustomer, models.DO_NOTHING, to_field='id', related_name='rprojectcustomer_customer_set')
-    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)  # The composite primary key (project_id, customer_area, customer_id) found, that is not supported. The first column is selected.
+    customer = models.OneToOneField(ECustomer, models.DO_NOTHING, primary_key=True)  # The composite primary key (customer_id, project_id) found, that is not supported. The first column is selected.
+    project = models.ForeignKey(EProject, models.DO_NOTHING)
+    relationship = models.ForeignKey(ACategory, models.DO_NOTHING, db_column='relationship')
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
-    relationship = models.ForeignKey(ACategory, models.DO_NOTHING, db_column='relationship')
 
     class Meta:
         managed = False
         db_table = 'r_project_customer'
-        unique_together = (('project', 'customer_area', 'customer'),)
+        unique_together = (('customer', 'project'),)
 
 
 class RProjectFwversionFeature(models.Model):

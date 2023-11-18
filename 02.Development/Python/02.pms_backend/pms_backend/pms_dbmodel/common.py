@@ -29,7 +29,7 @@ def logInfo(logger: logging.Logger, timing: LOGTIME, name, msg="", *args, **kwar
     logger.info(data, *args, **kwargs)
 
 
-class ArrayDate:
+class ArrayData:
     def __init__(self, requirement=None):
         infoLen = self.getInfoLength()
         if len(requirement) <= infoLen:

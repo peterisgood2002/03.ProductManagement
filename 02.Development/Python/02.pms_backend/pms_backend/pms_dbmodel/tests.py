@@ -109,3 +109,13 @@ class PlatformServiceTest(PMSDbTest):
             TestPlatformData.Gen1Name,
             TestPlatformData.platform,
         )
+
+
+class ProjectServiceTest(PMSDbTest):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        super().setManaged(
+            EPlatform,
+        )
+    

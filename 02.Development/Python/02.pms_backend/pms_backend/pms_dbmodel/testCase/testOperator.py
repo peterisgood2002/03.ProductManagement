@@ -23,7 +23,6 @@ class OperatorOperationTest(PMSDbTest):
 
         o = OperatorOperation.getOperator(TestOperatiorData.operator1)
         CheckOperatorData.checkOperator(o, TestOperatiorData.operator1)
-        assert TestOperatiorData.operator1 == o.name
         o = OperatorOperation.getOperator(TestOperatiorData.operator2)
         assert o == None
 

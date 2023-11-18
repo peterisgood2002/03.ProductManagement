@@ -33,9 +33,8 @@ class OperatorOperation:
                 result = o
 
         if result == None:
-            index = a.id * 100
-            if len(operators) != 0:
-                index = operators[0].id + 1
+            index = AreaOperation.getIndex(a.id, operators)
+
             r = EOperator.objects.get_or_create(id=index, name=operator, area=a)
             setDateAndSave(r)
             result = r[0]
