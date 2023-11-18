@@ -84,7 +84,8 @@ class EComplianceVersion(models.Model):
 
 
 class ECustomer(models.Model):
-    id = models.IntegerField(primary_key=True)
+    area = models.OneToOneField(EArea, models.DO_NOTHING, db_column='area', primary_key=True)  # The composite primary key (area, id) found, that is not supported. The first column is selected.
+    id = models.IntegerField()
     name = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
@@ -94,6 +95,7 @@ class ECustomer(models.Model):
     class Meta:
         managed = False
         db_table = 'e_customer'
+        unique_together = (('area', 'id'),)
 
 
 class EDeviceRequirement(models.Model):
@@ -374,13 +376,17 @@ class RProductSchedule(models.Model):
 
 
 class RProjectCustomer(models.Model):
-    customer = models.OneToOneField(ECustomer, models.DO_NOTHING, primary_key=True)  # The composite primary key (customer_id, project_id) found, that is not supported. The first column is selected.
-    project = models.ForeignKey(EProject, models.DO_NOTHING)
+    customer_area = models.ForeignKey(ECustomer, models.DO_NOTHING, db_column='customer_area')
+    customer = models.ForeignKey(ECustomer, models.DO_NOTHING, to_field='id', related_name='rprojectcustomer_customer_set')
+    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)  # The composite primary key (project_id, customer_area, customer_id) found, that is not supported. The first column is selected.
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+    relationship = models.ForeignKey(ACategory, models.DO_NOTHING, db_column='relationship')
 
     class Meta:
         managed = False
         db_table = 'r_project_customer'
-        unique_together = (('customer', 'project'),)
+        unique_together = (('project', 'customer_area', 'customer'),)
 
 
 class RProjectFwversionFeature(models.Model):
@@ -469,54 +475,3 @@ class RTestPlanExamineDeviceRequirement(models.Model):
         managed = False
         db_table = 'r_test_plan_examine_device_requirement'
         unique_together = (('operator', 'version_no', 'requirement', 'test'),)
-
-
-class VOperatorDocStructure(models.Model):
-    operator_id = models.IntegerField()
-    version_no = models.CharField(max_length=45, db_collation='utf8mb4_0900_ai_ci')
-    chapterid = models.CharField(db_column='ChapterId', max_length=45, db_collation='utf8mb3_general_ci')  # Field name made lowercase.
-    chapter = models.CharField(db_column='Chapter', max_length=45, db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)  # Field name made lowercase.
-    sectionid = models.CharField(db_column='SectionId', max_length=45, db_collation='utf8mb3_general_ci')  # Field name made lowercase.
-    section = models.CharField(db_column='Section', max_length=45, db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)  # Field name made lowercase.
-
-    class Meta:
-        managed = False  # Created from a view. Don't remove.
-        db_table = 'v_operator_doc_structure'
-        db_table_comment = 'VIEW'
-
-
-class VOperatorRequirement(models.Model):
-    area = models.CharField(max_length=45, db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)
-    operatorid = models.IntegerField(db_column='operatorId')  # Field name made lowercase.
-    operator = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
-    version_no = models.CharField(max_length=45, db_collation='utf8mb4_0900_ai_ci')
-    sectionid = models.CharField(db_column='SectionId', max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)  # Field name made lowercase.
-    tag_id = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
-    title = models.CharField(max_length=255, db_collation='utf8mb3_general_ci', blank=True, null=True)
-    name = models.CharField(max_length=255, db_collation='utf8mb3_general_ci', blank=True, null=True)
-    description = models.TextField(db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)
-
-    class Meta:
-        managed = False  # Created from a view. Don't remove.
-        db_table = 'v_operator_requirement'
-        db_table_comment = 'VIEW'
-
-
-class VOperatorRequirementWithStructure(models.Model):
-    area = models.CharField(max_length=45, db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)
-    operator = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
-    version_no = models.CharField(max_length=45, db_collation='utf8mb4_0900_ai_ci')
-    tag_id = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
-    chapterid = models.CharField(db_column='ChapterId', max_length=45, db_collation='utf8mb3_general_ci')  # Field name made lowercase.
-    chapter = models.CharField(db_column='Chapter', max_length=45, db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)  # Field name made lowercase.
-    sectionid = models.CharField(db_column='SectionId', max_length=45, db_collation='utf8mb3_general_ci')  # Field name made lowercase.
-    section = models.CharField(db_column='Section', max_length=45, db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)  # Field name made lowercase.
-    title = models.CharField(max_length=255, db_collation='utf8mb3_general_ci', blank=True, null=True)
-    name = models.CharField(max_length=255, db_collation='utf8mb3_general_ci', blank=True, null=True)
-    description = models.TextField(db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)
-    priority = models.CharField(max_length=45, db_collation='utf8mb4_0900_ai_ci', blank=True, null=True)
-
-    class Meta:
-        managed = False  # Created from a view. Don't remove.
-        db_table = 'v_operator_requirement_with_structure'
-        db_table_comment = 'VIEW'

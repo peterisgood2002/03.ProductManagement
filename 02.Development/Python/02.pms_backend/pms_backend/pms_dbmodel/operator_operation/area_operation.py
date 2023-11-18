@@ -1,5 +1,5 @@
 from pms_dbmodel.common import LOGTIME, logInfo, setDateAndSave
-from pms_dbmodel.models.e_operator import EArea
+from pms_dbmodel.models.e_area import EArea
 from pms_dbmodel.operator_operation import logger
 
 

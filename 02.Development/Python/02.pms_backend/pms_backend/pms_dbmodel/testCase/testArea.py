@@ -1,7 +1,7 @@
 from .base_test import PMSDbTest
 
 
-from pms_dbmodel.models.e_operator import EArea
+from pms_dbmodel.models.e_area import EArea
 from pms_dbmodel.operator_operation.area_operation import AreaOperation
 from pms_dbmodel.testoperatordata import TestOperatiorData
 

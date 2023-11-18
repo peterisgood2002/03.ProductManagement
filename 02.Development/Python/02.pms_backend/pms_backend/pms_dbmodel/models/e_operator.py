@@ -1,17 +1,9 @@
 from django.db import models
 
+from .e_area import EArea
+
 from .e_employee import EEmployee
 from viewflow.fields import CompositeKey
-
-
-class EArea(models.Model):
-    name = models.CharField(max_length=45, blank=True, null=True)
-    create_date = models.DateField(blank=True, null=True)
-    update_date = models.DateField(blank=True, null=True)
-
-    class Meta:
-        managed = False
-        db_table = "e_area"
 
 
 class EOperator(models.Model):
