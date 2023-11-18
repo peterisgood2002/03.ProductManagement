@@ -25,9 +25,13 @@ DROP TABLE IF EXISTS `a_category`;
 CREATE TABLE `a_category` (
   `id` int NOT NULL,
   `category_name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `note` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `parent` int DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  KEY `fk_a_category_a_category1_idx` (`parent`) /*!80000 INVISIBLE */,
+  CONSTRAINT `fk_a_category_a_category1` FOREIGN KEY (`parent`) REFERENCES `a_category` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -37,6 +41,7 @@ CREATE TABLE `a_category` (
 
 LOCK TABLES `a_category` WRITE;
 /*!40000 ALTER TABLE `a_category` DISABLE KEYS */;
+INSERT INTO `a_category` VALUES (1,'Platform',NULL,NULL,NULL,NULL),(2,'Customer',NULL,NULL,NULL,NULL),(3,'Product',NULL,NULL,NULL,NULL),(4,'Milestone',NULL,NULL,NULL,NULL),(10,'Modem',NULL,1,NULL,NULL),(11,'Connectivity',NULL,1,NULL,NULL),(12,'RF',NULL,1,NULL,NULL),(13,'PMIC',NULL,1,NULL,NULL),(20,'HOME','MAIN',2,NULL,NULL),(21,'ODM','MAIN',2,NULL,NULL),(22,'T2','MAIN',2,NULL,NULL),(23,'T1','INDIRCT',2,NULL,NULL),(24,'OEM','INDIRCT',2,NULL,NULL),(30,'Smartphone',NULL,3,NULL,NULL),(31,'CPE',NULL,3,NULL,NULL),(32,'DataCard',NULL,3,NULL,NULL),(33,'Telematics',NULL,3,NULL,NULL);
 /*!40000 ALTER TABLE `a_category` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -196,12 +201,15 @@ DROP TABLE IF EXISTS `e_customer`;
 CREATE TABLE `e_customer` (
   `id` int NOT NULL,
   `name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
-  `create_date` date DEFAULT NULL,
-  `update_date` date DEFAULT NULL,
+  `area` int NOT NULL,
   `cpm` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `is_alpha` tinyint NOT NULL,
+  `create_date` date DEFAULT NULL,
+  `update_date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_e_customer_e_employee_idx` (`cpm`),
+  KEY `fk_e_customer_e_area1_idx` (`area`),
+  CONSTRAINT `fk_e_customer_e_area1` FOREIGN KEY (`area`) REFERENCES `e_area` (`id`),
   CONSTRAINT `fk_e_customer_e_employee` FOREIGN KEY (`cpm`) REFERENCES `e_employee` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -236,8 +244,8 @@ CREATE TABLE `e_device_requirement` (
   KEY `fk_e_device_requirement_e_priority1_idx` (`priority`),
   KEY `fk_e_device_requirement_e_device_requirement_desc1_idx` (`desc_id`) /*!80000 INVISIBLE */,
   CONSTRAINT `fk_e_device_requirement_e_compliance_version1` FOREIGN KEY (`operator_id`, `version_no`) REFERENCES `e_compliance_version` (`operator_id`, `version_no`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_e_device_requirement_e_device_requirement_desc1` FOREIGN KEY (`desc_id`) REFERENCES `e_device_requirement_desc` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_e_device_requirement_e_doc_structure1` FOREIGN KEY (`operator_id`, `version_no`, `structure_id`) REFERENCES `e_doc_structure` (`operator_id`, `version_no`, `doc_id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_e_device_requirement_e_device_requirement_desc1` FOREIGN KEY (`desc_id`) REFERENCES `e_device_requirement_desc` (`id`),
+  CONSTRAINT `fk_e_device_requirement_e_doc_structure1` FOREIGN KEY (`operator_id`, `version_no`, `structure_id`) REFERENCES `e_doc_structure` (`operator_id`, `version_no`, `doc_id`),
   CONSTRAINT `fk_e_device_requirement_e_priority1` FOREIGN KEY (`priority`) REFERENCES `a_priority` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -500,7 +508,7 @@ CREATE TABLE `e_platform` (
   KEY `fk_e_platform_e_employee1_idx` (`ppm`),
   KEY `fk_e_platform_e_platform_family1_idx` (`platform_family_id`),
   KEY `fk_e_platform_a_category1_idx` (`category`),
-  CONSTRAINT `fk_e_platform_a_category1` FOREIGN KEY (`category`) REFERENCES `a_category` (`id`),
+  CONSTRAINT `fk_e_platform_a_category1` FOREIGN KEY (`category`) REFERENCES `a_category` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `fk_e_platform_e_employee1` FOREIGN KEY (`ppm`) REFERENCES `e_employee` (`id`),
   CONSTRAINT `fk_e_platform_e_platform_family1` FOREIGN KEY (`platform_family_id`) REFERENCES `e_platform_family` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -843,11 +851,16 @@ DROP TABLE IF EXISTS `r_project_customer`;
 CREATE TABLE `r_project_customer` (
   `customer_id` int NOT NULL,
   `project_id` int NOT NULL,
+  `relationship` int NOT NULL,
+  `create_date` date DEFAULT NULL,
+  `update_date` date DEFAULT NULL,
   PRIMARY KEY (`customer_id`,`project_id`),
   KEY `fk_e_customer_has_e_project_e_project1_idx` (`project_id`),
-  KEY `fk_e_customer_has_e_project_e_customer1_idx` (`customer_id`),
-  CONSTRAINT `fk_e_customer_has_e_project_e_customer1` FOREIGN KEY (`customer_id`) REFERENCES `e_customer` (`id`),
-  CONSTRAINT `fk_e_customer_has_e_project_e_project1` FOREIGN KEY (`project_id`) REFERENCES `e_project` (`id`)
+  KEY `fk_r_project_customer_a_category1_idx` (`relationship`),
+  KEY `fk_r_project_customer_e_customer1_idx` (`customer_id`),
+  CONSTRAINT `fk_e_customer_has_e_project_e_project1` FOREIGN KEY (`project_id`) REFERENCES `e_project` (`id`),
+  CONSTRAINT `fk_r_project_customer_a_category1` FOREIGN KEY (`relationship`) REFERENCES `a_category` (`id`),
+  CONSTRAINT `fk_r_project_customer_e_customer1` FOREIGN KEY (`customer_id`) REFERENCES `e_customer` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -898,6 +911,8 @@ DROP TABLE IF EXISTS `r_project_platform`;
 CREATE TABLE `r_project_platform` (
   `project_id` int NOT NULL,
   `platform_id` int NOT NULL,
+  `create_date` date DEFAULT NULL,
+  `update_date` date DEFAULT NULL,
   PRIMARY KEY (`project_id`,`platform_id`),
   KEY `fk_e_project_has_e_platform_e_platform1_idx` (`platform_id`),
   KEY `fk_e_project_has_e_platform_e_project1_idx` (`project_id`),
@@ -1128,6 +1143,26 @@ SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = @saved_cs_client;
 
 --
+-- Temporary view structure for view `v_platform`
+--
+
+DROP TABLE IF EXISTS `v_platform`;
+/*!50001 DROP VIEW IF EXISTS `v_platform`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `v_platform` AS SELECT 
+ 1 AS `G_ID`,
+ 1 AS `Generation`,
+ 1 AS `G_External`,
+ 1 AS `F_ID`,
+ 1 AS `Family`,
+ 1 AS `F_External`,
+ 1 AS `P_ID`,
+ 1 AS `Platform`,
+ 1 AS `Category`*/;
+SET character_set_client = @saved_cs_client;
+
+--
 -- Final view structure for view `v_operator_doc_structure`
 --
 
@@ -1177,6 +1212,24 @@ SET character_set_client = @saved_cs_client;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
 /*!50001 VIEW `v_operator_requirement_with_structure` AS select `a`.`name` AS `area`,`o`.`name` AS `operator`,`v`.`version_no` AS `version_no`,`r`.`tag_id` AS `tag_id`,`chapter`.`doc_id` AS `ChapterId`,`chapter`.`name` AS `Chapter`,`section`.`doc_id` AS `SectionId`,`section`.`name` AS `Section`,`d`.`title` AS `title`,`d`.`name` AS `name`,`d`.`description` AS `description`,`p`.`name` AS `priority` from (((((((`e_area` `a` join `e_operator` `o` on((`a`.`id` = `o`.`area_id`))) join `e_compliance_version` `v` on((`o`.`id` = `v`.`operator_id`))) join `e_device_requirement` `r` on(((`v`.`operator_id` = `r`.`operator_id`) and (`v`.`version_no` = `r`.`version_no`)))) left join `a_priority` `p` on((`r`.`priority` = `p`.`id`))) join `e_device_requirement_desc` `d` on((`r`.`desc_id` = `d`.`id`))) join `e_doc_structure` `section` on(((`r`.`operator_id` = `section`.`operator_id`) and (`r`.`version_no` = `section`.`version_no`) and (`r`.`structure_id` = `section`.`doc_id`)))) join `e_doc_structure` `chapter` on(((`chapter`.`operator_id` = `section`.`operator_id`) and (`chapter`.`version_no` = `section`.`version_no`) and (`section`.`parent_structure_id` = `chapter`.`doc_id`)))) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `v_platform`
+--
+
+/*!50001 DROP VIEW IF EXISTS `v_platform`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `v_platform` AS select `g`.`id` AS `G_ID`,`g`.`name` AS `Generation`,`g`.`external_name` AS `G_External`,`f`.`id` AS `F_ID`,`f`.`name` AS `Family`,`f`.`external_name` AS `F_External`,`p`.`id` AS `P_ID`,`p`.`name` AS `Platform`,`c`.`category_name` AS `Category` from (((`e_generation` `g` join `e_platform_family` `f` on((`f`.`generation_id` = `g`.`id`))) join `e_platform` `p` on((`p`.`platform_family_id` = `f`.`id`))) join `a_category` `c` on((`c`.`id` = `p`.`category`))) */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
