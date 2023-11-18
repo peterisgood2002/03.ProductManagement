@@ -6,6 +6,12 @@ class ACategory(models.Model):
     category_name = models.CharField(
         max_length=45, db_collation="utf8mb3_general_ci", blank=True, null=True
     )
+    note = models.CharField(
+        max_length=45, db_collation="utf8mb3_general_ci", blank=True, null=True
+    )
+    parent = models.ForeignKey(
+        "self", models.DO_NOTHING, db_column="parent", blank=True, null=True
+    )
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
 

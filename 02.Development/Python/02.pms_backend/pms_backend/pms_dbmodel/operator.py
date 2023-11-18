@@ -1,10 +1,12 @@
 from enum import Enum
+from pms_dbmodel.common_operation.priority_operation import (
+    PriorityOperation,
+)
 from pms_dbmodel.operator_operation import logger
 from pms_dbmodel.common import LOGTIME, logInfo, ArrayData
 from pms_dbmodel.operator_operation.version_operation import VersionOperation
 from pms_dbmodel.operator_operation.requirement_operation import (
     RequirementOperation,
-    PriorityOperation,
 )
 from pms_dbmodel.operator_operation.doc_operation import DocOperation, StructureCategory
 from pms_dbmodel.models.e_operator_requirement import (

@@ -1,7 +1,8 @@
 from pms_dbmodel.models.e_platform import EPlatformFamily, EGeneration
-from pms_dbmodel.common import LOGTIME, logInfo, setDateAndSave
+from pms_dbmodel.common import *
 from pms_dbmodel.platform_operation import logger
 from pms_dbmodel.platform_operation.generation_operation import GenerationOperation
+from pms_dbmodel.common_operation.common_operation import CommonOperation
 
 
 class PlatformFamilyOperation:
@@ -28,13 +29,12 @@ class PlatformFamilyOperation:
                 result = f
 
         if result == None:
-            index = gen.id * 10
-            if len(families) != 0:
-                index = families[0].id + 1
+            index = CommonOperation.getIndex(gen.id * 10, families)
+
             r = EPlatformFamily.objects.get_or_create(
                 id=index, name=familyName, generation=gen
             )
-            setDateAndSave(r)
+            CommonOperation.setDateAndSave(r)
             result = r[0]
 
         logInfo(
@@ -53,7 +53,7 @@ class PlatformFamilyOperation:
 
         result.external_name = name
 
-        setDateAndSave(result)
+        CommonOperation.setDateAndSave(result)
         return result
 
     @classmethod

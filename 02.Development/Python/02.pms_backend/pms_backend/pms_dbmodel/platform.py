@@ -1,9 +1,11 @@
 from enum import Enum
+from pms_dbmodel.common_operation.category_operation import (
+    CategoryOperation,
+)
 from pms_dbmodel.common import ArrayData
 from pms_dbmodel.models.e_platform import EPlatform, EPlatformFamily
 from pms_dbmodel.platform_operation.generation_operation import GenerationOperation
 from pms_dbmodel.platform_operation.platform_operation import (
-    CategoryOperation,
     PlatformOperation,
 )
 from pms_dbmodel.platform_operation.family_operation import PlatformFamilyOperation

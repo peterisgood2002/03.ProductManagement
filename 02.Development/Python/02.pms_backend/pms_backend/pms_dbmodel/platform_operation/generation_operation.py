@@ -1,7 +1,7 @@
-from pms_dbmodel.common import LOGTIME, logInfo, setDateAndSave
+from pms_dbmodel.common import *
 from pms_dbmodel.models.e_platform import EGeneration
 from pms_dbmodel.platform_operation import logger
-from pms_dbmodel.common import LOGTIME, logInfo, setDateAndSave
+from pms_dbmodel.common_operation.common_operation import CommonOperation
 
 
 class GenerationOperation:
@@ -22,7 +22,7 @@ class GenerationOperation:
         if result[1] == True:
             result[0].name = name
             result[0].external_name = externalName
-        setDateAndSave(result)
+        CommonOperation.setDateAndSave(result)
 
         return result
 
@@ -30,8 +30,4 @@ class GenerationOperation:
     def getGeneration(cls, name) -> EGeneration:
         logInfo(logger, LOGTIME.BEGIN, cls.getGeneration.__name__, "Name = %s", name)
 
-        gList = EGeneration.objects.filter(name=name)
-        if len(gList) == 0:
-            return None
-
-        return gList[0]
+        return CommonOperation.searchWithName(name, EGeneration)

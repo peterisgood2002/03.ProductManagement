@@ -5,7 +5,8 @@ from pms_dbmodel.models.e_operator import EOperator
 from pms_dbmodel.operator_operation import logger
 from .area_operation import AreaOperation
 
-from pms_dbmodel.common import LOGTIME, logInfo, setDateAndSave
+from pms_dbmodel.common import *
+from pms_dbmodel.common_operation.common_operation import CommonOperation
 
 
 class OperatorOperation:
@@ -33,10 +34,10 @@ class OperatorOperation:
                 result = o
 
         if result == None:
-            index = AreaOperation.getIndex(a.id, operators)
+            index = CommonOperation.getIndex(a.id * 100, operators)
 
             r = EOperator.objects.get_or_create(id=index, name=operator, area=a)
-            setDateAndSave(r)
+            CommonOperation.setDateAndSave(r)
             result = r[0]
 
         logInfo(
@@ -54,8 +55,4 @@ class OperatorOperation:
         logInfo(
             logger, LOGTIME.BEGIN, cls.getOperator.__name__, "Operator = %s", operator
         )
-        oList = EOperator.objects.filter(name=operator)
-
-        if len(oList) == 0:
-            return None
-        return oList[0]
+        return CommonOperation.searchWithName(operator, EOperator)

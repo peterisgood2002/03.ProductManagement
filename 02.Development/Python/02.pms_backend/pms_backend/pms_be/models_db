@@ -11,6 +11,8 @@ from django.db import models
 class ACategory(models.Model):
     id = models.IntegerField(primary_key=True)
     category_name = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
+    note = models.CharField(max_length=45, db_collation='utf8mb3_general_ci', blank=True, null=True)
+    parent = models.ForeignKey('self', models.DO_NOTHING, db_column='parent', blank=True, null=True)
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
 
@@ -401,6 +403,8 @@ class RProjectFwversionFeature(models.Model):
 class RProjectPlatform(models.Model):
     project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)  # The composite primary key (project_id, platform_id) found, that is not supported. The first column is selected.
     platform = models.ForeignKey(EPlatform, models.DO_NOTHING)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
 
     class Meta:
         managed = False

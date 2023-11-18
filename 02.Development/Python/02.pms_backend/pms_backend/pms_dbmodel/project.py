@@ -16,7 +16,7 @@ class ProjectData(ArrayData):
     class INFO(Enum):
         MAIN_PLATFROM = 0
         PROJCT_NAME = 1
-        DIRCET_CUSTOMER = 2
+        MAIN_CUSTOMER = 2
 
     def __init__(self, requirement=None):
         super().__init__(requirement)
@@ -36,5 +36,5 @@ class ProjectData(ArrayData):
 
 class ProjectService:
     @classmethod
-    def addProject():
-        pass
+    def addProject(project: ProjectData):
+        customer = project

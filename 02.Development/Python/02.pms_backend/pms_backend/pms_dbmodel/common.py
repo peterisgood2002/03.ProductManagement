@@ -1,21 +1,6 @@
-from datetime import date
-from django.db import models
 import logging
 from enum import Enum
 from abc import abstractmethod
-
-
-def setDateAndSave(data):
-    if isinstance(data, tuple):
-        if data[1] == True:
-            data[0].create_date = date.today()
-            data[0].update_date = date.today()
-        else:
-            data[0].update_date = date.today()
-        data[0].save()
-    elif isinstance(data, models.Model):
-        data.update_date = date.today()
-        data.save()
 
 
 class LOGTIME(Enum):

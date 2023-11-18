@@ -1,4 +1,4 @@
-from pms_dbmodel.common import setDateAndSave, LOGTIME, logInfo
+from pms_dbmodel.common import *
 from pms_dbmodel.models.e_operator import EComplianceVersion
 from pms_dbmodel.models.e_operator_requirement import (
     EDocStructure,
@@ -7,6 +7,7 @@ from pms_dbmodel.models.e_operator_requirement import (
 from pms_dbmodel.operator_operation import logger
 from .version_operation import VersionOperation
 from enum import Enum
+from pms_dbmodel.common_operation.common_operation import CommonOperation
 
 
 class StructureCategory(Enum):
@@ -27,7 +28,7 @@ class DocOperation:
         )
         r = EDocStructureCategory.objects.get_or_create(name=category)
 
-        setDateAndSave(r)
+        CommonOperation.setDateAndSave(r)
 
         return r[0]
 
@@ -93,7 +94,7 @@ class DocOperation:
         r[0].name = title
         if parent != None:
             r[0].parent_structure_id = parent.doc_id
-        setDateAndSave(r)
+        CommonOperation.setDateAndSave(r)
 
         return r
 
@@ -108,6 +109,7 @@ class DocOperation:
             version,
             id,
         )
+
         result = EDocStructure.objects.filter(
             operator__name=operator, version=version, doc_id=id
         )

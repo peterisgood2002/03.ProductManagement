@@ -1,5 +1,5 @@
 from .version_operation import VersionOperation
-from pms_dbmodel.common import setDateAndSave, LOGTIME, logInfo
+from pms_dbmodel.common import *
 from pms_dbmodel.operator_operation import logger
 from pms_dbmodel.models.e_operator import EComplianceVersion
 from pms_dbmodel.models.a_attribute import APriority
@@ -11,39 +11,7 @@ from pms_dbmodel.models.e_operator_requirement import (
     RDeviceRequirementCategory,
 )
 from enum import Enum
-
-
-class PriorityCategory(Enum):
-    Mandatory = 0
-    Optional = 1
-
-
-class PriorityOperation:
-    @classmethod
-    def addPriority(cls, priority) -> tuple[APriority, bool]:
-        logInfo(
-            logger, LOGTIME.BEGIN, cls.addPriority.__name__, "Priority = %s", priority
-        )
-
-        r = APriority.objects.get_or_create(name=priority)
-
-        setDateAndSave(r)
-
-        return r
-
-    @classmethod
-    def getPriorityMap(cls) -> dict[str, APriority]:
-        result = {}
-
-        data = APriority.objects.all()
-
-        for d in data:
-            result[d.name] = d
-
-        logInfo(
-            logger, LOGTIME.END, cls.getPriorityMap.__name__, "Size = %s", len(result)
-        )
-        return result
+from pms_dbmodel.common_operation.common_operation import CommonOperation
 
 
 class RequirementOperation:
@@ -54,7 +22,7 @@ class RequirementOperation:
         r = EDeviceRequirementDesc.objects.get_or_create(
             title=title, name=name, description=desc
         )
-        setDateAndSave(r)
+        CommonOperation.setDateAndSave(r)
 
         return r
 
@@ -63,6 +31,7 @@ class RequirementOperation:
         logInfo(
             logger, LOGTIME.BEGIN, cls.getDeviceRequirementDesc.__name__, "ID = %s", id
         )
+
         result = EDeviceRequirementDesc.objects.filter(id=id)
         if len(result) == 0:
             return None
@@ -154,7 +123,7 @@ class RequirementOperation:
 
         if priority != None:
             result[0].priority = priority
-        setDateAndSave(result)
+        CommonOperation.setDateAndSave(result)
         return result
 
     # END addNewDeviceRequirement
@@ -266,7 +235,7 @@ class RequirementOperation:
     def addCategory(cls, name) -> tuple[ERequirementCategory, bool]:
         result = ERequirementCategory.objects.get_or_create(name=name)
 
-        setDateAndSave(result)
+        CommonOperation.setDateAndSave(result)
         return result
 
     @classmethod
@@ -289,7 +258,7 @@ class RequirementOperation:
             category=category,
         )
 
-        setDateAndSave(result)
+        CommonOperation.setDateAndSave(result)
         return result
 
     @classmethod

@@ -1,12 +1,23 @@
 from pms_dbmodel.models.e_area import EArea
 from pms_dbmodel.project_operation import logger
-from pms_dbmodel.common import LOGTIME, logInfo, setDateAndSave
+from pms_dbmodel.common import *
 
 from pms_dbmodel.operator_operation.area_operation import AreaOperation
 from pms_dbmodel.models.e_customers import ECustomer
+from pms_dbmodel.common_operation.common_operation import CommonOperation
+from enum import Enum
+from pms_dbmodel.common_operation.common_operation import CommonOperation
 
 
-class CustomerOperation:
+class CustomerCategory(Enum):
+    HOME = 0
+    ODM = 1
+    T2 = 2
+    T1 = 3
+    OEM = 4
+
+
+class CustomerOperation(CommonOperation):
     @classmethod
     def addCustomer(cls, area, customer, alpha=False):
         logInfo(
@@ -32,12 +43,12 @@ class CustomerOperation:
                 result = customer
 
         if result == None:
-            index = AreaOperation.getIndex(a.id, customers)
+            index = cls.getIndex(a.id * 100, customers)
 
             r = ECustomer.objects.get_or_create(
                 id=index, name=customer, area=a, is_alpha=alpha
             )
-            setDateAndSave(r)
+            CommonOperation.setDateAndSave(r)
             result = r[0]
 
         logInfo(

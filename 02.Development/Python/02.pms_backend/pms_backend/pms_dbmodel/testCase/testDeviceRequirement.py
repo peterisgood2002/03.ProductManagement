@@ -96,7 +96,7 @@ class RequirementOperationTest(PMSDbTest):
 
     def _testInsertNoChangeRequirement(self):
         logInfo(logger, LOGTIME.BEGIN, self._testInsertNoChangeRequirement.__name__)
-        Util.addCategories()
+        Util.addDocCategories()
 
         # Create a version with the same requirement based on TAG
         rMap = RequirementOperation.getDeviceRequirementMapBasedOnTagId(

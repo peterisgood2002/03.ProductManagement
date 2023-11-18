@@ -1,9 +1,11 @@
+from pms_dbmodel.common_operation.category_operation import (
+    CategoryOperation,
+)
 from .base_test import PMSDbTest
 from pms_dbmodel.models.e_platform import EPlatform
 from pms_dbmodel.models.a_attribute import ACategory
 from pms_dbmodel.platform_operation.platform_operation import (
     PlatformOperation,
-    CategoryOperation,
 )
 from pms_dbmodel.platform_operation.generation_operation import GenerationOperation
 from pms_dbmodel.platform_operation.family_operation import PlatformFamilyOperation
@@ -37,10 +39,8 @@ class PlatformOperationTest(PMSDbTest):
             external = data.getInfo(PlatformData.INFO.EXTERNAL_NAME)
             category = data.getInfo(PlatformData.INFO.CATEGORY)
 
-            [c, succeed] = CategoryOperation.addCategory(
-                TestPlatformData.categoryId, category
-            )
-            [r, succeed] = PlatformOperation.addPlatform(id, platform, external, f, c)
+            c = CategoryOperation.addCategory(TestPlatformData.categoryId, category)
+            r = PlatformOperation.addPlatform(id, platform, external, f, c)
 
             CheckPlatformData.checkPlatform(r, data)
 

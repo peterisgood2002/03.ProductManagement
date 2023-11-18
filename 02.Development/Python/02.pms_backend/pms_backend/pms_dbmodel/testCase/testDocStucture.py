@@ -23,14 +23,14 @@ class DocOperationTest(PMSDbTest):
         )
 
     def testGetCategoriesMap(self):
-        Util.addCategories()
+        Util.addDocCategories()
         result = DocOperation.getDocStructureCategoryMap()
 
         for c in TestOperatiorData.categories:
             assert c in result.keys()
 
     def testInsertChapterAndSection(self):
-        Util.addCategories()
+        Util.addDocCategories()
         titleId = TestOperatiorData.requirement_19[0].getInfo(
             OperatorRequirement.INFO.ChapterId
         )

@@ -1,8 +1,8 @@
-from pms_dbmodel.common import setDateAndSave, LOGTIME, logInfo
+from pms_dbmodel.common import *
 from pms_dbmodel.models.e_operator import EComplianceVersion
 from pms_dbmodel.operator_operation import logger
 from .operator_operation import OperatorOperation
-
+from pms_dbmodel.common_operation.common_operation import CommonOperation
 
 class VersionOperation:
     @classmethod
@@ -12,7 +12,7 @@ class VersionOperation:
         result = EComplianceVersion.objects.get_or_create(
             operator=o, version_no=version
         )
-        setDateAndSave(result)
+        CommonOperation.setDateAndSave(result)
 
         return result
 

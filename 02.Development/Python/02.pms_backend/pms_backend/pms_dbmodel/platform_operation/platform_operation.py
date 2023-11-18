@@ -1,41 +1,15 @@
-from pms_dbmodel.common import LOGTIME, logInfo, setDateAndSave
+from pms_dbmodel.common import *
 from pms_dbmodel.models.e_platform import EPlatform, EPlatformFamily
 from pms_dbmodel.models.a_attribute import ACategory
 from pms_dbmodel.operator_operation import logger
-
-
-class CategoryOperation:
-    @classmethod
-    def addCategory(cls, id, category) -> tuple[ACategory, bool]:
-        logInfo(
-            logger, LOGTIME.BEGIN, cls.addCategory.__name__, "Category = %s", category
-        )
-
-        r = ACategory.objects.get_or_create(id=id)
-
-        r[0].category_name = category
-
-        setDateAndSave(r)
-
-        return r
-
-    @classmethod
-    def getCategoryMap(cls) -> dict[str, ACategory]:
-        data = ACategory.objects.all()
-
-        result = {}
-
-        for d in data:
-            result[d.category_name] = d
-
-        return result
+from pms_dbmodel.common_operation.common_operation import CommonOperation
 
 
 class PlatformOperation:
     @classmethod
     def addPlatform(
         cls, id, name, external_name, family: EPlatformFamily, category: ACategory
-    ):
+    ) -> EPlatform:
         logInfo(
             logger,
             LOGTIME.BEGIN,
@@ -54,8 +28,8 @@ class PlatformOperation:
         r[0].name = name
         r[0].external_name = external_name
 
-        setDateAndSave(r)
-        return r
+        CommonOperation.setDateAndSave(r)
+        return r[0]
 
     @classmethod
     def getPlatformBasedOnFamily(cls, family) -> list[str]:
@@ -66,3 +40,15 @@ class PlatformOperation:
             result.append(d.name)
 
         return result
+
+    @classmethod
+    def getPlatform(cls, name) -> EPlatform:
+        logInfo(
+            logger,
+            LOGTIME.BEGIN,
+            cls.getPlatform.__name__,
+            "Platform = %s ",
+            name,
+        )
+
+        return CommonOperation.searchWithName(name, EPlatform)
