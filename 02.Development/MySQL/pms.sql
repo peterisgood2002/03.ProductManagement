@@ -41,7 +41,7 @@ CREATE TABLE `a_category` (
 
 LOCK TABLES `a_category` WRITE;
 /*!40000 ALTER TABLE `a_category` DISABLE KEYS */;
-INSERT INTO `a_category` VALUES (1,'Platform',NULL,NULL,NULL,NULL),(2,'Customer',NULL,NULL,NULL,NULL),(3,'Product',NULL,NULL,NULL,NULL),(4,'Milestone',NULL,NULL,NULL,NULL),(10,'Modem',NULL,1,NULL,NULL),(11,'Connectivity',NULL,1,NULL,NULL),(12,'RF',NULL,1,NULL,NULL),(13,'PMIC',NULL,1,NULL,NULL),(20,'HOME','MAIN',2,NULL,NULL),(21,'ODM','MAIN',2,NULL,NULL),(22,'T2','MAIN',2,NULL,NULL),(23,'T1','INDIRCT',2,NULL,NULL),(24,'OEM','INDIRCT',2,NULL,NULL),(30,'Smartphone',NULL,3,NULL,NULL),(31,'CPE',NULL,3,NULL,NULL),(32,'DataCard',NULL,3,NULL,NULL),(33,'Telematics',NULL,3,NULL,NULL);
+INSERT INTO `a_category` VALUES (1,'Platform',NULL,NULL,NULL,NULL),(2,'Customer',NULL,NULL,NULL,NULL),(3,'Product',NULL,NULL,NULL,NULL),(4,'Milestone',NULL,NULL,NULL,NULL),(10,'Modem',NULL,1,NULL,NULL),(11,'Connectivity',NULL,1,NULL,NULL),(12,'RF',NULL,1,NULL,NULL),(13,'PMIC',NULL,1,NULL,NULL),(14,'AP',NULL,1,NULL,NULL),(20,'HOME','MAIN',2,NULL,NULL),(21,'ODM','MAIN',2,NULL,NULL),(22,'T2','MAIN',2,NULL,NULL),(23,'T1','INDIRCT',2,NULL,NULL),(24,'OEM','INDIRCT',2,NULL,NULL),(30,'Smartphone',NULL,3,NULL,NULL),(31,'CPE',NULL,3,NULL,NULL),(32,'DataCard',NULL,3,NULL,NULL),(33,'Telematics',NULL,3,NULL,NULL);
 /*!40000 ALTER TABLE `a_category` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -592,7 +592,7 @@ DROP TABLE IF EXISTS `e_project`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_project` (
-  `id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
@@ -624,9 +624,9 @@ DROP TABLE IF EXISTS `e_project_fwversion`;
 CREATE TABLE `e_project_fwversion` (
   `project_id` int NOT NULL,
   `version` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `ta_id` int DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  `ta_id` int DEFAULT NULL,
   PRIMARY KEY (`project_id`,`version`),
   KEY `fk_e_platform_version_e_technical_acceptance1_idx` (`ta_id`),
   KEY `fk_e_project_fwversion_e_project1_idx` (`project_id`),
@@ -656,7 +656,10 @@ CREATE TABLE `e_requirement_category` (
   `name` varchar(45) DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `parent` int NOT NULL,
+  PRIMARY KEY (`id`,`parent`),
+  KEY `fk_e_requirement_category_a_category1_idx` (`parent`),
+  CONSTRAINT `fk_e_requirement_category_a_category1` FOREIGN KEY (`parent`) REFERENCES `a_category` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1163,6 +1166,42 @@ SET @saved_cs_client     = @@character_set_client;
 SET character_set_client = @saved_cs_client;
 
 --
+-- Temporary view structure for view `v_project_customer`
+--
+
+DROP TABLE IF EXISTS `v_project_customer`;
+/*!50001 DROP VIEW IF EXISTS `v_project_customer`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `v_project_customer` AS SELECT 
+ 1 AS `P_ID`,
+ 1 AS `Project`,
+ 1 AS `A_ID`,
+ 1 AS `Area`,
+ 1 AS `C_ID`,
+ 1 AS `Customer`,
+ 1 AS `category_name`,
+ 1 AS `note`*/;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Temporary view structure for view `v_project_platform`
+--
+
+DROP TABLE IF EXISTS `v_project_platform`;
+/*!50001 DROP VIEW IF EXISTS `v_project_platform`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `v_project_platform` AS SELECT 
+ 1 AS `P_ID`,
+ 1 AS `Project`,
+ 1 AS `Generation`,
+ 1 AS `Family`,
+ 1 AS `Platform`,
+ 1 AS `Category`*/;
+SET character_set_client = @saved_cs_client;
+
+--
 -- Final view structure for view `v_operator_doc_structure`
 --
 
@@ -1233,6 +1272,42 @@ SET character_set_client = @saved_cs_client;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `v_project_customer`
+--
+
+/*!50001 DROP VIEW IF EXISTS `v_project_customer`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `v_project_customer` AS select `p`.`id` AS `P_ID`,`p`.`name` AS `Project`,`a`.`id` AS `A_ID`,`a`.`name` AS `Area`,`pc`.`customer_id` AS `C_ID`,`c`.`name` AS `Customer`,`category`.`category_name` AS `category_name`,`category`.`note` AS `note` from ((((`e_project` `p` join `r_project_customer` `pc` on((`pc`.`project_id` = `p`.`id`))) join `e_customer` `c` on((`c`.`id` = `pc`.`customer_id`))) join `e_area` `a` on((`a`.`id` = `c`.`area`))) join `a_category` `category` on((`category`.`id` = `pc`.`relationship`))) order by `pc`.`relationship` */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+
+--
+-- Final view structure for view `v_project_platform`
+--
+
+/*!50001 DROP VIEW IF EXISTS `v_project_platform`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `v_project_platform` AS select `p`.`id` AS `P_ID`,`p`.`name` AS `Project`,`platform`.`Generation` AS `Generation`,`platform`.`Family` AS `Family`,`platform`.`Platform` AS `Platform`,`platform`.`Category` AS `Category` from ((`e_project` `p` join `r_project_platform` `pp` on((`p`.`id` = `pp`.`project_id`))) join `v_platform` `platform` on((`platform`.`P_ID` = `pp`.`platform_id`))) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -1243,4 +1318,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-11-16 21:06:20
+-- Dump completed on 2023-11-21 22:13:43
