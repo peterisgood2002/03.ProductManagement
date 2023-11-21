@@ -21,6 +21,8 @@ from pms_dbmodel.testplatformdata import TestPlatformData
 from pms_dbmodel.platform import PlatformService
 from pms_dbmodel.common_operation.category_operation import CategoryOperation, Category
 from pms_dbmodel.project_operation.customer_operation import CustomerCategory
+from pms_dbmodel.testprojectdata import TestProjectData
+from pms_dbmodel.project import ProjectService, ProjectData
 from django.db import models
 
 
@@ -45,6 +47,18 @@ class Util:
 
         for c, member in CustomerCategory.__members__.items():
             category = CategoryOperation.addCategoryWithParent(c, parent)
+
+    @staticmethod
+    def addPlatform():
+        CategoryOperation.addCategory(Category.Platform.value, Category.Platform.name)
+        CategoryOperation.addCategory(
+            TestPlatformData.categoryId, TestPlatformData.category
+        )
+        PlatformService.addPlatformsWithGeneration(
+            TestPlatformData.Gen1Id,
+            TestPlatformData.Gen1Name,
+            TestPlatformData.platform,
+        )
 
 
 class OperatorServiceTest(PMSDbTest):
@@ -110,15 +124,7 @@ class PlatformServiceTest(PMSDbTest):
         )
 
     def testAddPlatform(self):
-        CategoryOperation.addCategory(Category.Platform.value, Category.Platform.name)
-        CategoryOperation.addCategory(
-            TestPlatformData.categoryId, TestPlatformData.category
-        )
-        PlatformService.addPlatformsWithGeneration(
-            TestPlatformData.Gen1Id,
-            TestPlatformData.Gen1Name,
-            TestPlatformData.platform,
-        )
+        Util.addPlatform()
 
 
 class ProjectServiceTest(PMSDbTest):
@@ -130,4 +136,15 @@ class ProjectServiceTest(PMSDbTest):
         )
 
     def testAddProject(self):
-        pass
+        project = TestProjectData.getProject1()
+        Util.addPlatform()
+        Util.addCustomerCategory()
+        ProjectService.addProject(project)
+
+        pName = project.getInfo(ProjectData.INFO.PROJCT_NAME)
+        rList = ProjectService.getCustomerRelationship(pName)
+
+        assert len(project.getAllCustomers()) == len(rList)
+
+        rList = ProjectService.getPlatformRelationship(pName)
+        assert len(project.getAllPlatform()) == len(rList)

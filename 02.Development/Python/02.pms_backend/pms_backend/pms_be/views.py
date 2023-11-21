@@ -7,8 +7,8 @@ import requests
 from bs4 import BeautifulSoup, Tag
 import webbrowser
 
-from pms_dbmodel.platform import PlatformService
-from pms_dbmodel.testplatformdata import TestPlatformData
+from pms_dbmodel.project import ProjectService
+from pms_dbmodel.testprojectdata import TestProjectData
 
 
 def index(request):
@@ -58,9 +58,7 @@ def getCNN5():
 
 
 def testDB(request):
-    PlatformService.addPlatformsWithGeneration(
-        TestPlatformData.Gen1Id,
-        TestPlatformData.Gen1Name,
-        TestPlatformData.platform,
-    )
+    project = TestProjectData.getProject1()
+
+    ProjectService.addProject(project)
     return HttpResponse("TEST")

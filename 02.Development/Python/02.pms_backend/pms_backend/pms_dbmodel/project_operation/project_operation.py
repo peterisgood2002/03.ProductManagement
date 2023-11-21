@@ -13,17 +13,16 @@ from pms_dbmodel.common_operation.common_operation import CommonOperation
 
 class ProjectOperation:
     @classmethod
-    def addProject(cls, id, name) -> EProject:
+    def addProject(cls, name) -> EProject:
         logInfo(
             logger,
             LOGTIME.BEGIN,
             cls.addProject.__name__,
-            "Id = %s, Name = %s ",
-            id,
+            " Name = %s ",
             name,
         )
 
-        result = EProject.objects.get_or_create(id=id)
+        result = EProject.objects.get_or_create(name=name)
         result[0].name = name
         CommonOperation.setDateAndSave(result)
 
@@ -61,25 +60,26 @@ class ProjectOperation:
     def addCustomerRelationship(
         cls, project, customer, relationship, cMap
     ) -> tuple[RProjectCustomer, bool]:
-        logInfo(
-            logger,
-            LOGTIME.BEGIN,
-            cls.addCustomerRelationship.__name__,
-            "Project = %s, Customer = %s, CustomerLevel = %s",
-            project,
-            customer,
-            relationship,
-        )
         p = cls.getProject(project)
         c = CustomerOperation.getCustomer(customer)
 
         r = cMap[relationship]
-        return cls._addCustomerRelationship(p, c, r)
+        return cls.addCustomerRelationshipWithObjects(p, c, r)
 
     @classmethod
-    def _addCustomerRelationship(
+    def addCustomerRelationshipWithObjects(
         cls, project: EProject, customer: ECustomer, relationship: ACategory
     ) -> tuple[RProjectCustomer, bool]:
+        logInfo(
+            logger,
+            LOGTIME.BEGIN,
+            cls.addCustomerRelationshipWithObjects.__name__,
+            "Project = %s, Customer = %s, CustomerLevel = %s",
+            project.name,
+            customer.name,
+            relationship.category_name,
+        )
+
         result = RProjectCustomer.objects.get_or_create(
             customer=customer, project=project, relationship=relationship
         )
@@ -89,25 +89,65 @@ class ProjectOperation:
         return result
 
     @classmethod
+    def getCustomerRelationships(cls, projectName) -> list[RProjectCustomer]:
+        data = RProjectCustomer.objects.filter(project__name=projectName)
+        result = []
+        for d in data:
+            result.append(d)
+
+        logInfo(
+            logger,
+            LOGTIME.END,
+            cls.getCustomerRelationships.__name__,
+            "Project = %s, Size = %d",
+            projectName,
+            len(result),
+        )
+        return result
+
+    @classmethod
     def addPlatformRelationship(
         cls, projectName, platformName
+    ) -> tuple[RProjectPlatform, bool]:
+        project = cls.getProject(projectName)
+        platform = PlatformOperation.getPlatform(platformName)
+
+        return cls.addPlatformRelationshipWithObject(project, platform)
+
+    @classmethod
+    def addPlatformRelationshipWithObject(
+        cls, project: EProject, platform: EPlatform
     ) -> tuple[RProjectPlatform, bool]:
         logInfo(
             logger,
             LOGTIME.BEGIN,
-            cls.addPlatformRelationship.__name__,
+            cls.addPlatformRelationshipWithObject.__name__,
             "Project = %s, Platform = %s",
-            projectName,
-            platformName,
+            project.name,
+            platform.name,
         )
-
-        project = cls.getProject(projectName)
-        platform = PlatformOperation.getPlatform(platformName)
-
         result = RProjectPlatform.objects.get_or_create(
             project=project, platform=platform
         )
 
         CommonOperation.setDateAndSave(result)
 
+        return result
+
+    @classmethod
+    def getPlatformRelationships(cls, projectName) -> list[RProjectPlatform]:
+        data = RProjectPlatform.objects.filter(project__name=projectName)
+
+        result = []
+        for d in data:
+            result.append(d)
+
+        logInfo(
+            logger,
+            LOGTIME.END,
+            cls.getPlatformRelationships.__name__,
+            "Project = %s, Size = %d",
+            projectName,
+            len(result),
+        )
         return result

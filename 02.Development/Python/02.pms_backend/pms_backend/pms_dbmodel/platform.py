@@ -11,6 +11,7 @@ from pms_dbmodel.platform_operation.platform_operation import (
 from pms_dbmodel.platform_operation.family_operation import PlatformFamilyOperation
 from pms_dbmodel.operator_operation import logger
 from pms_dbmodel.common import LOGTIME, logInfo
+from pms_dbmodel.models.a_attribute import ACategory
 
 
 class PlatformData(ArrayData):
@@ -46,7 +47,7 @@ class PlatformService:
         categoryMap = CategoryOperation.getCategoryMap()
         fMap = cls._getFamilyMap(gName, platform)
         # 3. Add Platform
-        cls._addPlatform(platform, categoryMap, fMap)
+        cls._addPlatforms(platform, fMap, categoryMap)
 
     @classmethod
     def _getFamilyMap(
@@ -66,12 +67,30 @@ class PlatformService:
         return result
 
     @classmethod
-    def _addPlatform(cls, data: list[PlatformData], categoryMap, fMap):
+    def _addPlatforms(cls, data: list[PlatformData], fMap, categoryMap):
         for d in data:
             family = fMap[d.getInfo(PlatformData.INFO.FAMILY)]
-            category = categoryMap[d.getInfo(PlatformData.INFO.CATEGORY)]
 
-            id = d.getInfo(PlatformData.INFO.ID)
-            platform = d.getInfo(PlatformData.INFO.NAME)
-            external = d.getInfo(PlatformData.INFO.EXTERNAL_NAME)
-            PlatformOperation.addPlatform(id, platform, external, family, category)
+            cls._addPlatformWithFamilyAndCategory(d, family, categoryMap)
+
+    @classmethod
+    def _addPlatformWithFamilyAndCategory(
+        cls,
+        data: PlatformData,
+        family: EPlatformFamily,
+        categoryMap: dict[str, ACategory],
+    ) -> EPlatform:
+        category = categoryMap[data.getInfo(PlatformData.INFO.CATEGORY)]
+        id = data.getInfo(PlatformData.INFO.ID)
+        platform = data.getInfo(PlatformData.INFO.NAME)
+        external = data.getInfo(PlatformData.INFO.EXTERNAL_NAME)
+
+        return PlatformOperation.addPlatform(id, platform, external, family, category)
+
+    @classmethod
+    def getPlatform(cls, platform: str):
+        result = PlatformOperation.getPlatform(platform)
+
+        if result == None:
+            raise Exception(" Can not find platform: " + platform)
+        return result

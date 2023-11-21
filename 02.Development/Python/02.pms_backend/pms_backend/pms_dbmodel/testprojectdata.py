@@ -9,9 +9,17 @@ from pms_dbmodel.models.r_project_platform import RProjectPlatform
 class TestCustomerData:
     cData = ["Customer1", "Customer2", "Customer3"]
     customer = [
-        CustomerData(["CN", cData[0]]),
-        CustomerData(["EU", cData[1]]),
-        CustomerData(["JP", cData[2]]),
+        CustomerData(
+            [
+                "CN",
+                cData[0],
+                CustomerCategory.T2.name,
+            ]
+        ),
+        CustomerData(["EU", cData[1], CustomerCategory.T1.name]),
+        CustomerData(
+            ["JP", cData[2], CustomerCategory.OEM.name],
+        ),
     ]
 
 
@@ -38,17 +46,9 @@ class TestProjectData:
     def getProject1() -> ProjectData:
         result = TestProjectData.project[0]
         # add another customer
-        result.addCustomer(
-            TestCustomerData.customer[1].getInfo(CustomerData.INFO.AREA),
-            TestCustomerData.customer[1].getInfo(CustomerData.INFO.CUSTOMER),
-            CustomerCategory.T1.name,
-        )
+        result.addCustomer(TestCustomerData.customer[1])
 
-        result.addCustomer(
-            TestCustomerData.customer[2].getInfo(CustomerData.INFO.AREA),
-            TestCustomerData.customer[2].getInfo(CustomerData.INFO.CUSTOMER),
-            CustomerCategory.T2.name,
-        )
+        result.addCustomer(TestCustomerData.customer[2])
 
         result.addOtherPlatform(TestPlatformData.pdata[1])
         return result
@@ -56,10 +56,9 @@ class TestProjectData:
 
 class CheckProjectData:
     @staticmethod
-    def checkProject(data: EProject, id, name):
+    def checkProject(data: EProject, name):
         assert isinstance(data, EProject)
 
-        assert data.id == id
         assert data.name == name
 
     @staticmethod

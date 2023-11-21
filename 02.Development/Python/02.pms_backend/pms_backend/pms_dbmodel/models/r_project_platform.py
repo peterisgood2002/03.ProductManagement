@@ -8,7 +8,7 @@ from viewflow.fields import CompositeKey
 
 class RProjectPlatform(models.Model):
     id = CompositeKey(columns=["project", "platform"])
-    project = models.OneToOneField(
+    project = models.ForeignKey(
         EProject, models.DO_NOTHING, db_column="project_id", to_field="id"
     )  # The composite primary key (project_id, platform_id) found, that is not supported. The first column is selected.
     platform = models.ForeignKey(

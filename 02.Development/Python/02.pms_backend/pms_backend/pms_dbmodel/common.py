@@ -15,20 +15,23 @@ def logInfo(logger: logging.Logger, timing: LOGTIME, name, msg="", *args, **kwar
 
 
 class ArrayData:
-    def __init__(self, requirement=None):
+    def __init__(self, data=None):
         infoLen = self.getInfoLength()
-        if len(requirement) <= infoLen:
-            self._requirement = []
-            for r in requirement:
-                self._requirement.append(r)
+        if len(data) <= infoLen:
+            self._data = []
+            for r in data:
+                self._data.append(r)
 
-            remaining = infoLen - len(requirement)
+            remaining = infoLen - len(data)
             for i in range(remaining):
-                self._requirement.append(None)
+                self._data.append(None)
 
     def getInfo(self, info: Enum):
-        return self._requirement[info.value]
+        return self._data[info.value]
 
     @abstractmethod
     def getInfoLength(self):
         pass
+
+    def getData(self):
+        return self._data

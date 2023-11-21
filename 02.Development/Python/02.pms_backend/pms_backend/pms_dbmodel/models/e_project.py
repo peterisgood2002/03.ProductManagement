@@ -7,7 +7,6 @@ from viewflow.fields import CompositeKey
 
 
 class EProject(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(
         max_length=45, db_collation="utf8mb3_general_ci", blank=True, null=True
     )
@@ -26,7 +25,7 @@ class EProject(models.Model):
 
 class RProjectCustomer(models.Model):
     id = CompositeKey(columns=["customer", "project"])
-    customer = models.OneToOneField(
+    customer = models.ForeignKey(
         ECustomer, models.DO_NOTHING, db_column="customer_id", to_field="id"
     )  # The composite primary key (customer_id, project_id) found, that is not supported. The first column is selected.
     project = models.ForeignKey(

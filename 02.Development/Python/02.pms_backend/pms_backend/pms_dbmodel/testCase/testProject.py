@@ -19,14 +19,12 @@ class ProjectOperationTest(PMSDbTest):
         super().setManaged(ACategory, EProject, RProjectCustomer, RProjectPlatform)
 
     def testAddProject(self):
-        id = 0
         for p in TestProjectData.project:
             name = p.getInfo(ProjectData.INFO.PROJCT_NAME)
-            ProjectOperation.addProject(id, name)
+            ProjectOperation.addProject(name)
 
             project = ProjectOperation.getProject(name)
-            CheckProjectData.checkProject(project, id, name)
-            id += 1
+            CheckProjectData.checkProject(project, name)
 
         projects = ProjectOperation.getProjects()
 
@@ -39,9 +37,7 @@ class ProjectOperationTest(PMSDbTest):
         project = TestProjectData.getProject1()
         customer: CustomerData = project.getInfo(ProjectData.INFO.MAIN_CUSTOMER)
 
-        p = ProjectOperation.addProject(
-            0, project.getInfo(ProjectData.INFO.PROJCT_NAME)
-        )
+        p = ProjectOperation.addProject(project.getInfo(ProjectData.INFO.PROJCT_NAME))
 
         c = CustomerOperation.addCustomer(
             customer.getInfo(CustomerData.INFO.AREA),
@@ -55,12 +51,17 @@ class ProjectOperationTest(PMSDbTest):
             cMap,
         )
 
+        rList = ProjectOperation.getCustomerRelationships(
+            project.getInfo(ProjectData.INFO.PROJCT_NAME)
+        )
+        assert 1 == len(rList)
         CheckProjectData.checkCustomerRelation(
-            result,
+            rList[0],
             project.getInfo(ProjectData.INFO.PROJCT_NAME),
             customer.getInfo(CustomerData.INFO.CUSTOMER),
         )
 
+        # Platform
         CategoryOperation.addCategory(Category.Platform.value, Category.Platform.name)
         CategoryOperation.addCategory(
             TestPlatformData.categoryId, TestPlatformData.category
@@ -76,8 +77,13 @@ class ProjectOperationTest(PMSDbTest):
             project.getInfo(ProjectData.INFO.MAIN_PLATFROM),
         )
 
+        rList = ProjectOperation.getPlatformRelationships(
+            project.getInfo(ProjectData.INFO.PROJCT_NAME)
+        )
+
+        assert 1 == len(rList)
         CheckProjectData.checkPlatformRelation(
-            result,
+            rList[0],
             project.getInfo(ProjectData.INFO.PROJCT_NAME),
             project.getInfo(ProjectData.INFO.MAIN_PLATFROM),
         )

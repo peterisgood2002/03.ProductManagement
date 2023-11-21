@@ -28,16 +28,6 @@ class OperatorRequirement(ArrayData):
         DESC = 8
         PRIORITY = 9
 
-    def __init__(self, requirement=None):
-        if len(requirement) <= len(OperatorRequirement.INFO):
-            self._requirement = []
-            for r in requirement:
-                self._requirement.append(r)
-
-            remaining = len(OperatorRequirement.INFO) - len(requirement)
-            for i in range(remaining):
-                self._requirement.append(None)
-
     def getInfoLength(self):
         return len(OperatorRequirement.INFO)
 
@@ -86,7 +76,7 @@ class OperatorService:
                 LOGTIME.MIDDLE,
                 "createDocStructureMap",
                 "Data = %s",
-                d._requirement,
+                d.getData(),
             )
 
             parent = result.get(d.getInfo(OperatorRequirement.INFO.ChapterId))
