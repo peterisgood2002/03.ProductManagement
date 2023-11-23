@@ -104,7 +104,6 @@ class ExcelParserTest(TestCase):
         assert "TEST_TRD" == items[0].getKey(KEYINFO.DocLocation)
         assert "Mandatory" == items[0].getPriority()
         assert "Yes" == items[0].getKey(KEYINFO.Note)
-        i = 0
 
     def tearDown(self) -> None:
         self.excel.close()
