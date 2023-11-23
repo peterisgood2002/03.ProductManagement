@@ -6,9 +6,10 @@ from urllib.parse import urlencode
 import requests
 from bs4 import BeautifulSoup, Tag
 import webbrowser
-
+from pathlib import Path
 from pms_dbmodel.project import ProjectService
 from pms_dbmodel.testprojectdata import TestProjectData
+from pms_platform.services import PlatformService
 
 
 def index(request):
@@ -62,3 +63,12 @@ def testDB(request):
 
     ProjectService.addProject(project)
     return HttpResponse("TEST")
+
+
+def addPlatform(request):
+    path_home = str(Path(__file__).parents[1])
+    print("PATH = " + path_home)
+    fileName = path_home + "./pms_platform/input_test/test.xlsx"
+    PlatformService.parse(fileName)
+
+    return HttpResponse("addPlatform")
