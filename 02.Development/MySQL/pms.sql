@@ -289,6 +289,37 @@ LOCK TABLES `e_device_requirement_desc` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `e_device_requirement_question`
+--
+
+DROP TABLE IF EXISTS `e_device_requirement_question`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `e_device_requirement_question` (
+  `desc_id` int NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `question` longtext,
+  `answer` longtext,
+  `create_date` date DEFAULT NULL,
+  `update_date` date DEFAULT NULL,
+  `create_user` varchar(45) DEFAULT NULL,
+  `answer_user` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`,`desc_id`),
+  KEY `fk_e_device_requirement_question_e_device_requirement_desc1_idx` (`desc_id`),
+  CONSTRAINT `fk_e_device_requirement_question_e_device_requirement_desc1` FOREIGN KEY (`desc_id`) REFERENCES `e_device_requirement_desc` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `e_device_requirement_question`
+--
+
+LOCK TABLES `e_device_requirement_question` WRITE;
+/*!40000 ALTER TABLE `e_device_requirement_question` DISABLE KEYS */;
+/*!40000 ALTER TABLE `e_device_requirement_question` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `e_doc_structure`
 --
 
@@ -510,7 +541,7 @@ CREATE TABLE `e_platform` (
   KEY `fk_e_platform_a_category1_idx` (`category`),
   CONSTRAINT `fk_e_platform_a_category1` FOREIGN KEY (`category`) REFERENCES `a_category` (`id`) ON UPDATE CASCADE,
   CONSTRAINT `fk_e_platform_e_employee1` FOREIGN KEY (`ppm`) REFERENCES `e_employee` (`id`),
-  CONSTRAINT `fk_e_platform_e_platform_family1` FOREIGN KEY (`platform_family_id`) REFERENCES `e_platform_family` (`id`)
+  CONSTRAINT `fk_e_platform_e_platform_family1` FOREIGN KEY (`platform_family_id`) REFERENCES `e_platform_family` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -539,7 +570,7 @@ CREATE TABLE `e_platform_family` (
   `update_date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_e_platform_family_e_generation1_idx` (`generation_id`),
-  CONSTRAINT `fk_e_platform_family_e_generation1` FOREIGN KEY (`generation_id`) REFERENCES `e_generation` (`id`)
+  CONSTRAINT `fk_e_platform_family_e_generation1` FOREIGN KEY (`generation_id`) REFERENCES `e_generation` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -919,7 +950,7 @@ CREATE TABLE `r_project_platform` (
   PRIMARY KEY (`project_id`,`platform_id`),
   KEY `fk_e_project_has_e_platform_e_platform1_idx` (`platform_id`),
   KEY `fk_e_project_has_e_platform_e_project1_idx` (`project_id`),
-  CONSTRAINT `fk_e_project_has_e_platform_e_platform1` FOREIGN KEY (`platform_id`) REFERENCES `e_platform` (`id`),
+  CONSTRAINT `fk_e_project_has_e_platform_e_platform1` FOREIGN KEY (`platform_id`) REFERENCES `e_platform` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_e_project_has_e_platform_e_project1` FOREIGN KEY (`project_id`) REFERENCES `e_project` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1318,4 +1349,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-11-21 22:13:43
+-- Dump completed on 2023-11-29 21:15:01
