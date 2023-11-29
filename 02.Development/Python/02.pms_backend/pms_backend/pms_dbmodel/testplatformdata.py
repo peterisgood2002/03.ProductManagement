@@ -13,6 +13,7 @@ class TestPlatformData:
     categoryId = 1
     category = "TEST"
     family = ["Family1", "Family2"]
+
     pdata = ["Platform1", "Platform2", "Platform3", "Platform4"]
     platform = [
         PlatformData([1, Gen1Name, family[0], pdata[0], "P1", category]),

@@ -3,7 +3,7 @@ from pms_dbmodel.common_operation.category_operation import (
     CategoryOperation,
 )
 from pms_dbmodel.common import ArrayData
-from pms_dbmodel.models.e_platform import EPlatform, EPlatformFamily
+from pms_dbmodel.models.e_platform import EPlatform, EPlatformFamily, EGeneration
 from pms_dbmodel.platform_operation.generation_operation import GenerationOperation
 from pms_dbmodel.platform_operation.platform_operation import (
     PlatformOperation,
@@ -25,6 +25,16 @@ class PlatformData(ArrayData):
 
     def getInfoLength(self):
         return len(PlatformData.INFO)
+
+
+class GenerationService:
+    @classmethod
+    def addGeneration(cls, id, name, external):
+        GenerationOperation.addGerneration(id, name, external)
+
+    @classmethod
+    def getGeneration(cls, name) -> EGeneration:
+        return GenerationOperation.getGeneration(name)
 
 
 class PlatformService:
@@ -96,3 +106,7 @@ class PlatformService:
         if result == None:
             raise Exception(" Can not find platform: " + platform)
         return result
+
+    @classmethod
+    def updatePlatformFamily(cls, fName, external):
+        PlatformFamilyOperation.updatePlatformExternalName(fName, external)

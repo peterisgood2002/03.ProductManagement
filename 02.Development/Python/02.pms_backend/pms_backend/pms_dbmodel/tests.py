@@ -15,10 +15,9 @@ from pms_dbmodel.operator_operation.doc_operation import DocOperation, Structure
 from pms_dbmodel.operator import OperatorService
 from pms_dbmodel.operator_operation.requirement_operation import RequirementOperation
 from pms_dbmodel.operator_operation.version_operation import VersionOperation
-from pms_dbmodel.models.e_platform import EPlatform
-
-from pms_dbmodel.testplatformdata import TestPlatformData
-from pms_dbmodel.platform import PlatformService
+from pms_dbmodel.models.e_platform import EPlatform, EGeneration
+from pms_dbmodel.testplatformdata import TestPlatformData, CheckPlatformData
+from pms_dbmodel.platform import PlatformService, GenerationService
 from pms_dbmodel.common_operation.category_operation import CategoryOperation, Category
 from pms_dbmodel.project_operation.customer_operation import CustomerCategory
 from pms_dbmodel.testprojectdata import TestProjectData
@@ -59,6 +58,8 @@ class Util:
             TestPlatformData.Gen1Name,
             platform=TestPlatformData.platform,
         )
+
+        PlatformService.updatePlatformFamily(TestPlatformData.family[0], "F1")
 
 
 class OperatorServiceTest(PMSDbTest):
@@ -113,6 +114,27 @@ class OperatorServiceTest(PMSDbTest):
         )
 
         assert len(result22) == len(TestOperatiorData.requirement_22_No)
+
+
+class GenerationServiceTest(PMSDbTest):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        super().setManaged(
+            EGeneration,
+        )
+
+    def testAddGeneration(self):
+        GenerationService.addGeneration(
+            TestPlatformData.Gen1Id,
+            TestPlatformData.Gen1Name,
+            TestPlatformData.Gen1ExternalName,
+        )
+
+        data = GenerationService.getGeneration(TestPlatformData.Gen1Name)
+        CheckPlatformData.checkGeneration(
+            data, TestPlatformData.Gen1Id, TestPlatformData.Gen1Name
+        )
 
 
 class PlatformServiceTest(PMSDbTest):

@@ -49,6 +49,15 @@ class PlatformFamilyOperation:
 
     @classmethod
     def updatePlatformExternalName(cls, family, name) -> EPlatformFamily:
+        logInfo(
+            logger,
+            LOGTIME.BEGIN,
+            cls.addPlatformFamily.__name__,
+            "Family = %s, External = %s",
+            family,
+            name,
+        )
+
         result = EPlatformFamily.objects.get(name=family)
 
         result.external_name = name
