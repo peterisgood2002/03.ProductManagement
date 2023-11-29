@@ -57,7 +57,7 @@ class Util:
         PlatformService.addPlatformsWithGeneration(
             TestPlatformData.Gen1Id,
             TestPlatformData.Gen1Name,
-            TestPlatformData.platform,
+            platform=TestPlatformData.platform,
         )
 
 

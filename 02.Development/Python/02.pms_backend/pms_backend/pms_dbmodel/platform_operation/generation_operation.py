@@ -19,8 +19,9 @@ class GenerationOperation:
 
         result = EGeneration.objects.get_or_create(id=id)
 
-        if result[1] == True:
-            result[0].name = name
+        result[0].name = name
+
+        if externalName != None:
             result[0].external_name = externalName
         CommonOperation.setDateAndSave(result)
 

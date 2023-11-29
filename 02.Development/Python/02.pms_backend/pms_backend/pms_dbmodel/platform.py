@@ -29,7 +29,9 @@ class PlatformData(ArrayData):
 
 class PlatformService:
     @classmethod
-    def addPlatformsWithGeneration(cls, id, gName, platform: list[PlatformData]):
+    def addPlatformsWithGeneration(
+        cls, id, gName, external_name=None, platform: list[PlatformData] = []
+    ):
         logInfo(
             logger,
             LOGTIME.BEGIN,
@@ -41,7 +43,7 @@ class PlatformService:
         )
 
         # 1. Get Generation
-        generation = GenerationOperation.addGerneration(id, gName)
+        GenerationOperation.addGerneration(id, gName, external_name)
 
         # 2. Get Category and Family
         categoryMap = CategoryOperation.getCategoryMap()
