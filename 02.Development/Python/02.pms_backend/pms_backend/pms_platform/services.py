@@ -51,6 +51,8 @@ class PlatformService:
 
         cls.addPlatforms(generation, dMap, P.addPlatformsWithGeneration)
 
+        cls.updateFamilyExternal(fList, P.updatePlatformFamily)
+
     @classmethod
     def parseGeneration(cls, fileName, excel) -> list[Item]:
         sheet = excel[SHEETNAME.Generation.name]
@@ -158,3 +160,21 @@ class PlatformService:
             data = dMap.get(gName)
             if data != None:
                 func(gId, gName, gExternal, data)
+
+    @classmethod
+    def updateFamilyExternal(cls, family: list[Item], func):
+        for f in family:
+            fName = f.getKey(FAMILY.NAME)
+            fExternal = f.getKey(FAMILY.EXTERNAL)
+            func(fName, fExternal)
+
+    @classmethod
+    def getGenerationMapBasedOneID(cls, data: list[Item]) -> dict[str, int]:
+        result = {}
+
+        for d in data:
+            id = int(d.getKey(GENERATION.ID))
+            name = d.getKey(GENERATION.NAME)
+            result[name] = id
+
+        return result

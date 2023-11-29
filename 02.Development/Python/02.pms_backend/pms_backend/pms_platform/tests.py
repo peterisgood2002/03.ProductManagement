@@ -23,7 +23,7 @@ class PlatformServiceTest(TestCase):
     def testParseGeneration(self):
         # PlatformService.parse(self.fileName)
         generation = PlatformService.parseGeneration(self.fileName, self.excel)
-        assert len(generation) == 3
+        assert len(generation) == 4
 
         family = PlatformService.parseFamily(self.fileName, self.excel)
         assert len(family) == 5
@@ -39,11 +39,24 @@ class PlatformServiceTest(TestCase):
 
         PlatformService.addPlatforms(generation, dMap, self._test)
 
+        gMap = PlatformService.getGenerationMapBasedOneID(generation)
+
+        PlatformService.updateFamilyExternal(family, self._testFamilyExternal)
+
+        assert len(gMap) == 4
+
     def _test(self, id, gName, external, data: list):
         logger.info(
-            "[test] id = %s, name = %s, external = %s, data = %d",
+            "[_test] id = %s, name = %s, external = %s, data = %d",
             id,
             gName,
             external,
             len(data),
+        )
+
+    def _testFamilyExternal(self, name, external):
+        logger.info(
+            "[_testFamilyExternal]  name = %s, external = %s",
+            name,
+            external,
         )

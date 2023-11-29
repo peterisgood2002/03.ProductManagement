@@ -108,5 +108,5 @@ class PlatformService:
         return result
 
     @classmethod
-    def updatePlatformFamily(cls, fName, external):
+    def updateFamilyExternal(cls, fName, external):
         PlatformFamilyOperation.updatePlatformExternalName(fName, external)
