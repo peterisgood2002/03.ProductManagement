@@ -52,7 +52,7 @@ class PlatformFamilyOperation:
         logInfo(
             logger,
             LOGTIME.BEGIN,
-            cls.addPlatformFamily.__name__,
+            cls.updatePlatformFamilyExternalName.__name__,
             "Family = %s, External = %s",
             family,
             name,

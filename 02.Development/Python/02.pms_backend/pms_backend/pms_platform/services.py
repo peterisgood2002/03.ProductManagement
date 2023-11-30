@@ -3,7 +3,7 @@ import openpyxl
 from enum import Enum
 from excel_common.excel_operation import ExcelParser
 from pms_dbmodel.platform import PlatformData
-from pms_dbmodel.platform import PlatformService as P
+from pms_dbmodel.platform import GenerationService, PlatformService as P, FamilyService
 from excel_common.item import Item
 
 
@@ -35,13 +35,19 @@ class PLATFORM(Enum):
 
 # Create your models here.
 class PlatformService:
+    """
+    BEGIN INTEGRATION TEST
+    """
+
     @classmethod
     def parse(cls, fileName):
         excel = openpyxl.load_workbook(fileName)
         generation = cls.parseGeneration(fileName, excel)
 
+        PlatformService.addGeneration(generation)
         # Get Map: <Family, Generation>
         fList = cls.parseFamily(fileName, excel)
+        PlatformService.addFamily(fList)
         gMap = cls.getGenerationMapBasedOnFamily(fList)
 
         # Get Map: <Generation, list<PlatformData> >
@@ -49,9 +55,48 @@ class PlatformService:
 
         dMap = cls.getMapAboutPlatformData(platforms, gMap)
 
-        cls.addPlatforms(generation, dMap, P.addPlatformsWithGeneration)
+        PlatformService.addPlatforms(generation, dMap)
 
-        cls.updateFamilyExternal(fList, P.updatePlatformFamily)
+    @staticmethod
+    def addGeneration(data: list[Item]):
+        for g in data:
+            gId = g.getKey(GENERATION.ID)
+            gName = g.getKey(GENERATION.NAME)
+            external = g.getKey(GENERATION.EXTERNAL)
+
+            GenerationService.addGeneration(gId, gName, external)
+
+    @staticmethod
+    def addFamily(data: list[Item]):
+        for f in data:
+            gName = f.getKey(FAMILY.GENERATION)
+            fName = f.getKey(FAMILY.NAME)
+            fExternal = f.getKey(FAMILY.EXTERNAL)
+            FamilyService.addPlatformFamilty(gName, fName, fExternal)
+
+    @staticmethod
+    def addPlatforms(generation: list[Item], dMap: dict[str, list[PlatformData]]):
+        """
+
+        We should call it normally but We adopt function call to implement addPlatforms feature due to Unit Test
+        If we do not implement it in this way, we have to add Django Models dependency in this pms_platform project
+
+        Args:
+            generation (list[Item]): _description_
+            dMap (dict[str, list[PlatformData]]): _description_
+            func (_type_): _description_
+        """
+        for g in generation:
+            gId = int(g.getKey(GENERATION.ID))
+            gName = g.getKey(GENERATION.NAME)
+            gExternal = g.getKey(GENERATION.EXTERNAL)
+            data = dMap.get(gName)
+            if data != None:
+                P.addPlatformsWithGeneration(gId, gName, gExternal, data)
+
+    """
+    END INTEGRATION TEST
+    """
 
     @classmethod
     def parseGeneration(cls, fileName, excel) -> list[Item]:
@@ -138,35 +183,6 @@ class PlatformService:
             r.append(p)
 
         return result
-
-    @classmethod
-    def addPlatforms(
-        cls, generation: list[Item], dMap: dict[str, list[PlatformData]], func
-    ):
-        """
-
-        We should call it normally but We adopt function call to implement addPlatforms feature due to Unit Test
-        If we do not implement it in this way, we have to add Django Models dependency in this pms_platform project
-
-        Args:
-            generation (list[Item]): _description_
-            dMap (dict[str, list[PlatformData]]): _description_
-            func (_type_): _description_
-        """
-        for g in generation:
-            gId = int(g.getKey(GENERATION.ID))
-            gName = g.getKey(GENERATION.NAME)
-            gExternal = g.getKey(GENERATION.EXTERNAL)
-            data = dMap.get(gName)
-            if data != None:
-                func(gId, gName, gExternal, data)
-
-    @classmethod
-    def updateFamilyExternal(cls, family: list[Item], func):
-        for f in family:
-            fName = f.getKey(FAMILY.NAME)
-            fExternal = f.getKey(FAMILY.EXTERNAL)
-            func(fName, fExternal)
 
     @classmethod
     def getGenerationMapBasedOneID(cls, data: list[Item]) -> dict[str, int]:
