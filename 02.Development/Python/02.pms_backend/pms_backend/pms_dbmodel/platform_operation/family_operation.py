@@ -48,7 +48,7 @@ class PlatformFamilyOperation:
         return result
 
     @classmethod
-    def updatePlatformExternalName(cls, family, name) -> EPlatformFamily:
+    def updatePlatformFamilyExternalName(cls, family, name) -> EPlatformFamily:
         logInfo(
             logger,
             LOGTIME.BEGIN,

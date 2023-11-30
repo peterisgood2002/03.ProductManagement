@@ -29,12 +29,44 @@ class PlatformData(ArrayData):
 
 class GenerationService:
     @classmethod
-    def addGeneration(cls, id, name, external):
+    def addGeneration(cls, id, name, external=None):
         GenerationOperation.addGerneration(id, name, external)
 
     @classmethod
     def getGeneration(cls, name) -> EGeneration:
         return GenerationOperation.getGeneration(name)
+
+
+class FamilyService:
+    @classmethod
+    def addPlatformFamilty(cls, genName, familyName, external):
+        PlatformFamilyOperation.addPlatformFamily(genName, familyName)
+        cls.updateFamilyExternal(familyName, external)
+
+    @classmethod
+    def updateFamilyExternal(cls, fName, external):
+        PlatformFamilyOperation.updatePlatformFamilyExternalName(fName, external)
+
+    @classmethod
+    def getFamilyMap(
+        cls, gName, data: list[PlatformData]
+    ) -> dict[str, EPlatformFamily]:
+        family = set()
+        for d in data:
+            f = d.getInfo(PlatformData.INFO.FAMILY)
+            family.add(f)
+
+        result = PlatformFamilyOperation.getFamilyMapBasedOnGen(gName)
+
+        for f in family:
+            if result.get(f) == None:
+                d = PlatformFamilyOperation.addPlatformFamily(gName, f)
+                result[f] = d
+        return result
+
+    @classmethod
+    def getFamilies(cls, genName) -> list[EPlatformFamily]:
+        return PlatformFamilyOperation.getFamilies(genName)
 
 
 class PlatformService:
@@ -57,26 +89,9 @@ class PlatformService:
 
         # 2. Get Category and Family
         categoryMap = CategoryOperation.getCategoryMap()
-        fMap = cls._getFamilyMap(gName, platform)
+        fMap = FamilyService.getFamilyMap(gName, platform)
         # 3. Add Platform
         cls._addPlatforms(platform, fMap, categoryMap)
-
-    @classmethod
-    def _getFamilyMap(
-        cls, gName, data: list[PlatformData]
-    ) -> dict[str, EPlatformFamily]:
-        family = set()
-        for d in data:
-            f = d.getInfo(PlatformData.INFO.FAMILY)
-            family.add(f)
-
-        result = PlatformFamilyOperation.getFamilyMapBasedOnGen(gName)
-
-        for f in family:
-            if result.get(f) == None:
-                d = PlatformFamilyOperation.addPlatformFamily(gName, f)
-                result[f] = d
-        return result
 
     @classmethod
     def _addPlatforms(cls, data: list[PlatformData], fMap, categoryMap):
@@ -106,7 +121,3 @@ class PlatformService:
         if result == None:
             raise Exception(" Can not find platform: " + platform)
         return result
-
-    @classmethod
-    def updateFamilyExternal(cls, fName, external):
-        PlatformFamilyOperation.updatePlatformExternalName(fName, external)

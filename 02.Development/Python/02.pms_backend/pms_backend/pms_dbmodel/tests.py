@@ -15,9 +15,9 @@ from pms_dbmodel.operator_operation.doc_operation import DocOperation, Structure
 from pms_dbmodel.operator import OperatorService
 from pms_dbmodel.operator_operation.requirement_operation import RequirementOperation
 from pms_dbmodel.operator_operation.version_operation import VersionOperation
-from pms_dbmodel.models.e_platform import EPlatform, EGeneration
+from pms_dbmodel.models.e_platform import EPlatform, EGeneration, EPlatformFamily
 from pms_dbmodel.testplatformdata import TestPlatformData, CheckPlatformData
-from pms_dbmodel.platform import PlatformService, GenerationService
+from pms_dbmodel.platform import PlatformService, GenerationService, FamilyService
 from pms_dbmodel.common_operation.category_operation import CategoryOperation, Category
 from pms_dbmodel.project_operation.customer_operation import CustomerCategory
 from pms_dbmodel.testprojectdata import TestProjectData
@@ -58,8 +58,6 @@ class Util:
             TestPlatformData.Gen1Name,
             platform=TestPlatformData.platform,
         )
-
-        PlatformService.updatePlatformFamily(TestPlatformData.family[0], "F1")
 
 
 class OperatorServiceTest(PMSDbTest):
@@ -134,6 +132,30 @@ class GenerationServiceTest(PMSDbTest):
         data = GenerationService.getGeneration(TestPlatformData.Gen1Name)
         CheckPlatformData.checkGeneration(
             data, TestPlatformData.Gen1Id, TestPlatformData.Gen1Name
+        )
+
+
+class PlatformFamilyServiceTest(PMSDbTest):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        super().setManaged(
+            EPlatformFamily,
+        )
+
+    def testAddPlatformFamilty(self):
+        GenerationService.addGeneration(
+            TestPlatformData.Gen1Id,
+            TestPlatformData.Gen1Name,
+        )
+        FamilyService.addPlatformFamilty(
+            TestPlatformData.Gen1Name, TestPlatformData.family[0], "F1"
+        )
+
+        rList = FamilyService.getFamilies(TestPlatformData.Gen1Name)
+        assert len(rList) == 1
+        CheckPlatformData.checkFamily(
+            rList[0], TestPlatformData.Gen1Name, TestPlatformData.family[0]
         )
 
 

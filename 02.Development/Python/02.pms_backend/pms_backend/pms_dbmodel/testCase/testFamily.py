@@ -33,6 +33,6 @@ class PlatformFamilyOperationTest(PMSDbTest):
 
         family = TestPlatformData.platform[0].getInfo(PlatformData.INFO.FAMILY)
         external = "Test"
-        f = PlatformFamilyOperation.updatePlatformExternalName(family, external)
+        f = PlatformFamilyOperation.updatePlatformFamilyExternalName(family, external)
         result = EPlatformFamily.objects.get(name=family)
         assert external == result.external_name
