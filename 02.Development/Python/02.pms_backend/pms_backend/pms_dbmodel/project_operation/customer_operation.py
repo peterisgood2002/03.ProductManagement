@@ -2,8 +2,9 @@ from pms_dbmodel.models.e_area import EArea
 from pms_dbmodel.project_operation import logger
 from pms_dbmodel.common import *
 
-from pms_dbmodel.operator_operation.area_operation import AreaOperation
+from pms_dbmodel.common_operation.area_operation import AreaOperation
 from pms_dbmodel.models.e_customers import ECustomer
+from pms_dbmodel.models.e_employee import EEmployee
 from pms_dbmodel.common_operation.common_operation import CommonOperation
 from enum import Enum
 from pms_dbmodel.common_operation.common_operation import CommonOperation
@@ -19,7 +20,7 @@ class CustomerCategory(Enum):
 
 class CustomerOperation(CommonOperation):
     @classmethod
-    def addCustomer(cls, area, customer, alpha=False):
+    def addCustomer(cls, area: str, customer, alpha=False) -> ECustomer:
         logInfo(
             logger,
             LOGTIME.BEGIN,
@@ -45,11 +46,7 @@ class CustomerOperation(CommonOperation):
         if result == None:
             index = cls.getIndex(a.id * 100, customers)
 
-            r = ECustomer.objects.get_or_create(
-                id=index, name=customer, area=a, is_alpha=alpha
-            )
-            CommonOperation.setDateAndSave(r)
-            result = r[0]
+            result = cls.addOrUpdateCustomer(a, index, customer, alpha, update=False)
 
         logInfo(
             logger,
@@ -60,6 +57,35 @@ class CustomerOperation(CommonOperation):
         )
 
         return result
+
+    @classmethod
+    def addOrUpdateCustomer(
+        cls, area, id, customer, alpha, cpm: EEmployee = None, update=True
+    ) -> ECustomer:
+        # 1. Get Area
+        a = area
+        if isinstance(a, EArea) != True:
+            a = AreaOperation.getArea(area)
+
+        result = ECustomer.objects.get_or_create(area=a, id=id, is_alpha=alpha)
+
+        result[0].name = customer
+
+        if cpm != None:
+            result[0].cpm = cpm
+
+        CommonOperation.setDateAndSave(result, update)
+
+        return result[0]
+
+    @classmethod
+    def getCustomerWithId(cls, id) -> ECustomer:
+        rList = ECustomer.objects.filter(id=id)
+
+        if len(rList) == 0:
+            return None
+        else:
+            return rList[0]
 
     @classmethod
     def getCustomers(cls, area=None) -> list[str]:

@@ -27,3 +27,17 @@ class CustomerOperationTest(PMSDbTest):
         lResult = CustomerOperation.getCustomers()
 
         assert len(lResult) == len(TestCustomerData.customer)
+
+    def testAddOrUpdateCustomer(self):
+        id = 8888
+
+        c = TestCustomerData.customer[0]
+        area = c.getInfo(CustomerData.INFO.AREA)
+        customer = c.getInfo(CustomerData.INFO.CUSTOMER)
+
+        CustomerOperation.addOrUpdateCustomer(area, id, customer, True)
+
+        result = CustomerOperation.getCustomerWithId(id)
+
+        assert result != None
+        assert result.update_date != None

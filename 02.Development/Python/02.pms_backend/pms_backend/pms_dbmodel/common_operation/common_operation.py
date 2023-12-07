@@ -5,12 +5,14 @@ from django.db import models
 
 class CommonOperation:
     @staticmethod
-    def setDateAndSave(data):
+    def setDateAndSave(
+        data, update=False
+    ):  # TODO We need to review all reference and set update as True if necessary
         if isinstance(data, tuple):
             if data[1] == True:
                 data[0].create_date = date.today()
                 data[0].update_date = date.today()
-            else:
+            elif update == True:
                 data[0].update_date = date.today()
             data[0].save()
         elif isinstance(data, models.Model):

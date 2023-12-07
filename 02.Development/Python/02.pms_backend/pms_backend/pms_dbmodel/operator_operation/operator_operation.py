@@ -3,7 +3,7 @@
 from pms_dbmodel.models.e_area import EArea
 from pms_dbmodel.models.e_operator import EOperator
 from pms_dbmodel.operator_operation import logger
-from .area_operation import AreaOperation
+from pms_dbmodel.common_operation.area_operation import AreaOperation
 
 from pms_dbmodel.common import *
 from pms_dbmodel.common_operation.common_operation import CommonOperation
