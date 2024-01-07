@@ -5,6 +5,7 @@ import openpyxl
 from openpyxl.worksheet.worksheet import Worksheet
 from enum import Enum
 from .item import Item
+from abc import abstractmethod, ABC
 
 
 class KEYINFO(Enum):
@@ -112,6 +113,10 @@ class ExcelParser:
         return self._keyInfo
 
     # END Initialize method
+    """
+        We will create mapping between KeyMap and column index in the excel.
+        If we can not find any item in the KeyMap, we will put -1 as the column index indicated there is not column in this key
+    """
 
     def createMap(self, sheet: Worksheet):
         self.setKeyMap(sheet, self.keyRow, self._originalKeyMap)
@@ -222,3 +227,20 @@ class ExcelParser:
 
 
 # END class ExcelParser
+
+
+class SheetParserSercice:
+    @classmethod
+    def parseSheet(cls, fileName, sheet, keyMap: dict, keyInfo: Enum) -> list[Item]:
+        parser = ExcelParser(keyRow=1, originalKeyMap=keyMap, keyInfo=keyInfo)
+
+        parser.createMap(sheet)
+        items = parser.parseExcel(fileName, 2, sheet)
+
+        return items
+
+
+class AbstractExcelService(ABC):
+    @classmethod
+    def parse(cls, fileName):
+        pass
