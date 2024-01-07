@@ -55,6 +55,11 @@ class ProjectServiceTest(TestCase):
         customers = ProjectParserService.getAllCustomers(result)
 
         assert len(customers) == 4
-
-        project = ProjectService.createProjectData(result)
+        customerAreaMap = {
+            "Home": ["TW"],
+            "Customer1": ["TW"],
+            "Customer3": ["EU"],
+            "Customer2": ["CN"],
+        }
+        project = ProjectParserService.createProjectData(result, customerAreaMap)
         assert len(project) == 4

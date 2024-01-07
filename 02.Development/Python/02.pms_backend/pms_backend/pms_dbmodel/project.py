@@ -42,7 +42,9 @@ class ProjectData(ArrayData):
 
     def getAllCustomers(self) -> list[CustomerData]:
         result = []
-        result.append(self.getInfo(ProjectData.INFO.MAIN_CUSTOMER))
+        mainCustomer = self.getMainCustomer()
+        if mainCustomer != None:
+            result.append(mainCustomer)
 
         for c in self._othercustomers:
             result.append(c)
@@ -51,7 +53,9 @@ class ProjectData(ArrayData):
 
     def getAllPlatform(self) -> list[str]:
         result = []
-        result.append(self.getInfo(ProjectData.INFO.MAIN_PLATFROM))
+        mainPlatform = self.getAllPlatform()
+        if mainPlatform != None:
+            result.append(self.getInfo(ProjectData.INFO.MAIN_PLATFROM))
 
         for p in self._otherplatforms:
             result.append(p)

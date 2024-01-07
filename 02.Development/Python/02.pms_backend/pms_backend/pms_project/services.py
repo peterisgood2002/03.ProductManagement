@@ -5,7 +5,7 @@ from excel_common.excel_operation import (
 )
 from enum import Enum
 from excel_common.item import Item
-from pms_dbmodel.project import ProjectData, ProjectService
+from pms_dbmodel.project import CustomerData, ProjectData, ProjectService as PS
 import openpyxl
 from .util import *
 from pms_dbmodel.customer import CustomerService
@@ -22,7 +22,7 @@ class SHEETNAME(Enum):
 class PROJECT(Enum):
     NAME = 0
     PLATFROM = 1
-    Home = 2
+    HOME = 2
     ODM = 3
     T2 = 4
     T1 = 5
@@ -55,7 +55,7 @@ class ProjectParserService:
         keyMap = {
             PROJECT.NAME: "Project Name",
             PROJECT.PLATFROM: "Chipset",
-            PROJECT.Home: "Customer",
+            PROJECT.HOME: "Customer",
             PROJECT.PRIORITY: "Business Priority",
             PROJECT.TYPE: "Product Type",
         }
@@ -124,6 +124,51 @@ class ProjectParserService:
 
         return result
 
+    @classmethod
+    def createProjectData(
+        cls, data: list[Item], customerArea: dict
+    ) -> list[ProjectData]:
+        result = []
+        projectName = []
+        for d in data:
+            name = d.getKey(PROJECT.NAME)
+            platform = d.getKey(PROJECT.PLATFROM)
+            p = ProjectData([platform, name, None])
+            cls._addCustomer(d, p, customerArea)
+
+            if name not in projectName:
+                result.append(p)
+                projectName.append(name)
+        return result
+
+    @classmethod
+    def _addCustomer(
+        cls, data: Item, project: ProjectData, customerArea: dict
+    ) -> CustomerData:
+        """
+        Note: we do not know why we should have MAIN_PLATFROM and MAIN_CUSTOMER in the PROJECT_DATA
+        However because the purpose is for insertion, we can ignore this two attribute
+        """
+        for e in PROJECT:
+            if e.isCustomerInfo():
+                customer = data.getKey(e)
+
+                if customer == None:
+                    continue
+
+                aList = customerArea.get(customer, None)
+
+                if aList == None:
+                    raise Exception(
+                        "We can not find the customer %s" % customer,
+                    )
+                if len(aList) > 1 or len(aList) == 0:
+                    raise Exception(
+                        " customer %s  has more area in the database" % customer,
+                    )
+
+                project.addCustomer(CustomerData([aList[0], customer, e.name]))
+
 
 class ProjectService(AbstractExcelService):
     @classmethod
@@ -131,42 +176,33 @@ class ProjectService(AbstractExcelService):
         # 1. parsing excel to items
         data = ProjectParserService.getAllItem(fileName)
         # 2. Examine there are some customers or platforms does not exit in database
-        cls.getCustomerAreaMap(data)
-        cls.examinePlatform(data)
+        cls.examine(data)
         # 3. sort out all items into ProjectData
-        result = cls.createProjectData(data)
+        customerArea = CustomerService.getCustomerAreaMap()
+        result = ProjectParserService.createProjectData(data, customerArea)
         # 4. add or update project
+        for p in result:
+            PS.addProject(p)
+
         pass
 
     @classmethod
-    def getCustomerAreaMap(cls, data: list[Item]) -> dict[str, str]:
+    def examine(cls, data: list[Item]) -> dict[str, str]:
         # 1. Check Customer
         customers = CustomerService.getCustomers()
         for c in ProjectParserService.getAllCustomers(data):
             if c not in customers:
                 raise Exception(
-                    " Can not find customer(%s) in database, please add it ", c
+                    " Can not find customer(%s) in database, please add it " % c
                 )
 
-    @classmethod
-    def examinePlatform(cls, data: list[Item]):
         # 2. Check Platforms
         platforms = PlatformService.getPlatforms()
         for p in ProjectParserService.getAllPlatforms(data):
             if p not in platforms:
                 raise Exception(
-                    " Can not find platform(%s) in database, please add it ", cp
+                    " Can not find platform(%s) in database, please add it " % p
                 )
-
-    @classmethod
-    def createProjectData(cls, data: list[Item]) -> list[ProjectData]:
-        result = []
-
-        for d in data:
-            name = d.getKey(PROJECT.NAME)
-            platform = d.getKey(PROJECT.PLATFROM)
-            mainCustomer = ""
-        return result
 
     @classmethod
     def collectIntoOneExcel(cls, homeFileName, l1FileName, l2FileName, l3FileName):
