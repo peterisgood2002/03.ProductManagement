@@ -22,5 +22,9 @@ class CustomerService:
             return CustomerOperation.getCustomers()
 
     @classmethod
+    def getCustomerAreaMap(cls) -> dict[str, str]:
+        return CustomerOperation.getCustomerAreaMap()
+
+    @classmethod
     def getCustomer(cls, customer) -> ECustomer:
         return CustomerOperation.getCustomer(customer)

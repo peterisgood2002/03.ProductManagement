@@ -124,3 +124,20 @@ class CustomerOperation(CommonOperation):
         if len(rList) == 0:
             return None
         return rList[0]
+
+    @classmethod
+    def getCustomerAreaMap(cls) -> dict[str, list[str]]:
+        """
+        getCustomerAreaMap
+
+        Returns:
+            dict[str, list[str]]: { Customer, [Area,Area] }
+        """
+        result = {}
+        for d in ECustomer.objects.all():
+            customer = d.name
+            area = d.area.name
+            aList: list = result.get(customer, [])
+            aList.append(area)
+            result[customer] = aList
+        return result

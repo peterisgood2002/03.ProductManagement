@@ -20,6 +20,9 @@ class TestCustomerData:
         CustomerData(
             ["JP", cData[2], CustomerCategory.OEM.name],
         ),
+        CustomerData(
+            ["EU", cData[2], CustomerCategory.OEM.name],
+        ),
     ]
 
 

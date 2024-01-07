@@ -28,6 +28,9 @@ class CustomerOperationTest(PMSDbTest):
 
         assert len(lResult) == len(TestCustomerData.customer)
 
+        mResult = CustomerOperation.getCustomerAreaMap()
+        assert len(mResult) == 3
+
     def testAddOrUpdateCustomer(self):
         id = 8888
 

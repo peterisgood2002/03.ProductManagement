@@ -2,7 +2,7 @@ from django.db import models
 
 from .e_employee import EEmployee
 from .e_customers import ECustomer
-from .a_attribute import ACategory
+from .a_attribute import ACategory, APriority
 from viewflow.fields import CompositeKey
 
 
@@ -10,13 +10,16 @@ class EProject(models.Model):
     name = models.CharField(
         max_length=45, db_collation="utf8mb3_general_ci", blank=True, null=True
     )
-    create_date = models.DateField(blank=True, null=True)
-    update_date = models.DateField(blank=True, null=True)
-    pm = models.ForeignKey(
-        EEmployee, models.DO_NOTHING, db_column="pm", blank=True, null=True
-    )
     note = models.CharField(max_length=255, blank=True, null=True)
     alpha_project = models.IntegerField(blank=True, null=True)
+    priority = models.ForeignKey(
+        APriority, models.DO_NOTHING, db_column="priority", blank=True, null=True
+    )
+    type = models.ForeignKey(
+        ACategory, models.DO_NOTHING, db_column="type", blank=True, null=True
+    )
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
 
     class Meta:
         managed = False
