@@ -7,4 +7,6 @@ urlpatterns = [
     path("cnn5", views.getCNN5Things, name="cnn5"),
     path("test", views.testDB, name="test"),
     path("addPlatform", views.addPlatform, name="addPlatform"),
+    path("addCustomer", views.addCustomer, name="addCustomer"),
+    path("addProject", views.addProject, name="addProject"),
 ]

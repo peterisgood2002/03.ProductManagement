@@ -10,6 +10,7 @@ from pathlib import Path
 from pms_dbmodel.project import ProjectService
 from pms_dbmodel.testprojectdata import TestProjectData
 from pms_platform.services import PlatformService
+from pms_project.services import ProjectService as ps
 
 
 def index(request):
@@ -72,3 +73,16 @@ def addPlatform(request):
     PlatformService.parse(fileName)
 
     return HttpResponse("addPlatform")
+
+
+def addProject(request):
+    path_home = str(Path(__file__).parents[1])
+    print("PATH = " + path_home)
+    fileName = path_home + "./pms_project/input_test/test.xlsx"
+    ps.parse(fileName)
+
+    return HttpResponse("addProject")
+
+
+def addCustomer(request):
+    return HttpResponse("TEST")
