@@ -41,7 +41,7 @@ CREATE TABLE `a_category` (
 
 LOCK TABLES `a_category` WRITE;
 /*!40000 ALTER TABLE `a_category` DISABLE KEYS */;
-INSERT INTO `a_category` VALUES (1,'Platform',NULL,NULL,NULL,NULL),(2,'Customer',NULL,NULL,NULL,NULL),(3,'Product',NULL,NULL,NULL,NULL),(4,'Milestone',NULL,NULL,NULL,NULL),(10,'Modem',NULL,1,NULL,NULL),(11,'Connectivity',NULL,1,NULL,NULL),(12,'RF',NULL,1,NULL,NULL),(13,'PMIC',NULL,1,NULL,NULL),(14,'AP',NULL,1,NULL,NULL),(20,'HOME','MAIN',2,NULL,NULL),(21,'ODM','MAIN',2,NULL,NULL),(22,'T2','MAIN',2,NULL,NULL),(23,'T1','INDIRCT',2,NULL,NULL),(24,'OEM','INDIRCT',2,NULL,NULL),(30,'Smartphone',NULL,3,NULL,NULL),(31,'CPE',NULL,3,NULL,NULL),(32,'DataCard',NULL,3,NULL,NULL),(33,'Telematics',NULL,3,NULL,NULL);
+INSERT INTO `a_category` VALUES (1,'Platform',NULL,NULL,NULL,NULL),(2,'Customer',NULL,NULL,NULL,NULL),(3,'Product',NULL,NULL,NULL,NULL),(4,'Milestone',NULL,NULL,NULL,NULL),(10,'Modem',NULL,1,NULL,NULL),(11,'Connectivity',NULL,1,NULL,NULL),(12,'RF',NULL,1,NULL,NULL),(13,'PMIC',NULL,1,NULL,NULL),(14,'AP',NULL,1,NULL,NULL),(20,'HOME','MAIN',2,NULL,NULL),(21,'ODM','MAIN',2,NULL,NULL),(22,'T2','MAIN',2,NULL,NULL),(23,'T1','INDIRCT',2,NULL,NULL),(24,'OEM','INDIRCT',2,NULL,NULL),(30,'Smartphone',NULL,3,NULL,NULL),(31,'CPE',NULL,3,NULL,NULL),(32,'DataCard',NULL,3,NULL,NULL),(33,'Telematics',NULL,3,NULL,NULL),(34,'Wearable',NULL,3,NULL,NULL);
 /*!40000 ALTER TABLE `a_category` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -158,7 +158,7 @@ CREATE TABLE `e_area` (
 
 LOCK TABLES `e_area` WRITE;
 /*!40000 ALTER TABLE `e_area` DISABLE KEYS */;
-INSERT INTO `e_area` VALUES (1,'NA','2022-05-19','2023-11-16'),(2,'JP','2022-05-19','2022-05-19'),(3,'EU','2022-05-19','2022-05-19'),(4,'CN','2022-05-19','2022-05-19');
+INSERT INTO `e_area` VALUES (1,'NA','2022-05-19','2023-11-16'),(2,'JP','2022-05-19','2023-11-21'),(3,'EU','2022-05-19','2023-11-21'),(4,'CN','2022-05-19','2023-11-21'),(5,'TW',NULL,NULL);
 /*!40000 ALTER TABLE `e_area` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -625,15 +625,18 @@ DROP TABLE IF EXISTS `e_project`;
 CREATE TABLE `e_project` (
   `id` int NOT NULL AUTO_INCREMENT,
   `name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `alpha_project` tinyint DEFAULT NULL,
+  `priority` int DEFAULT NULL,
+  `note` varchar(255) DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   `pm` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `note` varchar(255) DEFAULT NULL,
   `alpha_project` tinyint DEFAULT NULL,
   PRIMARY KEY (`id`),
-  KEY `fk_e_project_e_employee1_idx` (`pm`),
-  CONSTRAINT `fk_e_project_e_employee1` FOREIGN KEY (`pm`) REFERENCES `e_employee` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `fk_e_project_a_priority1_idx` (`priority`),
+  CONSTRAINT `fk_e_project_a_priority1` FOREIGN KEY (`priority`) REFERENCES `a_priority` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -785,6 +788,36 @@ LOCK TABLES `r_device_requirement_category` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `r_employee_role_project`
+--
+
+DROP TABLE IF EXISTS `r_employee_role_project`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `r_employee_role_project` (
+  `e_project_id` int NOT NULL,
+  `e_employee_id` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `role` int NOT NULL,
+  PRIMARY KEY (`e_project_id`,`e_employee_id`),
+  KEY `fk_e_project_has_e_employee_e_employee1_idx` (`e_employee_id`),
+  KEY `fk_e_project_has_e_employee_e_project1_idx` (`e_project_id`),
+  KEY `fk_r_employee_role_project_a_category1_idx` (`role`),
+  CONSTRAINT `fk_e_project_has_e_employee_e_employee1` FOREIGN KEY (`e_employee_id`) REFERENCES `e_employee` (`id`),
+  CONSTRAINT `fk_e_project_has_e_employee_e_project1` FOREIGN KEY (`e_project_id`) REFERENCES `e_project` (`id`),
+  CONSTRAINT `fk_r_employee_role_project_a_category1` FOREIGN KEY (`role`) REFERENCES `a_category` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `r_employee_role_project`
+--
+
+LOCK TABLES `r_employee_role_project` WRITE;
+/*!40000 ALTER TABLE `r_employee_role_project` DISABLE KEYS */;
+/*!40000 ALTER TABLE `r_employee_role_project` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `r_op_rfp`
 --
 
@@ -892,7 +925,7 @@ CREATE TABLE `r_project_customer` (
   KEY `fk_e_customer_has_e_project_e_project1_idx` (`project_id`),
   KEY `fk_r_project_customer_a_category1_idx` (`relationship`),
   KEY `fk_r_project_customer_e_customer1_idx` (`customer_id`),
-  CONSTRAINT `fk_e_customer_has_e_project_e_project1` FOREIGN KEY (`project_id`) REFERENCES `e_project` (`id`),
+  CONSTRAINT `fk_e_customer_has_e_project_e_project1` FOREIGN KEY (`project_id`) REFERENCES `e_project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_r_project_customer_a_category1` FOREIGN KEY (`relationship`) REFERENCES `a_category` (`id`),
   CONSTRAINT `fk_r_project_customer_e_customer1` FOREIGN KEY (`customer_id`) REFERENCES `e_customer` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -951,7 +984,7 @@ CREATE TABLE `r_project_platform` (
   KEY `fk_e_project_has_e_platform_e_platform1_idx` (`platform_id`),
   KEY `fk_e_project_has_e_platform_e_project1_idx` (`project_id`),
   CONSTRAINT `fk_e_project_has_e_platform_e_platform1` FOREIGN KEY (`platform_id`) REFERENCES `e_platform` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_e_project_has_e_platform_e_project1` FOREIGN KEY (`project_id`) REFERENCES `e_project` (`id`)
+  CONSTRAINT `fk_e_project_has_e_platform_e_project1` FOREIGN KEY (`project_id`) REFERENCES `e_project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1349,4 +1382,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-11-29 21:15:01
+-- Dump completed on 2024-01-07 20:23:22
