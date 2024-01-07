@@ -8,6 +8,8 @@ from excel_common.item import Item
 from pms_dbmodel.project import ProjectData, ProjectService
 import openpyxl
 from .util import *
+from pms_dbmodel.customer import CustomerService
+from pms_dbmodel.platform import PlatformService
 
 
 class SHEETNAME(Enum):
@@ -30,27 +32,11 @@ class PROJECT(Enum):
     CPM = 9
     AM = 10
 
+    def isCustomerInfo(self):
+        return 2 <= self.value and self.value <= 6
+
 
 class ProjectParserService:
-    @classmethod
-    def collectIntoOneExcel(cls, homeFileName, l1FileName, l2FileName, l3FileName):
-        """
-            Collect from several location and output the excel which system can use
-        Args:
-            homeFileName (_type_): _description_
-            l1FileName (_type_): _description_
-            l2FileName (_type_): _description_
-            l3FileName (_type_): _description_
-        """
-
-        home = openpyxl.load_workbook(homeFileName)
-        l1 = openpyxl.load_workbook(l1FileName)
-        l2 = openpyxl.load_workbook(l2FileName)
-        l3 = openpyxl.load_workbook(l3FileName)
-        result = openpyxl.Workbook()
-
-        result.save(OUTPUT_FILE)
-
     @classmethod
     def getAllItem(cls, fileName) -> list[Item]:
         result = []
@@ -115,12 +101,88 @@ class ProjectParserService:
         }
         return SheetParserSercice.parseSheet(fileName, sheet, keyMap, PROJECT)
 
+    @classmethod
+    def getAllPlatforms(cls, data: list[Item]) -> list[str]:
+        result = []
+
+        for item in data:
+            platform = item.getKey(PROJECT.PLATFROM)
+            if platform not in result:
+                result.append(platform)
+        return result
+
+    @classmethod
+    def getAllCustomers(cls, data: list[Item]) -> list[str]:
+        result = []
+
+        for item in data:
+            for e in PROJECT:
+                if e.isCustomerInfo():
+                    customer = item.getKey(e)
+                    if customer != None and customer not in result:
+                        result.append(customer)
+
+        return result
+
 
 class ProjectService(AbstractExcelService):
     @classmethod
     def parse(cls, fileName):
         # 1. parsing excel to items
+        data = ProjectParserService.getAllItem(fileName)
         # 2. Examine there are some customers or platforms does not exit in database
+        cls.getCustomerAreaMap(data)
+        cls.examinePlatform(data)
         # 3. sort out all items into ProjectData
+        result = cls.createProjectData(data)
         # 4. add or update project
         pass
+
+    @classmethod
+    def getCustomerAreaMap(cls, data: list[Item]) -> dict[str, str]:
+        # 1. Check Customer
+        customers = CustomerService.getCustomers()
+        for c in ProjectParserService.getAllCustomers(data):
+            if c not in customers:
+                raise Exception(
+                    " Can not find customer(%s) in database, please add it ", c
+                )
+
+    @classmethod
+    def examinePlatform(cls, data: list[Item]):
+        # 2. Check Platforms
+        platforms = PlatformService.getPlatforms()
+        for p in ProjectParserService.getAllPlatforms(data):
+            if p not in platforms:
+                raise Exception(
+                    " Can not find platform(%s) in database, please add it ", cp
+                )
+
+    @classmethod
+    def createProjectData(cls, data: list[Item]) -> list[ProjectData]:
+        result = []
+
+        for d in data:
+            name = d.getKey(PROJECT.NAME)
+            platform = d.getKey(PROJECT.PLATFROM)
+            mainCustomer = ""
+        return result
+
+    @classmethod
+    def collectIntoOneExcel(cls, homeFileName, l1FileName, l2FileName, l3FileName):
+        """
+            Collect from several location and output the excel which system can use
+        Args:
+            homeFileName (_type_): _description_
+            l1FileName (_type_): _description_
+            l2FileName (_type_): _description_
+            l3FileName (_type_): _description_
+        """
+
+        home = openpyxl.load_workbook(homeFileName)
+        l1 = openpyxl.load_workbook(l1FileName)
+        l2 = openpyxl.load_workbook(l2FileName)
+        l3 = openpyxl.load_workbook(l3FileName)
+        result = openpyxl.Workbook()
+
+        result.save(OUTPUT_FILE)

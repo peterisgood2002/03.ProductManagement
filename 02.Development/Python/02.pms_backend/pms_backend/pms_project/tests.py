@@ -47,3 +47,14 @@ class ProjectServiceTest(TestCase):
 
         result = ProjectParserService.getAllItem(self.fileName)
         assert len(result) == 8
+
+        platform = ProjectParserService.getAllPlatforms(result)
+
+        assert len(platform) == 3
+
+        customers = ProjectParserService.getAllCustomers(result)
+
+        assert len(customers) == 4
+
+        project = ProjectService.createProjectData(result)
+        assert len(project) == 4
