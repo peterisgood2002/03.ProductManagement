@@ -53,7 +53,7 @@ class ProjectData(ArrayData):
 
     def getAllPlatform(self) -> list[str]:
         result = []
-        mainPlatform = self.getAllPlatform()
+        mainPlatform = self.getMainPlatform()
         if mainPlatform != None:
             result.append(self.getInfo(ProjectData.INFO.MAIN_PLATFROM))
 
