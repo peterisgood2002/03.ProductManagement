@@ -45,3 +45,11 @@ class PlatformOperationTest(PMSDbTest):
             CheckPlatformData.checkPlatform(r, data)
 
         CheckPlatformData.checkPlatforms(3, TestPlatformData.family[0])
+
+        result = PlatformOperation.getPlatforms()
+
+        assert len(result) == 4
+
+        result = PlatformOperation.getPlatforms(TestPlatformData.family[0])
+
+        assert len(result) == 3

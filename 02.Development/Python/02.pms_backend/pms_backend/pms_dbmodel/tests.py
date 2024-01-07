@@ -169,6 +169,9 @@ class PlatformServiceTest(PMSDbTest):
 
     def testAddPlatform(self):
         Util.addPlatform()
+        result = PlatformService.getPlatforms()
+
+        assert len(result) == 4
 
 
 class ProjectServiceTest(PMSDbTest):

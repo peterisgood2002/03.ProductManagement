@@ -52,3 +52,26 @@ class PlatformOperation:
         )
 
         return CommonOperation.searchWithName(name, EPlatform)
+
+    @classmethod
+    def getPlatforms(cls, family=None) -> list[str]:
+        rList = []
+
+        if family == None:
+            rList = EPlatform.objects.all()
+        else:
+            rList = EPlatform.objects.filter(platform_family__name=family)
+
+        result = []
+        for r in rList:
+            result.append(r.name)
+
+        logInfo(
+            logger,
+            LOGTIME.END,
+            cls.getPlatforms.__name__,
+            "Family = %s, Size = %d",
+            family,
+            len(result),
+        )
+        return result

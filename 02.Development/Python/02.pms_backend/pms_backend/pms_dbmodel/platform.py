@@ -121,3 +121,7 @@ class PlatformService:
         if result == None:
             raise Exception(" Can not find platform: " + platform)
         return result
+
+    @classmethod
+    def getPlatforms(cls, family=None) -> list[str]:
+        return PlatformOperation.getPlatforms(family)
