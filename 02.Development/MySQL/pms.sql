@@ -107,7 +107,7 @@ DROP TABLE IF EXISTS `e_action`;
 CREATE TABLE `e_action` (
   `project_id` int NOT NULL,
   `milestone_id` int NOT NULL,
-  `milestone_category` int NOT NULL,
+  `schedule_id` int NOT NULL,
   `action_id` int NOT NULL,
   `action_desc` longtext,
   `owner_id` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
@@ -120,10 +120,10 @@ CREATE TABLE `e_action` (
   PRIMARY KEY (`action_id`),
   KEY `fk_e_action_e_employee1_idx` (`owner_id`),
   KEY `fk_e_action_e_Priority1_idx` (`priority_id`),
-  KEY `fk_e_action_r_project_schedule1_idx` (`project_id`,`milestone_id`,`milestone_category`),
+  KEY `fk_e_action_r_project_schedule1_idx` (`project_id`,`milestone_id`,`schedule_id`),
   CONSTRAINT `fk_e_action_e_employee1` FOREIGN KEY (`owner_id`) REFERENCES `e_employee` (`id`),
   CONSTRAINT `fk_e_action_e_Priority1` FOREIGN KEY (`priority_id`) REFERENCES `a_priority` (`id`),
-  CONSTRAINT `fk_e_action_r_project_schedule1` FOREIGN KEY (`project_id`, `milestone_id`, `milestone_category`) REFERENCES `r_project_schedule` (`project_id`, `milestone_id`, `milestone_category`)
+  CONSTRAINT `fk_e_action_r_project_schedule1` FOREIGN KEY (`project_id`, `milestone_id`, `schedule_id`) REFERENCES `r_project_schedule` (`project_id`, `milestone_id`, `schedule_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -468,15 +468,18 @@ CREATE TABLE `e_milestone` (
   `category_id` int NOT NULL,
   `milestone_name` longtext,
   `deliverable` longtext,
+  `parent_milestone` int NOT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   `estimated` double DEFAULT NULL,
   `estimated_baseline` int DEFAULT NULL,
-  PRIMARY KEY (`milestone_id`,`category_id`),
+  PRIMARY KEY (`milestone_id`),
   KEY `fk_e_milestone_a_category1_idx` (`category_id`),
   KEY `fk_estimated_basedon_idx` (`estimated_baseline`),
+  KEY `fk_e_milestone_e_milestone1_idx` (`parent_milestone`),
   CONSTRAINT `fk_e_milestone_a_category1` FOREIGN KEY (`category_id`) REFERENCES `a_category` (`id`),
-  CONSTRAINT `fk_e_milestone_a_category2` FOREIGN KEY (`estimated_baseline`) REFERENCES `a_category` (`id`)
+  CONSTRAINT `fk_e_milestone_a_category2` FOREIGN KEY (`estimated_baseline`) REFERENCES `a_category` (`id`),
+  CONSTRAINT `fk_e_milestone_e_milestone1` FOREIGN KEY (`parent_milestone`) REFERENCES `e_milestone` (`milestone_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -630,9 +633,6 @@ CREATE TABLE `e_project` (
   `note` varchar(255) DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  `pm` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
-  `note` varchar(255) DEFAULT NULL,
-  `alpha_project` tinyint DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_e_project_a_priority1_idx` (`priority`),
   CONSTRAINT `fk_e_project_a_priority1` FOREIGN KEY (`priority`) REFERENCES `a_priority` (`id`)
