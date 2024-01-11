@@ -849,6 +849,38 @@ LOCK TABLES `r_op_rfp` WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table `r_operator_schedule`
+--
+
+DROP TABLE IF EXISTS `r_operator_schedule`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `r_operator_schedule` (
+  `operator_id` int NOT NULL,
+  `milestone_id` int NOT NULL COMMENT 'Operator has its own schedule to release document',
+  `version` varchar(45) DEFAULT NULL,
+  `plan_release_date` date DEFAULT NULL,
+  `actual_release_date` date DEFAULT NULL,
+  `create_date` date DEFAULT NULL,
+  `update_date` date DEFAULT NULL,
+  PRIMARY KEY (`operator_id`,`milestone_id`),
+  KEY `fk_e_operator_has_e_milestone_e_milestone1_idx` (`milestone_id`),
+  KEY `fk_e_operator_has_e_milestone_e_operator1_idx` (`operator_id`),
+  CONSTRAINT `fk_e_operator_has_e_milestone_e_milestone1` FOREIGN KEY (`milestone_id`) REFERENCES `e_milestone` (`milestone_id`),
+  CONSTRAINT `fk_e_operator_has_e_milestone_e_operator1` FOREIGN KEY (`operator_id`) REFERENCES `e_operator` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `r_operator_schedule`
+--
+
+LOCK TABLES `r_operator_schedule` WRITE;
+/*!40000 ALTER TABLE `r_operator_schedule` DISABLE KEYS */;
+/*!40000 ALTER TABLE `r_operator_schedule` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `r_product_feature`
 --
 
@@ -886,15 +918,14 @@ DROP TABLE IF EXISTS `r_product_schedule`;
 CREATE TABLE `r_product_schedule` (
   `product_id` int NOT NULL,
   `milestone_id` int NOT NULL,
-  `milestone_category` int NOT NULL,
   `plan_start_dt` date DEFAULT NULL,
   `plan_end_dt` date DEFAULT NULL,
   `actual_start_dt` date DEFAULT NULL,
   `actual_end_dt` date DEFAULT NULL,
-  PRIMARY KEY (`product_id`,`milestone_id`,`milestone_category`),
+  PRIMARY KEY (`product_id`,`milestone_id`),
   KEY `fk_e_milestone_has_e_product_e_product1_idx` (`product_id`),
-  KEY `fk_e_milestone_has_e_product_e_milestone1_idx` (`milestone_id`,`milestone_category`),
-  CONSTRAINT `fk_e_milestone_has_e_product_e_milestone1` FOREIGN KEY (`milestone_id`, `milestone_category`) REFERENCES `e_milestone` (`milestone_id`, `category_id`),
+  KEY `fk_e_milestone_has_e_product_e_milestone1_idx` (`milestone_id`),
+  CONSTRAINT `fk_e_milestone_has_e_product_e_milestone1` FOREIGN KEY (`milestone_id`) REFERENCES `e_milestone` (`milestone_id`),
   CONSTRAINT `fk_e_milestone_has_e_product_e_product1` FOREIGN KEY (`product_id`) REFERENCES `e_product` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1007,19 +1038,19 @@ DROP TABLE IF EXISTS `r_project_schedule`;
 CREATE TABLE `r_project_schedule` (
   `project_id` int NOT NULL,
   `milestone_id` int NOT NULL,
-  `milestone_category` int NOT NULL,
+  `schedule_id` int NOT NULL,
+  `note` longtext,
   `plan_start_dt` date DEFAULT NULL,
   `plan_end_dt` date DEFAULT NULL,
   `actual_start_dt` date DEFAULT NULL,
   `actual_end_dt` date DEFAULT NULL,
-  `note` longtext,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  PRIMARY KEY (`project_id`,`milestone_id`,`milestone_category`),
+  PRIMARY KEY (`project_id`,`milestone_id`,`schedule_id`),
   KEY `fk_e_project_has_e_milestone_e_project1_idx` (`project_id`),
-  KEY `fk_e_project_has_e_milestone_e_milestone1_idx` (`milestone_id`,`milestone_category`),
-  CONSTRAINT `fk_e_project_has_e_milestone_e_milestone1` FOREIGN KEY (`milestone_id`, `milestone_category`) REFERENCES `e_milestone` (`milestone_id`, `category_id`),
-  CONSTRAINT `fk_e_project_has_e_milestone_e_project1` FOREIGN KEY (`project_id`) REFERENCES `e_project` (`id`)
+  KEY `fk_e_project_has_e_milestone_e_milestone1_idx` (`milestone_id`),
+  CONSTRAINT `fk_e_project_has_e_milestone_e_milestone1` FOREIGN KEY (`milestone_id`) REFERENCES `e_milestone` (`milestone_id`),
+  CONSTRAINT `fk_e_project_has_e_milestone_e_project1` FOREIGN KEY (`project_id`) REFERENCES `e_project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1382,4 +1413,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-01-07 20:23:22
+-- Dump completed on 2024-01-11 21:06:47

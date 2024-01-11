@@ -46,7 +46,7 @@ class APriority(models.Model):
 class EAction(models.Model):
     project = models.ForeignKey('RProjectSchedule', models.DO_NOTHING)
     milestone = models.ForeignKey('RProjectSchedule', models.DO_NOTHING, to_field='milestone_id', related_name='eaction_milestone_set')
-    milestone_category = models.ForeignKey('RProjectSchedule', models.DO_NOTHING, db_column='milestone_category', to_field='milestone_category', related_name='eaction_milestone_category_set')
+    schedule = models.ForeignKey('RProjectSchedule', models.DO_NOTHING, to_field='schedule_id', related_name='eaction_schedule_set')
     action_id = models.IntegerField(primary_key=True)
     action_desc = models.TextField(blank=True, null=True)
     owner = models.ForeignKey('EEmployee', models.DO_NOTHING)
@@ -208,10 +208,11 @@ class EGeneration(models.Model):
 
 
 class EMilestone(models.Model):
-    milestone_id = models.IntegerField(primary_key=True)  # The composite primary key (milestone_id, category_id) found, that is not supported. The first column is selected.
+    milestone_id = models.IntegerField(primary_key=True)
     category = models.ForeignKey(ACategory, models.DO_NOTHING)
     milestone_name = models.TextField(blank=True, null=True)
     deliverable = models.TextField(blank=True, null=True)
+    parent_milestone = models.ForeignKey('self', models.DO_NOTHING, db_column='parent_milestone')
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
     estimated = models.FloatField(blank=True, null=True)
@@ -220,7 +221,6 @@ class EMilestone(models.Model):
     class Meta:
         managed = False
         db_table = 'e_milestone'
-        unique_together = (('milestone_id', 'category'),)
 
 
 class EOperator(models.Model):
@@ -377,6 +377,21 @@ class ROpRfp(models.Model):
         unique_together = (('operator', 'product', 'version_no'),)
 
 
+class ROperatorSchedule(models.Model):
+    operator = models.OneToOneField(EOperator, models.DO_NOTHING, primary_key=True)  # The composite primary key (operator_id, milestone_id) found, that is not supported. The first column is selected.
+    milestone = models.ForeignKey(EMilestone, models.DO_NOTHING, db_comment='Operator has its own schedule to release document')
+    version = models.CharField(max_length=45, blank=True, null=True)
+    plan_release_date = models.DateField(blank=True, null=True)
+    actual_release_date = models.DateField(blank=True, null=True)
+    create_date = models.DateField(blank=True, null=True)
+    update_date = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'r_operator_schedule'
+        unique_together = (('operator', 'milestone'),)
+
+
 class RProductFeature(models.Model):
     product = models.OneToOneField(EProduct, models.DO_NOTHING, primary_key=True)  # The composite primary key (product_id, feature_id) found, that is not supported. The first column is selected.
     feature = models.ForeignKey(EFeature, models.DO_NOTHING)
@@ -389,9 +404,8 @@ class RProductFeature(models.Model):
 
 
 class RProductSchedule(models.Model):
-    product = models.OneToOneField(EProduct, models.DO_NOTHING, primary_key=True)  # The composite primary key (product_id, milestone_id, milestone_category) found, that is not supported. The first column is selected.
+    product = models.OneToOneField(EProduct, models.DO_NOTHING, primary_key=True)  # The composite primary key (product_id, milestone_id) found, that is not supported. The first column is selected.
     milestone = models.ForeignKey(EMilestone, models.DO_NOTHING)
-    milestone_category = models.ForeignKey(EMilestone, models.DO_NOTHING, db_column='milestone_category', to_field='category_id', related_name='rproductschedule_milestone_category_set')
     plan_start_dt = models.DateField(blank=True, null=True)
     plan_end_dt = models.DateField(blank=True, null=True)
     actual_start_dt = models.DateField(blank=True, null=True)
@@ -400,7 +414,7 @@ class RProductSchedule(models.Model):
     class Meta:
         managed = False
         db_table = 'r_product_schedule'
-        unique_together = (('product', 'milestone', 'milestone_category'),)
+        unique_together = (('product', 'milestone'),)
 
 
 class RProjectCustomer(models.Model):
@@ -440,21 +454,21 @@ class RProjectPlatform(models.Model):
 
 
 class RProjectSchedule(models.Model):
-    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)  # The composite primary key (project_id, milestone_id, milestone_category) found, that is not supported. The first column is selected.
+    project = models.OneToOneField(EProject, models.DO_NOTHING, primary_key=True)  # The composite primary key (project_id, milestone_id, schedule_id) found, that is not supported. The first column is selected.
     milestone = models.ForeignKey(EMilestone, models.DO_NOTHING)
-    milestone_category = models.ForeignKey(EMilestone, models.DO_NOTHING, db_column='milestone_category', to_field='category_id', related_name='rprojectschedule_milestone_category_set')
+    schedule_id = models.IntegerField()
+    note = models.TextField(blank=True, null=True)
     plan_start_dt = models.DateField(blank=True, null=True)
     plan_end_dt = models.DateField(blank=True, null=True)
     actual_start_dt = models.DateField(blank=True, null=True)
     actual_end_dt = models.DateField(blank=True, null=True)
-    note = models.TextField(blank=True, null=True)
     create_date = models.DateField(blank=True, null=True)
     update_date = models.DateField(blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'r_project_schedule'
-        unique_together = (('project', 'milestone', 'milestone_category'),)
+        unique_together = (('project', 'milestone', 'schedule_id'),)
 
 
 class RProjectTargetProduct(models.Model):
