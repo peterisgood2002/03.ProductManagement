@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .services import ProjectService, ProjectParserService
+from .services import ProjectParserService
 import logging
 from .util import *
 from pathlib import Path
