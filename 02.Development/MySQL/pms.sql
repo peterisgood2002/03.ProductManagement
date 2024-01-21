@@ -464,22 +464,22 @@ DROP TABLE IF EXISTS `e_milestone`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_milestone` (
-  `milestone_id` int NOT NULL,
+  `id` int NOT NULL,
   `category_id` int NOT NULL,
   `milestone_name` longtext,
   `deliverable` longtext,
-  `parent_milestone` int NOT NULL,
+  `parent_milestone` int DEFAULT NULL,
+  `estimated_baseline` int DEFAULT NULL,
+  `estimated` double DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  `estimated` double DEFAULT NULL,
-  `estimated_baseline` int DEFAULT NULL,
-  PRIMARY KEY (`milestone_id`),
+  PRIMARY KEY (`id`),
   KEY `fk_e_milestone_a_category1_idx` (`category_id`),
   KEY `fk_estimated_basedon_idx` (`estimated_baseline`),
   KEY `fk_e_milestone_e_milestone1_idx` (`parent_milestone`),
   CONSTRAINT `fk_e_milestone_a_category1` FOREIGN KEY (`category_id`) REFERENCES `a_category` (`id`),
   CONSTRAINT `fk_e_milestone_a_category2` FOREIGN KEY (`estimated_baseline`) REFERENCES `a_category` (`id`),
-  CONSTRAINT `fk_e_milestone_e_milestone1` FOREIGN KEY (`parent_milestone`) REFERENCES `e_milestone` (`milestone_id`)
+  CONSTRAINT `fk_e_milestone_e_milestone1` FOREIGN KEY (`parent_milestone`) REFERENCES `e_milestone` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -866,7 +866,7 @@ CREATE TABLE `r_operator_schedule` (
   PRIMARY KEY (`operator_id`,`milestone_id`),
   KEY `fk_e_operator_has_e_milestone_e_milestone1_idx` (`milestone_id`),
   KEY `fk_e_operator_has_e_milestone_e_operator1_idx` (`operator_id`),
-  CONSTRAINT `fk_e_operator_has_e_milestone_e_milestone1` FOREIGN KEY (`milestone_id`) REFERENCES `e_milestone` (`milestone_id`),
+  CONSTRAINT `fk_e_operator_has_e_milestone_e_milestone1` FOREIGN KEY (`milestone_id`) REFERENCES `e_milestone` (`id`),
   CONSTRAINT `fk_e_operator_has_e_milestone_e_operator1` FOREIGN KEY (`operator_id`) REFERENCES `e_operator` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -925,7 +925,7 @@ CREATE TABLE `r_product_schedule` (
   PRIMARY KEY (`product_id`,`milestone_id`),
   KEY `fk_e_milestone_has_e_product_e_product1_idx` (`product_id`),
   KEY `fk_e_milestone_has_e_product_e_milestone1_idx` (`milestone_id`),
-  CONSTRAINT `fk_e_milestone_has_e_product_e_milestone1` FOREIGN KEY (`milestone_id`) REFERENCES `e_milestone` (`milestone_id`),
+  CONSTRAINT `fk_e_milestone_has_e_product_e_milestone1` FOREIGN KEY (`milestone_id`) REFERENCES `e_milestone` (`id`),
   CONSTRAINT `fk_e_milestone_has_e_product_e_product1` FOREIGN KEY (`product_id`) REFERENCES `e_product` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1049,7 +1049,7 @@ CREATE TABLE `r_project_schedule` (
   PRIMARY KEY (`project_id`,`milestone_id`,`schedule_id`),
   KEY `fk_e_project_has_e_milestone_e_project1_idx` (`project_id`),
   KEY `fk_e_project_has_e_milestone_e_milestone1_idx` (`milestone_id`),
-  CONSTRAINT `fk_e_project_has_e_milestone_e_milestone1` FOREIGN KEY (`milestone_id`) REFERENCES `e_milestone` (`milestone_id`),
+  CONSTRAINT `fk_e_project_has_e_milestone_e_milestone1` FOREIGN KEY (`milestone_id`) REFERENCES `e_milestone` (`id`),
   CONSTRAINT `fk_e_project_has_e_milestone_e_project1` FOREIGN KEY (`project_id`) REFERENCES `e_project` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -1181,6 +1181,24 @@ LOCK TABLES `r_test_plan_examine_device_requirement` WRITE;
 UNLOCK TABLES;
 
 --
+-- Temporary view structure for view `v_milestone`
+--
+
+DROP TABLE IF EXISTS `v_milestone`;
+/*!50001 DROP VIEW IF EXISTS `v_milestone`*/;
+SET @saved_cs_client     = @@character_set_client;
+/*!50503 SET character_set_client = utf8mb4 */;
+/*!50001 CREATE VIEW `v_milestone` AS SELECT 
+ 1 AS `category_name`,
+ 1 AS `milestone_id`,
+ 1 AS `milestone_name`,
+ 1 AS `deliverable`,
+ 1 AS `ESTIMATED_BASE`,
+ 1 AS `estimated`,
+ 1 AS `PARENT_MILESTONE`*/;
+SET character_set_client = @saved_cs_client;
+
+--
 -- Temporary view structure for view `v_operator_doc_structure`
 --
 
@@ -1295,6 +1313,24 @@ SET @saved_cs_client     = @@character_set_client;
  1 AS `Platform`,
  1 AS `Category`*/;
 SET character_set_client = @saved_cs_client;
+
+--
+-- Final view structure for view `v_milestone`
+--
+
+/*!50001 DROP VIEW IF EXISTS `v_milestone`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8mb4 */;
+/*!50001 SET character_set_results     = utf8mb4 */;
+/*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `v_milestone` AS select `c`.`category_name` AS `category_name`,(case when (`e`.`parent_milestone` is null) then `e`.`id` else (`e`.`id` / (round((`e`.`id` / `e`.`category_id`),0) / 10)) end) AS `milestone_id`,`e`.`milestone_name` AS `milestone_name`,`e`.`deliverable` AS `deliverable`,`b`.`category_name` AS `ESTIMATED_BASE`,`e`.`estimated` AS `estimated`,`p`.`milestone_name` AS `PARENT_MILESTONE` from (((`e_milestone` `e` join `a_category` `c` on((`e`.`category_id` = `c`.`id`))) left join `a_category` `b` on((`e`.`estimated_baseline` = `b`.`id`))) left join `e_milestone` `p` on((`e`.`parent_milestone` = `p`.`id`))) order by (case when (`e`.`parent_milestone` is null) then `e`.`id` else (`e`.`id` / (round((`e`.`id` / `e`.`category_id`),0) / 10)) end) */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
 
 --
 -- Final view structure for view `v_operator_doc_structure`
@@ -1413,4 +1449,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-01-11 21:06:47
+-- Dump completed on 2024-01-21 12:45:03
