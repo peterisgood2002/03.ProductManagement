@@ -44,7 +44,7 @@ class CustomerOperation(CommonOperation):
                 result = customer
 
         if result == None:
-            index = cls.getIndex(a.id * 100, customers)
+            index = cls.getIntegerIndex(a.id * 100, customers)
 
             result = cls.addOrUpdateCustomer(a, index, customer, alpha, update=False)
 

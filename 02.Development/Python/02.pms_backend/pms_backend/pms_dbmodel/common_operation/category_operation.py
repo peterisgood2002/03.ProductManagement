@@ -45,7 +45,7 @@ class CategoryOperation:
                 result = d
 
         if result == None:
-            index = CommonOperation.getIndex(parent.id * 10, data)
+            index = CommonOperation.getIntegerIndex(parent.id * 10, data)
             r = ACategory.objects.get_or_create(id=index)
             r[0].category_name = category
             r[0].parent = parent

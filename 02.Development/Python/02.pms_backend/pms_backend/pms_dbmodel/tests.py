@@ -10,18 +10,21 @@ from pms_dbmodel.common_operation.priority_operation import (
 
 from pms_dbmodel.testCase.base_test import PMSDbTest
 from pms_dbmodel.testoperatordata import TestOperatiorData
+from pms_dbmodel.testprojectdata import TestProjectData
+from pms_dbmodel.testplatformdata import TestPlatformData, CheckPlatformData
+from pms_dbmodel.testmilestonedata import TestMilestoneData, CheckMilestoneData
 from pms_dbmodel.models.e_operator import EOperator
 from pms_dbmodel.operator_operation.doc_operation import DocOperation, StructureCategory
 from pms_dbmodel.operator import OperatorService
 from pms_dbmodel.operator_operation.requirement_operation import RequirementOperation
 from pms_dbmodel.operator_operation.version_operation import VersionOperation
 from pms_dbmodel.models.e_platform import EPlatform, EGeneration, EPlatformFamily
-from pms_dbmodel.testplatformdata import TestPlatformData, CheckPlatformData
 from pms_dbmodel.platform import PlatformService, GenerationService, FamilyService
 from pms_dbmodel.common_operation.category_operation import CategoryOperation, Category
 from pms_dbmodel.project_operation.customer_operation import CustomerCategory
-from pms_dbmodel.testprojectdata import TestProjectData
+from pms_dbmodel.models.e_milestone import EMilestone
 from pms_dbmodel.project import ProjectService, ProjectData
+from pms_dbmodel.milestone import MilestoneService
 from django.db import models
 
 
@@ -58,6 +61,14 @@ class Util:
             TestPlatformData.Gen1Name,
             platform=TestPlatformData.platform,
         )
+
+    @staticmethod
+    def addMilestoneCategory():
+        CategoryOperation.addCategory(Category.Milestone.value, Category.Milestone.name)
+        i = 1
+        for c in TestMilestoneData.category:
+            CategoryOperation.addCategory(i, c)
+            i += 1
 
 
 class OperatorServiceTest(PMSDbTest):
@@ -195,3 +206,21 @@ class ProjectServiceTest(PMSDbTest):
 
         rList = ProjectService.getPlatformRelationship(pName)
         assert len(project.getAllPlatform()) == len(rList)
+
+
+class MilestoneServiceTest(PMSDbTest):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        super().setManaged(
+            EMilestone,
+        )
+
+    def testAddMilestones(self):
+        Util.addMilestoneCategory()
+        milestones = TestMilestoneData.milestone
+
+        MilestoneService.addMilstones(milestones)
+        result = MilestoneService.getMilestonesMap()
+
+        assert len(result) == len(milestones)

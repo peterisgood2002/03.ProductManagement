@@ -14,6 +14,11 @@ def logInfo(logger: logging.Logger, timing: LOGTIME, name, msg="", *args, **kwar
     logger.info(data, *args, **kwargs)
 
 
+def logError(logger: logging.Logger, timing: LOGTIME, name, msg="", *args, **kwargs):
+    data = "[%s][%s] %s" % (name, timing.name, msg)
+    logger.error(data, *args, **kwargs)
+
+
 class ArrayData:
     def __init__(self, data=None):
         infoLen = self.getInfoLength()
