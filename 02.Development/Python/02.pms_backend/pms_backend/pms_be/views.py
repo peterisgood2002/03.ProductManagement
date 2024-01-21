@@ -11,6 +11,7 @@ from pms_dbmodel.project import ProjectService
 from pms_dbmodel.testprojectdata import TestProjectData
 from pms_platform.services import PlatformService
 from pms_project.services import ProjectService as ps
+from pms_milestone.services import MilestoneService
 
 
 def index(request):
@@ -82,6 +83,15 @@ def addProject(request):
     ps.parse(fileName)
 
     return HttpResponse("addProject")
+
+
+def addMilestone(request):
+    path_home = str(Path(__file__).parents[1])
+    print("PATH = " + path_home)
+    fileName = path_home + "./pms_milestone/input_test/test.xlsx"
+    MilestoneService.parse(fileName)
+
+    return HttpResponse("addMilestone")
 
 
 def addCustomer(request):

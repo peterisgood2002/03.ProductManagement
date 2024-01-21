@@ -9,4 +9,5 @@ urlpatterns = [
     path("addPlatform", views.addPlatform, name="addPlatform"),
     path("addCustomer", views.addCustomer, name="addCustomer"),
     path("addProject", views.addProject, name="addProject"),
+    path("addMilestone", views.addMilestone, name="addMilestone"),
 ]
