@@ -29,7 +29,7 @@ class PlatformFamilyOperation:
                 result = f
 
         if result == None:
-            index = CommonOperation.getIndex(gen.id * 10, families)
+            index = CommonOperation.getIntegerIndex(gen.id * 10, families)
 
             r = EPlatformFamily.objects.get_or_create(
                 id=index, name=familyName, generation=gen

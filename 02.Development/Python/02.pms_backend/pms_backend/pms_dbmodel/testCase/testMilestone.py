@@ -5,6 +5,7 @@ from pms_dbmodel.common_operation.category_operation import CategoryOperation
 from pms_dbmodel.testmilestonedata import TestMilestoneData, CheckMilestoneData
 from pms_dbmodel.milestone import MilestoneData
 from pms_dbmodel.milestone_operation.milestone_operation import MilestoneOperation
+from pms_dbmodel.tests import Util
 
 
 class MilestoneOperationTest(PMSDbTest):
@@ -15,12 +16,6 @@ class MilestoneOperationTest(PMSDbTest):
             ACategory,
             EMilestone,
         )
-
-    def _addCategory(self):
-        i = 1
-        for c in TestMilestoneData.category:
-            CategoryOperation.addCategory(i, c)
-            i += 1
 
     def _addMilestone(self, data: MilestoneData, catMap: dict, parent=None):
         category = data.getInfo(MilestoneData.INFO.CATEGORY)
@@ -43,7 +38,7 @@ class MilestoneOperationTest(PMSDbTest):
 
     def testAddMilstone(self):
         # 1. Add and Get Category
-        self._addCategory()
+        Util.addMilestoneCategory()
         catMap = CategoryOperation.getCategoryMap()
 
         milestoneMap = {}
@@ -61,3 +56,6 @@ class MilestoneOperationTest(PMSDbTest):
         result = MilestoneOperation.getMilestoneMap()
 
         assert len(result) == len(TestMilestoneData.milestone)
+        result = MilestoneOperation.getMilestoneMap(TestMilestoneData.category[4])
+
+        assert len(result) == 1

@@ -34,7 +34,7 @@ class OperatorOperation:
                 result = o
 
         if result == None:
-            index = CommonOperation.getIndex(a.id * 100, operators)
+            index = CommonOperation.getIntegerIndex(a.id * 100, operators)
 
             r = EOperator.objects.get_or_create(id=index, name=operator, area=a)
             CommonOperation.setDateAndSave(r)

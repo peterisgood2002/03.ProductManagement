@@ -34,11 +34,11 @@ class MilestoneOperation:
            | 10  |   M1       |
            | 11  |   M2       |
            | 12  |   M3       |
-           | 100 |   M1A      |  10
-           | 101 |   M1B      |  10
-           | 110 |   M2A      |  11
-           | 111 |   M2B      |  11
-           | 1000|   M1AA      |  100
+           | 10.1 |   M1A      |  10
+           | 10.2 |   M1B      |  10
+           | 11.1 |   M2A      |  11
+           | 11.2 |   M2B      |  11
+           | 10.11|   M1AA      | 10.1
           
 
         Raises:
@@ -60,8 +60,8 @@ class MilestoneOperation:
                 result = m
 
         if result == None:
-            idx = category.id if parent == None else parent.id
-            index = CommonOperation.getIndex(idx * 10, milstones)
+            idx = (category.id * 10) if parent == None else (parent.id * 10 + 1)
+            index = CommonOperation.getIntegerIndex(idx, milstones)
 
             r = EMilestone.objects.get_or_create(id=index, category=category)
             r[0].milestone_name = milestone
@@ -82,10 +82,13 @@ class MilestoneOperation:
         return result
 
     @classmethod
-    def getMilestoneMap(cls) -> dict[str, EMilestone]:
+    def getMilestoneMap(cls, category: str = None) -> dict[str, EMilestone]:
         result = {}
 
         for m in EMilestone.objects.all():
-            result[m.milestone_name] = m
+            if category == None:
+                result[m.milestone_name] = m
+            elif m.category.category_name == category:
+                result[m.milestone_name] = m
 
         return result

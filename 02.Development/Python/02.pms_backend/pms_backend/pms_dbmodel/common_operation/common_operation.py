@@ -1,6 +1,7 @@
 from django.db.models.query import QuerySet
 from datetime import date
 from django.db import models
+import math
 
 
 class CommonOperation:
@@ -20,7 +21,7 @@ class CommonOperation:
             data.save()
 
     @staticmethod
-    def getIndex(id, data: QuerySet):
+    def getIntegerIndex(id, data: QuerySet):
         result = id
         if len(data) != 0:
             result = data[0].id + 1
