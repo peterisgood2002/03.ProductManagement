@@ -6,7 +6,7 @@
     "configurations": [
         {
             "name": "Python: Django",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}\\pms_backend\\manage.py",
             "args": [
@@ -17,7 +17,7 @@
         },
         {
             "name": "Python: UnitTest",
-            "type": "python",
+            "type": "debugpy",
             "request": "launch",
             "program": "${workspaceFolder}\\pms_backend\\manage.py",
             "env": {"DJANGO_SETTINGS_MODULE": "pms_backend.settings"},
