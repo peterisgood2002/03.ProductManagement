@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.32, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
 --
 -- Host: localhost    Database: pms
 -- ------------------------------------------------------
--- Server version	8.0.32
+-- Server version	8.0.36
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -106,7 +106,6 @@ DROP TABLE IF EXISTS `e_action`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_action` (
   `project_id` int NOT NULL,
-  `milestone_id` int NOT NULL,
   `schedule_id` int NOT NULL,
   `action_id` int NOT NULL,
   `action_desc` longtext,
@@ -120,10 +119,10 @@ CREATE TABLE `e_action` (
   PRIMARY KEY (`action_id`),
   KEY `fk_e_action_e_employee1_idx` (`owner_id`),
   KEY `fk_e_action_e_Priority1_idx` (`priority_id`),
-  KEY `fk_e_action_r_project_schedule1_idx` (`project_id`,`milestone_id`,`schedule_id`),
+  KEY `fk_e_action_r_project_schedule1_idx` (`project_id`,`schedule_id`),
   CONSTRAINT `fk_e_action_e_employee1` FOREIGN KEY (`owner_id`) REFERENCES `e_employee` (`id`),
   CONSTRAINT `fk_e_action_e_Priority1` FOREIGN KEY (`priority_id`) REFERENCES `a_priority` (`id`),
-  CONSTRAINT `fk_e_action_r_project_schedule1` FOREIGN KEY (`project_id`, `milestone_id`, `schedule_id`) REFERENCES `r_project_schedule` (`project_id`, `milestone_id`, `schedule_id`)
+  CONSTRAINT `fk_e_action_r_project_schedule1` FOREIGN KEY (`project_id`, `schedule_id`) REFERENCES `r_project_schedule` (`project_id`, `schedule_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -187,7 +186,6 @@ CREATE TABLE `e_compliance_version` (
 
 LOCK TABLES `e_compliance_version` WRITE;
 /*!40000 ALTER TABLE `e_compliance_version` DISABLE KEYS */;
-
 /*!40000 ALTER TABLE `e_compliance_version` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -202,7 +200,7 @@ CREATE TABLE `e_customer` (
   `id` int NOT NULL,
   `name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `area` int NOT NULL,
-  `cpm` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `cpm` int DEFAULT NULL,
   `is_alpha` tinyint NOT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
@@ -386,13 +384,17 @@ DROP TABLE IF EXISTS `e_employee`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `e_employee` (
-  `id` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `id` int NOT NULL AUTO_INCREMENT,
+  `employee_id` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `chinese_name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `english_name` varchar(255) DEFAULT NULL,
   `nt_account` varchar(255) DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  `manager` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_e_employee_e_employee1_idx` (`manager`),
+  CONSTRAINT `fk_e_employee_e_employee1` FOREIGN KEY (`manager`) REFERENCES `e_employee` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -533,7 +535,7 @@ CREATE TABLE `e_platform` (
   `id` int NOT NULL,
   `name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
   `external_name` varchar(45) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
-  `ppm` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci DEFAULT NULL,
+  `ppm` int DEFAULT NULL,
   `platform_family_id` int NOT NULL,
   `category` int NOT NULL,
   `create_date` date DEFAULT NULL,
@@ -796,7 +798,7 @@ DROP TABLE IF EXISTS `r_employee_role_project`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `r_employee_role_project` (
   `e_project_id` int NOT NULL,
-  `e_employee_id` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `e_employee_id` int NOT NULL,
   `role` int NOT NULL,
   PRIMARY KEY (`e_project_id`,`e_employee_id`),
   KEY `fk_e_project_has_e_employee_e_employee1_idx` (`e_employee_id`),
@@ -1037,7 +1039,7 @@ DROP TABLE IF EXISTS `r_project_schedule`;
 /*!50503 SET character_set_client = utf8mb4 */;
 CREATE TABLE `r_project_schedule` (
   `project_id` int NOT NULL,
-  `milestone_id` int NOT NULL,
+  `milestone_id` int DEFAULT NULL,
   `schedule_id` int NOT NULL,
   `note` longtext,
   `plan_start_dt` date DEFAULT NULL,
@@ -1046,7 +1048,7 @@ CREATE TABLE `r_project_schedule` (
   `actual_end_dt` date DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
-  PRIMARY KEY (`project_id`,`milestone_id`,`schedule_id`),
+  PRIMARY KEY (`project_id`,`schedule_id`),
   KEY `fk_e_project_has_e_milestone_e_project1_idx` (`project_id`),
   KEY `fk_e_project_has_e_milestone_e_milestone1_idx` (`milestone_id`),
   CONSTRAINT `fk_e_project_has_e_milestone_e_milestone1` FOREIGN KEY (`milestone_id`) REFERENCES `e_milestone` (`id`),
@@ -1190,6 +1192,7 @@ SET @saved_cs_client     = @@character_set_client;
 /*!50503 SET character_set_client = utf8mb4 */;
 /*!50001 CREATE VIEW `v_milestone` AS SELECT 
  1 AS `category_name`,
+ 1 AS `M_ID`,
  1 AS `milestone_id`,
  1 AS `milestone_name`,
  1 AS `deliverable`,
@@ -1327,7 +1330,7 @@ SET character_set_client = @saved_cs_client;
 /*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `v_milestone` AS select `c`.`category_name` AS `category_name`,(case when (`e`.`parent_milestone` is null) then `e`.`id` else (`e`.`id` / (round((`e`.`id` / `e`.`category_id`),0) / 10)) end) AS `milestone_id`,`e`.`milestone_name` AS `milestone_name`,`e`.`deliverable` AS `deliverable`,`b`.`category_name` AS `ESTIMATED_BASE`,`e`.`estimated` AS `estimated`,`p`.`milestone_name` AS `PARENT_MILESTONE` from (((`e_milestone` `e` join `a_category` `c` on((`e`.`category_id` = `c`.`id`))) left join `a_category` `b` on((`e`.`estimated_baseline` = `b`.`id`))) left join `e_milestone` `p` on((`e`.`parent_milestone` = `p`.`id`))) order by (case when (`e`.`parent_milestone` is null) then `e`.`id` else (`e`.`id` / (round((`e`.`id` / `e`.`category_id`),0) / 10)) end) */;
+/*!50001 VIEW `v_milestone` AS select `c`.`category_name` AS `category_name`,`e`.`id` AS `M_ID`,(case when (`e`.`parent_milestone` is null) then `e`.`id` else (`e`.`id` / (round((`e`.`id` / `e`.`category_id`),0) / 10)) end) AS `milestone_id`,`e`.`milestone_name` AS `milestone_name`,`e`.`deliverable` AS `deliverable`,`b`.`category_name` AS `ESTIMATED_BASE`,`e`.`estimated` AS `estimated`,`p`.`milestone_name` AS `PARENT_MILESTONE` from (((`e_milestone` `e` join `a_category` `c` on((`e`.`category_id` = `c`.`id`))) left join `a_category` `b` on((`e`.`estimated_baseline` = `b`.`id`))) left join `e_milestone` `p` on((`e`.`parent_milestone` = `p`.`id`))) order by (case when (`e`.`parent_milestone` is null) then `e`.`id` else (`e`.`id` / (round((`e`.`id` / `e`.`category_id`),0) / 10)) end) */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -1449,4 +1452,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-01-21 12:45:03
+-- Dump completed on 2024-08-24  8:35:21
