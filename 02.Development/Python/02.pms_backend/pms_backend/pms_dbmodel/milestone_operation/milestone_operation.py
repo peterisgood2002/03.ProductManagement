@@ -25,7 +25,7 @@ class MilestoneOperation:
             milestone,
             deliverable,
             "" if est_baseline == None else est_baseline.category_name,
-            estimated,
+            0 if estimated == None else estimated,
             "" if parent == None else parent.milestone_name,
         )
         """
