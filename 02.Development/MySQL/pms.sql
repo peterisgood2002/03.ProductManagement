@@ -1,8 +1,8 @@
--- MySQL dump 10.13  Distrib 8.0.36, for Win64 (x86_64)
+-- MySQL dump 10.13  Distrib 8.0.39, for Win64 (x86_64)
 --
 -- Host: localhost    Database: pms
 -- ------------------------------------------------------
--- Server version	8.0.36
+-- Server version	8.0.39
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -109,7 +109,7 @@ CREATE TABLE `e_action` (
   `schedule_id` int NOT NULL,
   `action_id` int NOT NULL,
   `action_desc` longtext,
-  `owner_id` varchar(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_general_ci NOT NULL,
+  `owner_id` int NOT NULL,
   `deadline` date DEFAULT NULL,
   `finish_date` date DEFAULT NULL,
   `priority_id` int NOT NULL,
@@ -633,11 +633,14 @@ CREATE TABLE `e_project` (
   `alpha_project` tinyint DEFAULT NULL,
   `priority` int DEFAULT NULL,
   `note` varchar(255) DEFAULT NULL,
+  `parent` int DEFAULT NULL,
   `create_date` date DEFAULT NULL,
   `update_date` date DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_e_project_a_priority1_idx` (`priority`),
-  CONSTRAINT `fk_e_project_a_priority1` FOREIGN KEY (`priority`) REFERENCES `a_priority` (`id`)
+  KEY `fk_e_project_e_project1_idx` (`parent`),
+  CONSTRAINT `fk_e_project_a_priority1` FOREIGN KEY (`priority`) REFERENCES `a_priority` (`id`),
+  CONSTRAINT `fk_e_project_e_project1` FOREIGN KEY (`parent`) REFERENCES `e_project` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -1330,7 +1333,7 @@ SET character_set_client = @saved_cs_client;
 /*!50001 SET collation_connection      = utf8mb4_0900_ai_ci */;
 /*!50001 CREATE ALGORITHM=UNDEFINED */
 /*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
-/*!50001 VIEW `v_milestone` AS select `c`.`category_name` AS `category_name`,`e`.`id` AS `M_ID`,(case when (`e`.`parent_milestone` is null) then `e`.`id` else (`e`.`id` / (round((`e`.`id` / `e`.`category_id`),0) / 10)) end) AS `milestone_id`,`e`.`milestone_name` AS `milestone_name`,`e`.`deliverable` AS `deliverable`,`b`.`category_name` AS `ESTIMATED_BASE`,`e`.`estimated` AS `estimated`,`p`.`milestone_name` AS `PARENT_MILESTONE` from (((`e_milestone` `e` join `a_category` `c` on((`e`.`category_id` = `c`.`id`))) left join `a_category` `b` on((`e`.`estimated_baseline` = `b`.`id`))) left join `e_milestone` `p` on((`e`.`parent_milestone` = `p`.`id`))) order by (case when (`e`.`parent_milestone` is null) then `e`.`id` else (`e`.`id` / (round((`e`.`id` / `e`.`category_id`),0) / 10)) end) */;
+/*!50001 VIEW `v_milestone` AS select `c`.`category_name` AS `category_name`,`e`.`id` AS `M_ID`,(case when (`e`.`parent_milestone` is null) then `e`.`id` else (`e`.`id` / (floor((`e`.`id` / `e`.`category_id`)) / 10)) end) AS `milestone_id`,`e`.`milestone_name` AS `milestone_name`,`e`.`deliverable` AS `deliverable`,`b`.`category_name` AS `ESTIMATED_BASE`,`e`.`estimated` AS `estimated`,`p`.`milestone_name` AS `PARENT_MILESTONE` from (((`e_milestone` `e` join `a_category` `c` on((`e`.`category_id` = `c`.`id`))) left join `a_category` `b` on((`e`.`estimated_baseline` = `b`.`id`))) left join `e_milestone` `p` on((`e`.`parent_milestone` = `p`.`id`))) order by (case when (`e`.`parent_milestone` is null) then `e`.`id` else (`e`.`id` / (floor((`e`.`id` / `e`.`category_id`)) / 10)) end) */;
 /*!50001 SET character_set_client      = @saved_cs_client */;
 /*!50001 SET character_set_results     = @saved_cs_results */;
 /*!50001 SET collation_connection      = @saved_col_connection */;
@@ -1452,4 +1455,4 @@ SET character_set_client = @saved_cs_client;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2024-08-24  8:35:21
+-- Dump completed on 2025-01-10  7:18:41
