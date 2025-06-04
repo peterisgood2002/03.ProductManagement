@@ -7,7 +7,7 @@ class CustomerService:
     @staticmethod
     def addCustomer(area, name, id=None, alpha=False):
         customers = CustomerService.getCustomer(name)
-        if name in customers:
+        if customers != None and name in customers:
             raise Exception("This customer is in the database, please update it.")
         else:
             c.getOrAddCustomer(area, name)
